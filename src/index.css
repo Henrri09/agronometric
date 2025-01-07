@@ -92,4 +92,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Force white background on sidebar */
+  [data-sidebar="sidebar"] {
+    @apply !bg-white border-r border-gray-200;
+  }
 }

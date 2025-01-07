@@ -42,43 +42,45 @@ export function AppSidebar() {
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      <Sidebar className="bg-white">
-        <SidebarContent>
-          <div className="p-4 flex items-center justify-between">
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setOpenMobile(false)}
-              >
-                <X className="h-6 w-6" />
-              </Button>
-            )}
-          </div>
-          <SidebarGroup>
-            <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link 
-                        to={item.path} 
-                        className="flex items-center gap-2"
-                        onClick={() => isMobile && setOpenMobile(false)}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
+      <div className="bg-background border-r">
+        <Sidebar className="!bg-background">
+          <SidebarContent>
+            <div className="p-4 flex items-center justify-between">
+              {isMobile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setOpenMobile(false)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              )}
+            </div>
+            <SidebarGroup>
+              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link 
+                          to={item.path} 
+                          className="flex items-center gap-2"
+                          onClick={() => isMobile && setOpenMobile(false)}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+      </div>
     </>
   );
 }
