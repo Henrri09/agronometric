@@ -16,10 +16,20 @@ const machineryFormSchema = z.object({
   model: z.string().min(2, "Modelo deve ter no mínimo 2 caracteres"),
   serial_number: z.string().optional(),
   status: z.enum(["active", "maintenance", "inactive"]),
-  maintenance_frequency: z.string().transform((val) => Number(val)).pipe(z.number().positive("Frequência deve ser maior que 0")),
+  maintenance_frequency: z.string().transform((val) => {
+    const num = Number(val);
+    if (isNaN(num)) return 0;
+    return num;
+  }).pipe(z.number().min(0, "Frequência deve ser maior ou igual a 0")),
 });
 
-type MachineryFormValues = z.infer<typeof machineryFormSchema>;
+type MachineryFormValues = {
+  name: string;
+  model: string;
+  serial_number?: string;
+  status: "active" | "maintenance" | "inactive";
+  maintenance_frequency: string;
+};
 
 interface MachineryFormProps {
   onSuccess: () => void;
@@ -39,7 +49,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
       model: "",
       serial_number: "",
       status: "active",
-      maintenance_frequency: "", // Changed to empty string to match the schema
+      maintenance_frequency: "",
     },
   });
 
