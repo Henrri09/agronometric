@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar } from "lucide-react";
+import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar, Boxes } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -23,6 +23,8 @@ const menuItems = [
   { title: "Gestão de Tarefas", icon: KanbanSquare, path: "/task-management" },
   { title: "Calendário", icon: Calendar, path: "/calendar" },
   { title: "Analytics", icon: BarChart2, path: "/analytics" },
+  { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory" },
+  { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule" },
   { title: "Configurações", icon: Settings, path: "/settings" },
 ];
 
