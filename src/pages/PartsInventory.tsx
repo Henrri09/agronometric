@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -58,9 +59,18 @@ export default function PartsInventory() {
 
   const createPart = useMutation({
     mutationFn: async (values: FormValues) => {
+      const insertData: TablesInsert<"parts_inventory"> = {
+        name: values.name,
+        description: values.description || null,
+        quantity: values.quantity,
+        minimum_quantity: values.minimum_quantity,
+        unit_price: values.unit_price,
+        supplier: values.supplier || null,
+      };
+
       const { error } = await supabase
         .from("parts_inventory")
-        .insert([values]);
+        .insert([insertData]);
 
       if (error) throw error;
     },
