@@ -7,9 +7,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
   { title: "Painel Empresa", icon: Home, path: "/" },
@@ -23,34 +27,63 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
+  const { openMobile, setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
+
   return (
-    <Sidebar>
-      <SidebarContent>
-        <div className="p-4">
-          <img 
-            src="/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png" 
-            alt="AgroMetric" 
-            className="h-8 w-auto"
-          />
-        </div>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.path} className="flex items-center gap-2">
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <>
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed top-4 left-4 z-50 md:hidden"
+          onClick={() => setOpenMobile(true)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      )}
+      <Sidebar>
+        <SidebarContent>
+          <div className="p-4 flex items-center justify-between">
+            <img 
+              src="/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png" 
+              alt="AgroMetric" 
+              className="h-8 w-auto"
+            />
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setOpenMobile(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            )}
+          </div>
+          <SidebarGroup>
+            <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link 
+                        to={item.path} 
+                        className="flex items-center gap-2"
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </>
   );
 }
