@@ -36,7 +36,7 @@ export default function ServiceOrders() {
         .select(`
           *,
           machinery:machinery_id(name),
-          assigned_profile:assigned_to(full_name)
+          assigned_profile:profiles!service_orders_assigned_to_fkey(full_name)
         `)
         .order('created_at', { ascending: false });
 
@@ -154,8 +154,8 @@ export default function ServiceOrders() {
                   <TableCell>{order.assigned_profile?.full_name}</TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell>{getPriorityBadge(order.priority)}</TableCell>
-                  <TableCell>{new Date(order.start_date).toLocaleDateString('pt-BR')}</TableCell>
-                  <TableCell>{new Date(order.end_date).toLocaleDateString('pt-BR')}</TableCell>
+                  <TableCell>{order.start_date ? new Date(order.start_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                  <TableCell>{order.end_date ? new Date(order.end_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
