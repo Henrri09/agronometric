@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MaintenanceAlert } from "@/components/MaintenanceAlert";
 import { DashboardCard } from "@/components/DashboardCard";
+import { Users, Wrench, ClipboardList, DollarSign } from "lucide-react";
 
 export default function Dashboard() {
   return (
@@ -11,15 +12,20 @@ export default function Dashboard() {
         description="Visualize os principais indicadores do seu negócio"
       />
       
-      <MaintenanceAlert />
+      <MaintenanceAlert 
+        title="Manutenção Preventiva"
+        description="Há 3 equipamentos que precisam de manutenção preventiva esta semana."
+        severity="warning"
+      />
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
         <DashboardCard
           title="Total de Usuários"
           value="150"
           description="Usuários ativos no sistema"
           trend="up"
           trendValue="12%"
+          icon={<Users className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
@@ -28,6 +34,7 @@ export default function Dashboard() {
           description="Equipamentos cadastrados"
           trend="up"
           trendValue="5%"
+          icon={<Wrench className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
@@ -36,6 +43,7 @@ export default function Dashboard() {
           description="Ordens em aberto"
           trend="down"
           trendValue="3%"
+          icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
@@ -44,6 +52,7 @@ export default function Dashboard() {
           description="Últimos 30 dias"
           trend="up"
           trendValue="18%"
+          icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
         />
       </div>
       
