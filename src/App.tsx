@@ -17,7 +17,7 @@ import ServiceOrders from "./pages/ServiceOrders";
 import ServiceOrderRegister from "./pages/ServiceOrderRegister";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
-import KanbanBoard from "./pages/KanbanBoard";
+import TaskManagement from "./pages/TaskManagement";
 import Calendar from "./pages/Calendar";
 import PartsInventory from "./pages/PartsInventory";
 import MaintenanceSchedule from "./pages/MaintenanceSchedule";
@@ -48,7 +48,7 @@ const App = () => (
                         <Route path="/machinery" element={<Machinery />} />
                         <Route path="/service-orders" element={<ServiceOrders />} />
                         <Route path="/service-orders/register" element={<ServiceOrderRegister />} />
-                        <Route path="/kanban" element={<KanbanBoard />} />
+                        <Route path="/task-management" element={<TaskManagement />} />
                         <Route path="/calendar" element={<Calendar />} />
                         <Route path="/analytics" element={<Analytics />} />
                         <Route path="/settings" element={<Settings />} />

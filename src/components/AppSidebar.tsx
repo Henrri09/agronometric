@@ -20,7 +20,7 @@ const menuItems = [
   { title: "Cadastro Usuário", icon: Users, path: "/users" },
   { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
   { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders" },
-  { title: "Kanban", icon: KanbanSquare, path: "/kanban" },
+  { title: "Gestão de Tarefas", icon: KanbanSquare, path: "/task-management" },
   { title: "Calendário", icon: Calendar, path: "/calendar" },
   { title: "Analytics", icon: BarChart2, path: "/analytics" },
   { title: "Configurações", icon: Settings, path: "/settings" },
