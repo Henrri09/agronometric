@@ -41,14 +41,22 @@ export function ServiceOrderForm() {
     },
   });
 
-  const onSubmit = async (data: ServiceOrderFormValues) => {
+const onSubmit = async (data: ServiceOrderFormValues) => {
     try {
       // Insert service order
       const { data: serviceOrder, error: serviceOrderError } = await supabase
         .from("service_orders")
         .insert({
-          ...data,
-          status: "pending",
+          title: data.title,
+          description: data.description,
+          service_type: data.service_type,
+          priority: data.priority,
+          machinery_id: data.machinery_id,
+          location: data.location,
+          branch: data.branch,
+          start_date: data.start_date,
+          end_date: data.end_date,
+          status: 'pending'
         })
         .select()
         .single();

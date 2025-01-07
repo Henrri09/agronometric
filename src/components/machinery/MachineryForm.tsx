@@ -16,11 +16,12 @@ const machineryFormSchema = z.object({
   model: z.string().min(2, "Modelo deve ter no mínimo 2 caracteres"),
   serial_number: z.string().optional(),
   status: z.enum(["active", "maintenance", "inactive"]),
-  maintenance_frequency: z.string().transform((val) => {
-    const num = Number(val);
-    if (isNaN(num)) return 0;
-    return num;
-  }).pipe(z.number().min(0, "Frequência deve ser maior ou igual a 0")),
+  maintenance_frequency: z.string()
+    .transform((val) => {
+      const num = Number(val);
+      return isNaN(num) ? 0 : num;
+    })
+    .pipe(z.number().min(0, "Frequência deve ser maior ou igual a 0")),
 });
 
 type MachineryFormValues = {
@@ -131,13 +132,17 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
       }
 
       // Create maintenance schedule if frequency is provided
-      if (data.maintenance_frequency) {
+      const frequencyDays = Number(data.maintenance_frequency);
+      if (frequencyDays > 0 && machinery) {
+        const nextMaintenanceDate = new Date();
+        nextMaintenanceDate.setDate(nextMaintenanceDate.getDate() + frequencyDays);
+
         const { error: scheduleError } = await supabase
           .from('maintenance_schedules')
           .insert({
             machinery_id: machinery.id,
-            frequency_days: data.maintenance_frequency,
-            next_maintenance_date: new Date(Date.now() + data.maintenance_frequency * 24 * 60 * 60 * 1000).toISOString(),
+            frequency_days: frequencyDays,
+            next_maintenance_date: nextMaintenanceDate.toISOString(),
           });
 
         if (scheduleError) throw scheduleError;
