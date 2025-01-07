@@ -35,6 +35,9 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
       // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
@@ -54,7 +57,7 @@ export default function Users() {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
         return {
           id: profile.id,
-          email: profile.email || "",
+          email: "", // We'll update this in the UI component
           full_name: profile.full_name,
           role: userRole?.role || "visitor",
         };
