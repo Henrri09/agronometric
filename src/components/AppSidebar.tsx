@@ -9,10 +9,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
@@ -29,6 +29,12 @@ const menuItems = [
 export function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Add logout logic here
+    navigate('/login');
+  };
 
   return (
     <>
@@ -45,21 +51,27 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarContent>
           <div className="p-4 flex items-center justify-between">
-            <img 
-              src="/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png" 
-              alt="AgroMetric" 
-              className="h-8 w-auto"
-            />
-            {isMobile && (
+            <h1 className="text-lg font-semibold">AgroMetric</h1>
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
-                onClick={() => setOpenMobile(false)}
+                onClick={handleLogout}
+                className="text-muted-foreground hover:text-primary"
               >
-                <X className="h-6 w-6" />
+                <LogOut className="h-5 w-5" />
               </Button>
-            )}
+              {isMobile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setOpenMobile(false)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              )}
+            </div>
           </div>
           <SidebarGroup>
             <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
