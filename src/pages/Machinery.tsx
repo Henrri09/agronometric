@@ -1,23 +1,31 @@
 import { PageHeader } from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-const mockMachinery = [
-  {
-    name: "Estrusora ergométrica",
-    model: "04887",
-    serialNumber: "25252305547",
-    status: "Ativo",
-    lastMaintenance: "-",
-    frequency: "60 dias",
+const machinery = [
+  { 
+    id: 1, 
+    name: "Esteira Industrial X1000",
+    model: "X1000-2023",
+    serialNumber: "EST-001",
+    status: "Em operação",
+    lastMaintenance: "2024-01-15"
   },
-  {
-    name: "Tombador",
-    model: "04857",
-    serialNumber: "2525230580",
-    status: "Ativo",
-    lastMaintenance: "-",
-    frequency: "30 dias",
+  { 
+    id: 2, 
+    name: "Empacotadora AutoPack",
+    model: "AP-2000",
+    serialNumber: "EMP-002",
+    status: "Em manutenção",
+    lastMaintenance: "2024-02-01"
+  },
+  { 
+    id: 3, 
+    name: "Misturador Industrial",
+    model: "MIX-500",
+    serialNumber: "MIX-003",
+    status: "Inativo",
+    lastMaintenance: "2024-01-30"
   },
 ];
 
@@ -25,56 +33,36 @@ export default function Machinery() {
   return (
     <div className="p-6">
       <PageHeader
-        title="Maquinários"
-        description="Gerencie todos os equipamentos e maquinários da sua indústria"
+        title="Gestão de Maquinários"
+        description="Gerencie todos os equipamentos cadastrados no sistema"
       />
       
-      <div className="flex justify-end mb-6">
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Maquinário
-        </Button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Nome</th>
-              <th className="text-left p-4">Modelo</th>
-              <th className="text-left p-4">Número de Série</th>
-              <th className="text-left p-4">Status</th>
-              <th className="text-left p-4">Última Manutenção</th>
-              <th className="text-left p-4">Frequência (dias)</th>
-              <th className="text-left p-4">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockMachinery.map((machine, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-4">{machine.name}</td>
-                <td className="p-4">{machine.model}</td>
-                <td className="p-4">{machine.serialNumber}</td>
-                <td className="p-4">
-                  <span className="bg-success/20 text-success px-3 py-1 rounded-full text-sm">
-                    {machine.status}
-                  </span>
-                </td>
-                <td className="p-4">{machine.lastMaintenance}</td>
-                <td className="p-4">{machine.frequency}</td>
-                <td className="p-4">
-                  <Button variant="ghost" size="sm" className="mr-2">
-                    Editar
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-destructive">
-                    Excluir
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Modelo</TableHead>
+                <TableHead>Número de Série</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Última Manutenção</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {machinery.map((machine) => (
+                <TableRow key={machine.id}>
+                  <TableCell>{machine.name}</TableCell>
+                  <TableCell>{machine.model}</TableCell>
+                  <TableCell>{machine.serialNumber}</TableCell>
+                  <TableCell>{machine.status}</TableCell>
+                  <TableCell>{machine.lastMaintenance}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

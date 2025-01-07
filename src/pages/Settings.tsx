@@ -1,8 +1,8 @@
 import { PageHeader } from "@/components/PageHeader";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
 export default function Settings() {
@@ -12,71 +12,59 @@ export default function Settings() {
         title="Configurações"
         description="Gerencie as configurações do sistema"
       />
-
-      <div className="space-y-6">
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Configurações Gerais</h3>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Nome da Empresa</Label>
-                <Input placeholder="Nome da sua empresa" />
-              </div>
-              <div className="space-y-2">
-                <Label>Email principal</Label>
-                <Input type="email" placeholder="email@empresa.com" />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Endereço</Label>
-              <Input placeholder="Endereço completo" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Notificações</h3>
-          <div className="space-y-4">
+      
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Notificações</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Notificações por Email</p>
+              <div className="space-y-0.5">
+                <Label>Notificações por Email</Label>
                 <p className="text-sm text-muted-foreground">
-                  Receba atualizações sobre manutenções por email
+                  Receba atualizações sobre ordens de serviço
                 </p>
               </div>
               <Switch />
             </div>
             
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Alertas de Manutenção</p>
+              <div className="space-y-0.5">
+                <Label>Alertas do Sistema</Label>
                 <p className="text-sm text-muted-foreground">
-                  Receba alertas quando uma manutenção estiver próxima
+                  Notificações sobre manutenções preventivas
                 </p>
               </div>
               <Switch />
             </div>
-          </div>
+          </CardContent>
         </Card>
-
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Segurança</h3>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Senha Atual</Label>
-              <Input type="password" />
-            </div>
-            <div className="space-y-2">
-              <Label>Nova Senha</Label>
-              <Input type="password" />
-            </div>
-            <div className="space-y-2">
-              <Label>Confirmar Nova Senha</Label>
-              <Input type="password" />
-            </div>
-            <Button>Alterar Senha</Button>
-          </div>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações da Empresa</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Nome da Empresa</Label>
+                <Input id="companyName" placeholder="Digite o nome da empresa" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email de Contato</Label>
+                <Input id="email" type="email" placeholder="Digite o email" />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input id="phone" placeholder="Digite o telefone" />
+              </div>
+              
+              <Button type="submit">Salvar Alterações</Button>
+            </form>
+          </CardContent>
         </Card>
       </div>
     </div>
