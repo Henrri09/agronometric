@@ -16,7 +16,7 @@ const machineryFormSchema = z.object({
   model: z.string().min(2, "Modelo deve ter no mínimo 2 caracteres"),
   serial_number: z.string().optional(),
   status: z.enum(["active", "maintenance", "inactive"]),
-  maintenance_frequency: z.string().transform(Number).positive("Frequência deve ser maior que 0"),
+  maintenance_frequency: z.string().transform((val) => Number(val)).pipe(z.number().positive("Frequência deve ser maior que 0")),
 });
 
 type MachineryFormValues = z.infer<typeof machineryFormSchema>;
@@ -59,17 +59,19 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
       // Wait a bit for video to initialize
       setTimeout(() => {
         const context = canvas.getContext('2d');
-        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Convert to file
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const file = new File([blob], "machinery-photo.jpg", { type: "image/jpeg" });
-            setPhotoFile(file);
-          }
-          // Stop camera
-          stream.getTracks().forEach(track => track.stop());
-        }, 'image/jpeg');
+        if (context) {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Convert to file
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const file = new File([blob], "machinery-photo.jpg", { type: "image/jpeg" });
+              setPhotoFile(file);
+            }
+            // Stop camera
+            stream.getTracks().forEach(track => track.stop());
+          }, 'image/jpeg');
+        }
       }, 300);
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -108,7 +110,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
 
       // If there's a photo, upload it
       if (photoFile && machinery) {
-        const fileExt = photoFile.name.split('.').pop();
+        const fileExt = photoFile.name.split('.').pop() as string;
         const filePath = `${machinery.id}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
@@ -124,8 +126,8 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
           .from('maintenance_schedules')
           .insert({
             machinery_id: machinery.id,
-            frequency_days: parseInt(data.maintenance_frequency),
-            next_maintenance_date: new Date(Date.now() + parseInt(data.maintenance_frequency) * 24 * 60 * 60 * 1000).toISOString(),
+            frequency_days: data.maintenance_frequency,
+            next_maintenance_date: new Date(Date.now() + data.maintenance_frequency * 24 * 60 * 60 * 1000).toISOString(),
           });
 
         if (scheduleError) throw scheduleError;
