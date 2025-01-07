@@ -8,15 +8,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Tractor, ClipboardList, Users, Calendar, BarChart2, Settings } from "lucide-react";
+import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
-  { title: "Dashboard", icon: BarChart2, path: "/" },
-  { title: "Maquinários", icon: Tractor, path: "/machinery" },
-  { title: "Ordens de Serviço", icon: ClipboardList, path: "/service-orders" },
-  { title: "Usuários", icon: Users, path: "/users" },
-  { title: "Calendário", icon: Calendar, path: "/calendar" },
+  { title: "Painel Empresa", icon: Home, path: "/" },
+  { title: "Cadastro Usuário", icon: Users, path: "/users" },
+  { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
+  { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders" },
+  { title: "Kanban", icon: KanbanSquare, path: "/kanban" },
+  { title: "Analytics", icon: BarChart2, path: "/analytics" },
   { title: "Configurações", icon: Settings, path: "/settings" },
 ];
 
@@ -25,7 +26,11 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-primary">AgroMetric</h1>
+          <img 
+            src="/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png" 
+            alt="AgroMetric" 
+            className="h-8 w-auto"
+          />
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
