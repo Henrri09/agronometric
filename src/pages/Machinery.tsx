@@ -1,41 +1,55 @@
+import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-const machinery = [
-  { 
-    id: 1, 
-    name: "Esteira Industrial X1000",
-    model: "X1000-2023",
-    serialNumber: "EST-001",
-    status: "Em operação",
-    lastMaintenance: "2024-01-15"
-  },
-  { 
-    id: 2, 
-    name: "Empacotadora AutoPack",
-    model: "AP-2000",
-    serialNumber: "EMP-002",
-    status: "Em manutenção",
-    lastMaintenance: "2024-02-01"
-  },
-  { 
-    id: 3, 
-    name: "Misturador Industrial",
-    model: "MIX-500",
-    serialNumber: "MIX-003",
-    status: "Inativo",
-    lastMaintenance: "2024-01-30"
-  },
-];
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MachineryForm } from "@/components/machinery/MachineryForm";
+import { Plus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Machinery() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { data: machinery, refetch } = useQuery({
+    queryKey: ['machinery'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('machinery')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Em operação';
+      case 'maintenance':
+        return 'Em manutenção';
+      case 'inactive':
+        return 'Inativo';
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className="p-6">
-      <PageHeader
-        title="Gestão de Maquinários"
-        description="Gerencie todos os equipamentos cadastrados no sistema"
-      />
+      <div className="flex justify-between items-center mb-6">
+        <PageHeader
+          title="Gestão de Maquinários"
+          description="Gerencie todos os equipamentos cadastrados no sistema"
+        />
+        <Button onClick={() => setIsDialogOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Novo Maquinário
+        </Button>
+      </div>
       
       <Card>
         <CardContent className="p-6">
@@ -46,23 +60,36 @@ export default function Machinery() {
                 <TableHead>Modelo</TableHead>
                 <TableHead>Número de Série</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Última Manutenção</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {machinery.map((machine) => (
+              {machinery?.map((machine) => (
                 <TableRow key={machine.id}>
                   <TableCell>{machine.name}</TableCell>
                   <TableCell>{machine.model}</TableCell>
-                  <TableCell>{machine.serialNumber}</TableCell>
-                  <TableCell>{machine.status}</TableCell>
-                  <TableCell>{machine.lastMaintenance}</TableCell>
+                  <TableCell>{machine.serial_number}</TableCell>
+                  <TableCell>{getStatusText(machine.status)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Novo Maquinário</DialogTitle>
+          </DialogHeader>
+          <MachineryForm
+            onSuccess={() => {
+              setIsDialogOpen(false);
+              refetch();
+            }}
+            onCancel={() => setIsDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
