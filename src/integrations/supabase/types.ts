@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendar_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          service_order_id: string | null
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          service_order_id?: string | null
+          start_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          service_order_id?: string | null
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       machinery: {
         Row: {
           created_at: string
@@ -256,36 +297,51 @@ export type Database = {
       service_orders: {
         Row: {
           assigned_to: string | null
+          branch: string | null
           created_at: string
           created_by: string | null
           description: string | null
+          end_date: string | null
           id: string
+          location: string | null
           machinery_id: string | null
           priority: string | null
+          service_type: string | null
+          start_date: string | null
           status: string | null
           title: string
           updated_at: string
         }
         Insert: {
           assigned_to?: string | null
+          branch?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
+          location?: string | null
           machinery_id?: string | null
           priority?: string | null
+          service_type?: string | null
+          start_date?: string | null
           status?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           assigned_to?: string | null
+          branch?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
+          location?: string | null
           machinery_id?: string | null
           priority?: string | null
+          service_type?: string | null
+          start_date?: string | null
           status?: string | null
           title?: string
           updated_at?: string
@@ -310,6 +366,47 @@ export type Database = {
             columns: ["machinery_id"]
             isOneToOne: false
             referencedRelation: "machinery"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          priority: string | null
+          service_order_id: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          service_order_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string | null
+          service_order_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
