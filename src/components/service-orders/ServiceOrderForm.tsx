@@ -10,13 +10,17 @@ import { ServiceOrderTypeAndPriority } from "./form-sections/ServiceOrderTypeAnd
 import { ServiceOrderLocation } from "./form-sections/ServiceOrderLocation";
 import { ServiceOrderDates } from "./form-sections/ServiceOrderDates";
 
-export function ServiceOrderForm() {
+interface ServiceOrderFormProps {
+  initialData?: ServiceOrderFormValues;
+}
+
+export function ServiceOrderForm({ initialData }: ServiceOrderFormProps) {
   const navigate = useNavigate();
-  const { onSubmit } = useServiceOrderSubmit();
+  const { onSubmit } = useServiceOrderSubmit(initialData?.id);
   
   const form = useForm<ServiceOrderFormValues>({
     resolver: zodResolver(serviceOrderSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       title: "",
       description: "",
       service_type: "preventive",
@@ -44,7 +48,9 @@ export function ServiceOrderForm() {
           >
             Cancelar
           </Button>
-          <Button type="submit">Criar Ordem de Serviço</Button>
+          <Button type="submit">
+            {initialData ? "Atualizar" : "Criar"} Ordem de Serviço
+          </Button>
         </div>
       </form>
     </Form>

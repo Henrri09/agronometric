@@ -2,70 +2,124 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ServiceOrderFormValues } from "./schema";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const useServiceOrderSubmit = () => {
+export const useServiceOrderSubmit = (serviceOrderId?: string) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const onSubmit = async (data: ServiceOrderFormValues) => {
     try {
-      // Insert service order
-      const { data: serviceOrder, error: serviceOrderError } = await supabase
-        .from("service_orders")
-        .insert({
-          title: data.title,
-          description: data.description,
-          service_type: data.service_type,
-          priority: data.priority,
-          machinery_id: data.machinery_id,
-          location: data.location,
-          branch: data.branch,
-          start_date: data.start_date,
-          end_date: data.end_date,
-          status: 'pending'
-        })
-        .select()
-        .single();
+      if (serviceOrderId) {
+        // Update existing service order
+        const { error: serviceOrderError } = await supabase
+          .from("service_orders")
+          .update({
+            title: data.title,
+            description: data.description,
+            service_type: data.service_type,
+            priority: data.priority,
+            machinery_id: data.machinery_id,
+            location: data.location,
+            branch: data.branch,
+            start_date: data.start_date,
+            end_date: data.end_date,
+          })
+          .eq('id', serviceOrderId);
 
-      if (serviceOrderError) throw serviceOrderError;
+        if (serviceOrderError) throw serviceOrderError;
 
-      // Create associated task
-      const { error: taskError } = await supabase
-        .from("tasks")
-        .insert({
-          title: `OS: ${data.title}`,
-          description: data.description,
-          status: "todo",
-          priority: data.priority,
-          service_order_id: serviceOrder.id,
+        // Update associated task
+        const { error: taskError } = await supabase
+          .from("tasks")
+          .update({
+            title: `OS: ${data.title}`,
+            description: data.description,
+            priority: data.priority,
+          })
+          .eq('service_order_id', serviceOrderId);
+
+        if (taskError) throw taskError;
+
+        // Update calendar event
+        const { error: calendarError } = await supabase
+          .from("calendar_events")
+          .update({
+            title: `OS: ${data.title}`,
+            description: data.description,
+            start_date: data.start_date,
+            end_date: data.end_date,
+          })
+          .eq('service_order_id', serviceOrderId);
+
+        if (calendarError) throw calendarError;
+
+        toast({
+          title: "Ordem de serviço atualizada com sucesso!",
+          description: "A ordem de serviço foi atualizada e as tarefas foram reagendadas.",
         });
+      } else {
+        // Insert new service order
+        const { data: serviceOrder, error: serviceOrderError } = await supabase
+          .from("service_orders")
+          .insert({
+            title: data.title,
+            description: data.description,
+            service_type: data.service_type,
+            priority: data.priority,
+            machinery_id: data.machinery_id,
+            location: data.location,
+            branch: data.branch,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            status: 'pending'
+          })
+          .select()
+          .single();
 
-      if (taskError) throw taskError;
+        if (serviceOrderError) throw serviceOrderError;
 
-      // Create calendar event
-      const { error: calendarError } = await supabase
-        .from("calendar_events")
-        .insert({
-          title: `OS: ${data.title}`,
-          description: data.description,
-          start_date: data.start_date,
-          end_date: data.end_date,
-          service_order_id: serviceOrder.id,
+        // Create associated task
+        const { error: taskError } = await supabase
+          .from("tasks")
+          .insert({
+            title: `OS: ${data.title}`,
+            description: data.description,
+            status: "todo",
+            priority: data.priority,
+            service_order_id: serviceOrder.id,
+          });
+
+        if (taskError) throw taskError;
+
+        // Create calendar event
+        const { error: calendarError } = await supabase
+          .from("calendar_events")
+          .insert({
+            title: `OS: ${data.title}`,
+            description: data.description,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            service_order_id: serviceOrder.id,
+          });
+
+        if (calendarError) throw calendarError;
+
+        toast({
+          title: "Ordem de serviço criada com sucesso!",
+          description: "A ordem de serviço foi criada e as tarefas foram agendadas.",
         });
+      }
 
-      if (calendarError) throw calendarError;
-
-      toast({
-        title: "Ordem de serviço criada com sucesso!",
-        description: "A ordem de serviço foi criada e as tarefas foram agendadas.",
-      });
-
+      // Invalidate queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
       navigate("/service-orders");
     } catch (error) {
-      console.error("Error creating service order:", error);
+      console.error("Error saving service order:", error);
       toast({
-        title: "Erro ao criar ordem de serviço",
-        description: "Ocorreu um erro ao criar a ordem de serviço. Tente novamente.",
+        title: `Erro ao ${serviceOrderId ? 'atualizar' : 'criar'} ordem de serviço`,
+        description: `Ocorreu um erro ao ${serviceOrderId ? 'atualizar' : 'criar'} a ordem de serviço. Tente novamente.`,
         variant: "destructive",
       });
     }
