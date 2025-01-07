@@ -12,7 +12,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-3 flex justify-end items-center">
+    <header className="bg-white px-6 py-3 flex justify-end items-center">
       <Button 
         variant="ghost" 
         size="icon"
