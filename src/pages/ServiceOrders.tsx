@@ -27,7 +27,7 @@ export default function ServiceOrders() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
-  // Fetch service orders
+  // Fetch service orders with proper profile join
   const { data: serviceOrders, isLoading } = useQuery({
     queryKey: ['serviceOrders'],
     queryFn: async () => {
@@ -36,7 +36,7 @@ export default function ServiceOrders() {
         .select(`
           *,
           machinery:machinery_id(name),
-          assigned_to_profile:assigned_to(full_name)
+          assigned_profile:assigned_to(full_name)
         `)
         .order('created_at', { ascending: false });
 
@@ -103,7 +103,7 @@ export default function ServiceOrders() {
     const variants = {
       pending: "secondary",
       "in-progress": "default",
-      completed: "success",
+      completed: "outline",
       cancelled: "destructive",
     } as const;
 
@@ -151,7 +151,7 @@ export default function ServiceOrders() {
                 <TableRow key={order.id}>
                   <TableCell>{order.title}</TableCell>
                   <TableCell>{order.machinery?.name}</TableCell>
-                  <TableCell>{order.assigned_to_profile?.full_name}</TableCell>
+                  <TableCell>{order.assigned_profile?.full_name}</TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
                   <TableCell>{getPriorityBadge(order.priority)}</TableCell>
                   <TableCell>{new Date(order.start_date).toLocaleDateString('pt-BR')}</TableCell>

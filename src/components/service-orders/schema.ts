@@ -1,6 +1,7 @@
 import * as z from "zod";
 
 export const serviceOrderSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
   description: z.string().optional(),
   service_type: z.enum(["preventive", "corrective", "installation", "calibration"]),
