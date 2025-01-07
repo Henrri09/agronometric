@@ -42,7 +42,7 @@ export function AppSidebar() {
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      <Sidebar>
+      <Sidebar className="bg-white">
         <SidebarContent>
           <div className="p-4 flex items-center justify-between">
             {isMobile && (
