@@ -45,11 +45,6 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarContent>
           <div className="p-4 flex items-center justify-between">
-            <img 
-              src="/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png" 
-              alt="AgroMetric" 
-              className="h-8 w-auto"
-            />
             {isMobile && (
               <Button
                 variant="ghost"
