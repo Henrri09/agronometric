@@ -39,7 +39,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
       model: "",
       serial_number: "",
       status: "active",
-      maintenance_frequency: "",
+      maintenance_frequency: "", // Changed to empty string to match the schema
     },
   });
 
