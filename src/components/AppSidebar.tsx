@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare } from "lucide-react";
+import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
@@ -17,6 +17,7 @@ const menuItems = [
   { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
   { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders" },
   { title: "Kanban", icon: KanbanSquare, path: "/kanban" },
+  { title: "Calendário", icon: Calendar, path: "/calendar" },
   { title: "Analytics", icon: BarChart2, path: "/analytics" },
   { title: "Configurações", icon: Settings, path: "/settings" },
 ];

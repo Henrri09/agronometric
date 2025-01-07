@@ -15,6 +15,7 @@ import ServiceOrderRegister from "./pages/ServiceOrderRegister";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import KanbanBoard from "./pages/KanbanBoard";
+import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/service-orders" element={<ServiceOrders />} />
                 <Route path="/service-orders/register" element={<ServiceOrderRegister />} />
                 <Route path="/kanban" element={<KanbanBoard />} />
+                <Route path="/calendar" element={<Calendar />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
