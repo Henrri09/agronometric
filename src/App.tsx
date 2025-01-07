@@ -20,6 +20,7 @@ import Settings from "./pages/Settings";
 import KanbanBoard from "./pages/KanbanBoard";
 import Calendar from "./pages/Calendar";
 import PartsInventory from "./pages/PartsInventory";
+import MaintenanceSchedule from "./pages/MaintenanceSchedule";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
                         <Route path="/analytics" element={<Analytics />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/parts-inventory" element={<PartsInventory />} />
+                        <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                       </Routes>
                     </main>
