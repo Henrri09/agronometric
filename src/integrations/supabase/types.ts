@@ -39,6 +39,199 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_history: {
+        Row: {
+          cost: number | null
+          created_at: string
+          description: string | null
+          id: string
+          machinery_id: string | null
+          maintenance_date: string
+          maintenance_type: string
+          performed_by: string | null
+          service_order_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          machinery_id?: string | null
+          maintenance_date: string
+          maintenance_type: string
+          performed_by?: string | null
+          service_order_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          machinery_id?: string | null
+          maintenance_date?: string
+          maintenance_type?: string
+          performed_by?: string | null
+          service_order_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_history_machinery_id_fkey"
+            columns: ["machinery_id"]
+            isOneToOne: false
+            referencedRelation: "machinery"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_history_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_history_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_schedules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          frequency_days: number
+          id: string
+          last_maintenance_date: string | null
+          machinery_id: string | null
+          next_maintenance_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          frequency_days: number
+          id?: string
+          last_maintenance_date?: string | null
+          machinery_id?: string | null
+          next_maintenance_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          frequency_days?: number
+          id?: string
+          last_maintenance_date?: string | null
+          machinery_id?: string | null
+          next_maintenance_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedules_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedules_machinery_id_fkey"
+            columns: ["machinery_id"]
+            isOneToOne: false
+            referencedRelation: "machinery"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts_inventory: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          minimum_quantity: number | null
+          name: string
+          quantity: number | null
+          supplier: string | null
+          unit_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          minimum_quantity?: number | null
+          name: string
+          quantity?: number | null
+          supplier?: string | null
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          minimum_quantity?: number | null
+          name?: string
+          quantity?: number | null
+          supplier?: string | null
+          unit_price?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      parts_used: {
+        Row: {
+          created_at: string
+          id: string
+          maintenance_history_id: string | null
+          part_id: string | null
+          quantity: number
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          maintenance_history_id?: string | null
+          part_id?: string | null
+          quantity: number
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          maintenance_history_id?: string | null
+          part_id?: string | null
+          quantity?: number
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_used_maintenance_history_id_fkey"
+            columns: ["maintenance_history_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_history"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parts_used_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "parts_inventory"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
