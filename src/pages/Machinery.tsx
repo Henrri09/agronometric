@@ -39,12 +39,13 @@ export default function Machinery() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <PageHeader
-          title="Gestão de Maquinários"
-          description="Gerencie todos os equipamentos cadastrados no sistema"
-        />
+    <div className="container mx-auto py-6 space-y-6">
+      <PageHeader
+        title="Gestão de Maquinários"
+        description="Gerencie todos os equipamentos cadastrados no sistema"
+      />
+      
+      <div className="flex justify-end">
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Maquinário
