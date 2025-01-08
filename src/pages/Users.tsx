@@ -29,7 +29,7 @@ export default function Users() {
         .eq("user_id", session.user.id)
         .single();
       
-      setIsAdmin(roles?.role === "admin");
+      setIsAdmin(roles?.role === "admin" || roles?.role === "super_admin");
     }
   };
 
@@ -38,33 +38,54 @@ export default function Users() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch all profiles
+      // Primeiro, buscar o company_id do usuário atual
+      const { data: currentUserProfile } = await supabase
+        .from("profiles")
+        .select("company_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (!currentUserProfile?.company_id) {
+        toast.error("Erro ao identificar a empresa do usuário");
+        return;
+      }
+
+      // Buscar todos os perfis da mesma empresa
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*");
+        .select("id, full_name, company_id")
+        .eq("company_id", currentUserProfile.company_id);
 
       if (profilesError) throw profilesError;
 
-      // Fetch user roles
+      // Buscar roles dos usuários
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("*");
+        .select("user_id, role");
 
       if (rolesError) throw rolesError;
 
-      // Combine the data
+      // Buscar dados dos usuários do auth
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) throw authError;
+
+      // Combinar os dados
       const combinedUsers = profiles?.map(profile => {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
+        const authUser = authUsers?.users.find(user => user.id === profile.id);
+        
         return {
           id: profile.id,
-          email: "", // We'll update this in the UI component
-          full_name: profile.full_name,
+          email: authUser?.email || "",
+          full_name: profile.full_name || "",
           role: userRole?.role || "visitor",
         };
       }) || [];
 
       setUsers(combinedUsers);
     } catch (error: any) {
+      console.error("Erro ao buscar usuários:", error);
       toast.error(error.message || "Erro ao carregar usuários");
     }
   };
@@ -72,7 +93,7 @@ export default function Users() {
   const handleSubmit = async (data: UserFormValues) => {
     try {
       if (selectedUser) {
-        // Update existing user
+        // Atualizar usuário existente
         const { error: profileError } = await supabase
           .from("profiles")
           .update({ full_name: data.full_name })
@@ -89,20 +110,46 @@ export default function Users() {
 
         toast.success("Usuário atualizado com sucesso!");
       } else {
-        // Create new user
-        const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        // Criar novo usuário
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) throw new Error("Usuário não autenticado");
+
+        // Buscar company_id do usuário atual
+        const { data: currentUserProfile } = await supabase
+          .from("profiles")
+          .select("company_id")
+          .eq("id", session.user.id)
+          .single();
+
+        if (!currentUserProfile?.company_id) {
+          throw new Error("Empresa não encontrada");
+        }
+
+        // Criar novo usuário
+        const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
           email: data.email,
           password: data.password!,
-          options: {
-            data: {
-              full_name: data.full_name,
-            },
+          email_confirm: true,
+          user_metadata: {
+            full_name: data.full_name,
           },
         });
 
         if (signUpError) throw signUpError;
 
         if (authData.user) {
+          // Criar perfil com company_id
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .update({ 
+              full_name: data.full_name,
+              company_id: currentUserProfile.company_id 
+            })
+            .eq("id", authData.user.id);
+
+          if (profileError) throw profileError;
+
+          // Criar role
           const { error: roleError } = await supabase
             .from("user_roles")
             .insert([
@@ -119,22 +166,21 @@ export default function Users() {
       setSelectedUser(null);
       fetchUsers();
     } catch (error: any) {
+      console.error("Erro ao salvar usuário:", error);
       toast.error(error.message || "Erro ao salvar usuário");
     }
   };
 
   const handleDelete = async (userId: string) => {
     try {
-      const { error: deleteError } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", userId);
-
-      if (deleteError) throw deleteError;
+      // Primeiro deletar o usuário no auth
+      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+      if (authError) throw authError;
       
       toast.success("Usuário excluído com sucesso!");
       fetchUsers();
     } catch (error: any) {
+      console.error("Erro ao excluir usuário:", error);
       toast.error(error.message || "Erro ao excluir usuário");
     }
   };
