@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskCard } from "./TaskCard";
+import { ReactNode } from "react";
 
 interface ServiceOrder {
   id: string;
@@ -25,6 +26,7 @@ interface TaskColumnProps {
   count: number;
   onStatusChange?: (id: string, newStatus: string) => void;
   onDelete?: (id: string) => void;
+  renderTask?: (task: Task) => ReactNode;
 }
 
 export function TaskColumn({
@@ -33,6 +35,7 @@ export function TaskColumn({
   count,
   onStatusChange,
   onDelete,
+  renderTask,
 }: TaskColumnProps) {
   return (
     <Card>
@@ -46,20 +49,24 @@ export function TaskColumn({
       </CardHeader>
       <CardContent className="pt-2">
         <div className="space-y-2">
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              id={task.id}
-              title={task.title}
-              description={task.description}
-              priority={task.priority}
-              status={task.status}
-              date={task.start_date}
-              serviceOrders={task.service_orders}
-              onStatusChange={onStatusChange}
-              onDelete={onDelete}
-            />
-          ))}
+          {tasks.map((task) =>
+            renderTask ? (
+              renderTask(task)
+            ) : (
+              <TaskCard
+                key={task.id}
+                id={task.id}
+                title={task.title}
+                description={task.description}
+                priority={task.priority}
+                status={task.status}
+                date={task.start_date}
+                serviceOrders={task.service_orders}
+                onStatusChange={onStatusChange}
+                onDelete={onDelete}
+              />
+            )
+          )}
         </div>
       </CardContent>
     </Card>

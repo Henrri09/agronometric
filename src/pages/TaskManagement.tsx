@@ -5,38 +5,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Calendar, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { TaskColumn } from "@/components/tasks/TaskColumn";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
-
-interface ServiceOrder {
-  id: string;
-  title: string;
-  description?: string;
-  service_type: string;
-  priority: string;
-  assigned_to?: string;
-  branch?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  priority: string;
-  status: string;
-  start_date?: string;
-  service_orders: ServiceOrder | null;
-}
+import {
+  DndContext,
+  DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { DraggableTaskColumn } from "@/components/tasks/DraggableTaskColumn";
 
 export default function TaskManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Configure DnD sensors for both mouse and touch
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10, // 10px of movement required before activation
+    },
+  });
+  
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250, // 250ms delay before activation
+      tolerance: 5, // 5px of movement allowed before activation
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["tasks"],
@@ -47,7 +54,7 @@ export default function TaskManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Task[];
+      return data;
     },
   });
 
@@ -79,7 +86,6 @@ export default function TaskManagement() {
   const deleteTask = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("tasks").delete().eq("id", id);
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -113,6 +119,16 @@ export default function TaskManagement() {
       title: "Tarefa criada",
       description: "A nova tarefa foi criada com sucesso.",
     });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const taskId = active.id as string;
+      const newStatus = over.id as string;
+      handleStatusChange(taskId, newStatus);
+    }
   };
 
   const filteredTasks = tasks.filter((task) =>
@@ -158,36 +174,42 @@ export default function TaskManagement() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-        <TaskColumn
-          title="A Fazer"
-          tasks={todoTasks}
-          count={todoTasks.length}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
-        <TaskColumn
-          title="Em Andamento"
-          tasks={inProgressTasks}
-          count={inProgressTasks.length}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
-        <TaskColumn
-          title="Revisão"
-          tasks={reviewTasks}
-          count={reviewTasks.length}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
-        <TaskColumn
-          title="Concluído"
-          tasks={doneTasks}
-          count={doneTasks.length}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-        />
-      </div>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+          <DraggableTaskColumn
+            id="todo"
+            title="A Fazer"
+            tasks={todoTasks}
+            count={todoTasks.length}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+          />
+          <DraggableTaskColumn
+            id="in_progress"
+            title="Em Andamento"
+            tasks={inProgressTasks}
+            count={inProgressTasks.length}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+          />
+          <DraggableTaskColumn
+            id="review"
+            title="Revisão"
+            tasks={reviewTasks}
+            count={reviewTasks.length}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+          />
+          <DraggableTaskColumn
+            id="done"
+            title="Concluído"
+            tasks={doneTasks}
+            count={doneTasks.length}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+          />
+        </div>
+      </DndContext>
 
       <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
         <DialogContent className="max-w-4xl">
