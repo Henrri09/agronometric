@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MaintenanceAlert } from "@/components/MaintenanceAlert";
 
+type AlertSeverity = "warning" | "error" | "success";
+
 export function DashboardAlerts() {
   const { data: alerts = [] } = useQuery({
     queryKey: ['maintenanceAlerts'],
@@ -16,11 +18,15 @@ export function DashboardAlerts() {
         .order('next_maintenance_date', { ascending: true })
         .limit(5);
 
-      return (data || []).map(schedule => ({
-        title: "Manutenção Preventiva Necessária",
-        description: `${schedule.machinery?.name} requer manutenção em ${new Date(schedule.next_maintenance_date).toLocaleDateString()}`,
-        severity: (new Date(schedule.next_maintenance_date) <= new Date() ? "error" : "warning") as const
-      }));
+      return (data || []).map(schedule => {
+        const severity: AlertSeverity = new Date(schedule.next_maintenance_date) <= new Date() ? "error" : "warning";
+        
+        return {
+          title: "Manutenção Preventiva Necessária",
+          description: `${schedule.machinery?.name} requer manutenção em ${new Date(schedule.next_maintenance_date).toLocaleDateString()}`,
+          severity
+        };
+      });
     },
   });
 
