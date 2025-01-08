@@ -65,7 +65,7 @@ export function ServiceOrdersList({
             <div className="space-y-2">
               {order.start_date && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-success" />
                   <span>
                     Início: {format(new Date(order.start_date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                   </span>
@@ -74,9 +74,12 @@ export function ServiceOrdersList({
               
               {order.end_date && (
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-destructive" />
                   <span>
                     Término: {format(new Date(order.end_date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                    <Badge variant="destructive" className="ml-2 text-xs">
+                      Data de Entrega
+                    </Badge>
                   </span>
                 </div>
               )}
