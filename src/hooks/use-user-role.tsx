@@ -8,13 +8,19 @@ export function useUserRole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const checkUserRole = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.user) {
           console.log("No session found");
-          setLoading(false);
+          if (mounted) {
+            setIsAdmin(false);
+            setIsSuperAdmin(false);
+            setLoading(false);
+          }
           return;
         }
 
@@ -24,7 +30,7 @@ export function useUserRole() {
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (error) {
           console.error("Error fetching user role:", error);
@@ -34,20 +40,24 @@ export function useUserRole() {
 
         console.log("User role response:", userRole);
         
-        if (userRole?.role) {
-          setIsAdmin(userRole.role === 'admin');
-          setIsSuperAdmin(userRole.role === 'super_admin');
-          console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
-        } else {
-          console.log("No role found for user");
-          setIsAdmin(false);
-          setIsSuperAdmin(false);
+        if (mounted) {
+          if (userRole?.role) {
+            setIsAdmin(userRole.role === 'admin');
+            setIsSuperAdmin(userRole.role === 'super_admin');
+            console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
+          } else {
+            console.log("No role found for user");
+            setIsAdmin(false);
+            setIsSuperAdmin(false);
+          }
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error in checkUserRole:", error);
-        toast.error("Erro ao verificar status do usuário");
-      } finally {
-        setLoading(false);
+        if (mounted) {
+          toast.error("Erro ao verificar status do usuário");
+          setLoading(false);
+        }
       }
     };
 
@@ -56,10 +66,13 @@ export function useUserRole() {
 
     // Monitor authentication changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkUserRole();
+      if (mounted) {
+        checkUserRole();
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

@@ -64,6 +64,8 @@ export function AppSidebar() {
     );
   }
 
+  console.log("Rendering AppSidebar - isAdmin:", isAdmin, "isSuperAdmin:", isSuperAdmin);
+
   return (
     <>
       {isMobile && (
