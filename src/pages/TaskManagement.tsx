@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Calendar, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -14,20 +13,16 @@ import {
 } from "@/components/ui/dialog";
 import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
 import {
-  DndContext,
-  DragEndEvent,
   MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { DraggableTaskColumn } from "@/components/tasks/DraggableTaskColumn";
+import { TaskBoard } from "@/components/tasks/TaskBoard";
 
 export default function TaskManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   // Configure DnD sensors for both mouse and touch
   const mouseSensor = useSensor(MouseSensor, {
@@ -58,90 +53,13 @@ export default function TaskManagement() {
     },
   });
 
-  const updateTaskStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("tasks")
-        .update({ status })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast({
-        title: "Status atualizado",
-        description: "O status da tarefa foi atualizado com sucesso.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Erro ao atualizar status",
-        description: "Ocorreu um erro ao atualizar o status da tarefa.",
-      });
-    },
-  });
-
-  const deleteTask = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("tasks").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast({
-        title: "Tarefa excluída",
-        description: "A tarefa foi excluída com sucesso.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Erro ao excluir tarefa",
-        description: "Ocorreu um erro ao excluir a tarefa.",
-      });
-    },
-  });
-
-  const handleStatusChange = (id: string, newStatus: string) => {
-    updateTaskStatus.mutate({ id, status: newStatus });
-  };
-
-  const handleDelete = (id: string) => {
-    deleteTask.mutate(id);
-  };
-
   const handleNewTaskSuccess = () => {
     setIsNewTaskDialogOpen(false);
-    queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    toast({
-      title: "Tarefa criada",
-      description: "A nova tarefa foi criada com sucesso.",
-    });
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (over && active.id !== over.id) {
-      const taskId = active.id as string;
-      const newStatus = over.id as string;
-      handleStatusChange(taskId, newStatus);
-    }
   };
 
   const filteredTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const getTasksByStatus = (status: string) =>
-    filteredTasks.filter((task) => task.status === status);
-
-  const todoTasks = getTasksByStatus("todo");
-  const inProgressTasks = getTasksByStatus("in_progress");
-  const reviewTasks = getTasksByStatus("review");
-  const doneTasks = getTasksByStatus("done");
 
   return (
     <div className="p-6">
@@ -174,42 +92,7 @@ export default function TaskManagement() {
         </div>
       </div>
 
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-          <DraggableTaskColumn
-            id="todo"
-            title="A Fazer"
-            tasks={todoTasks}
-            count={todoTasks.length}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
-          <DraggableTaskColumn
-            id="in_progress"
-            title="Em Andamento"
-            tasks={inProgressTasks}
-            count={inProgressTasks.length}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
-          <DraggableTaskColumn
-            id="review"
-            title="Revisão"
-            tasks={reviewTasks}
-            count={reviewTasks.length}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
-          <DraggableTaskColumn
-            id="done"
-            title="Concluído"
-            tasks={doneTasks}
-            count={doneTasks.length}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-          />
-        </div>
-      </DndContext>
+      <TaskBoard tasks={filteredTasks} sensors={sensors} />
 
       <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
         <DialogContent className="max-w-4xl">
