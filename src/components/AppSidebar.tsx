@@ -12,7 +12,7 @@ import {
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, Calendar, Boxes, DollarSign, LineChart, LifeBuoy, BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +22,7 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -60,6 +61,20 @@ export function AppSidebar() {
     { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
     { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
   ];
+
+  const isActive = (path: string) => {
+    if (path === "/" && location.pathname === "/") return true;
+    if (path !== "/" && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+
+  const getLinkClassName = (path: string) => {
+    return `flex items-center gap-2 p-2 rounded-md transition-all duration-200 w-full
+      ${isActive(path) 
+        ? 'bg-[#F2FCE2] text-[#18374C] border border-[#7AE09A] shadow-sm' 
+        : 'hover:bg-[#F2FCE2] hover:shadow-sm hover:border hover:border-[#7AE09A]'
+      }`;
+  };
 
   const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
@@ -102,7 +117,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <Link 
                             to={item.path} 
-                            className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
+                            className={getLinkClassName(item.path)}
                             onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <item.icon className="h-5 w-5" />
@@ -126,7 +141,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <Link 
                             to={item.path} 
-                            className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
+                            className={getLinkClassName(item.path)}
                             onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <item.icon className="h-5 w-5" />
@@ -166,7 +181,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link 
                       to={item.path} 
-                      className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
+                      className={getLinkClassName(item.path)}
                       onClick={() => setOpenMobile(false)}
                     >
                       <item.icon className="h-5 w-5" />
