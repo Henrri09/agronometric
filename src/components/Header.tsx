@@ -2,17 +2,56 @@ import { LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Header() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    const getUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setUserName(profile.full_name);
+        }
+      }
+    };
+
+    getUserProfile();
+  }, []);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase();
+  };
 
   const handleLogout = () => {
     toast.success("Logout realizado com sucesso!");
     navigate("/login");
   };
 
+  const displayName = isMobile ? getInitials(userName) : `Olá ${userName}, seja bem-vindo`;
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-end items-center border-b border-gray-200">
+      {userName && (
+        <span className="mr-4 text-gray-700 font-medium">
+          {displayName}
+        </span>
+      )}
       <Button 
         variant="ghost" 
         size="icon"
