@@ -98,4 +98,9 @@
   .card-hover {
     @apply hover:shadow-lg transition-shadow duration-200;
   }
+
+  /* Add specific hover styles for sidebar menu items */
+  .sidebar-menu-item {
+    @apply transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A];
+  }
 }

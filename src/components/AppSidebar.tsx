@@ -102,7 +102,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <Link 
                             to={item.path} 
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
                             onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <item.icon className="h-5 w-5" />
@@ -126,7 +126,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <Link 
                             to={item.path} 
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
                             onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <item.icon className="h-5 w-5" />
@@ -166,7 +166,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link 
                       to={item.path} 
-                      className="flex items-center gap-2 p-2"
+                      className="flex items-center gap-2 p-2 rounded-md transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-sm hover:border-[#7AE09A] w-full"
                       onClick={() => setOpenMobile(false)}
                     >
                       <item.icon className="h-5 w-5" />
