@@ -25,6 +25,10 @@ import {
 
 type Machinery = Tables<"machinery">;
 
+interface MachineryWithPhoto extends Machinery {
+  photo_url?: string | null;
+}
+
 export default function Machinery() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
@@ -52,16 +56,36 @@ export default function Machinery() {
       const { data, error } = await query;
       
       if (error) throw error;
-      return data;
+
+      // Fetch photo URLs for each machinery
+      const machineryWithPhotos: MachineryWithPhoto[] = await Promise.all(
+        data.map(async (machine) => {
+          const { data: files } = await supabase.storage
+            .from('machinery_photos')
+            .list(machine.id);
+
+          let photo_url = null;
+          if (files && files.length > 0) {
+            const { data: photoUrl } = supabase.storage
+              .from('machinery_photos')
+              .getPublicUrl(`${machine.id}/${files[0].name}`);
+            photo_url = photoUrl.publicUrl;
+          }
+
+          return { ...machine, photo_url };
+        })
+      );
+
+      return machineryWithPhotos;
     },
   });
 
-  const handleEdit = (machine: Machinery) => {
+  const handleEdit = (machine: MachineryWithPhoto) => {
     setSelectedMachinery(machine);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (machine: Machinery) => {
+  const handleDelete = async (machine: MachineryWithPhoto) => {
     try {
       const { error } = await supabase
         .from('machinery')
@@ -105,21 +129,6 @@ export default function Machinery() {
     }
   };
 
-  const getMachineryPhoto = async (machineId: string) => {
-    const { data } = await supabase.storage
-      .from('machinery_photos')
-      .list(machineId);
-
-    if (data && data.length > 0) {
-      const { data: photoUrl } = supabase.storage
-        .from('machinery_photos')
-        .getPublicUrl(`${machineId}/${data[0].name}`);
-      
-      return photoUrl.publicUrl;
-    }
-    return null;
-  };
-
   return (
     <div className="p-6">
       <PageHeader
@@ -129,14 +138,14 @@ export default function Machinery() {
       
       <div className="flex justify-between items-center mb-4">
         <div className="flex gap-4 flex-1 max-w-2xl">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <Input
               placeholder="Buscar por nome, modelo ou número de série"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-              icon={<Search className="w-4 h-4" />}
+              className="w-full pl-10"
             />
+            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-500" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
