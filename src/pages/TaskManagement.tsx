@@ -1,58 +1,158 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const columns = [
-  {
-    title: "A Fazer",
-    tasks: [
-      { id: 1, title: "Manutenção Esteira X1000", priority: "Alta" },
-      { id: 2, title: "Calibração Empacotadora", priority: "Média" },
-    ]
-  },
-  {
-    title: "Em Andamento",
-    tasks: [
-      { id: 3, title: "Troca de Peças Misturador", priority: "Alta" },
-      { id: 4, title: "Limpeza Sistema", priority: "Baixa" },
-    ]
-  },
-  {
-    title: "Concluído",
-    tasks: [
-      { id: 5, title: "Atualização Software", priority: "Média" },
-      { id: 6, title: "Inspeção Rotina", priority: "Baixa" },
-    ]
-  }
-];
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, Calendar, Search } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { TaskColumn } from "@/components/tasks/TaskColumn";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TaskManagement() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: tasks = [], isLoading } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const updateTaskStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ status })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast({
+        title: "Status atualizado",
+        description: "O status da tarefa foi atualizado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao atualizar status",
+        description: "Ocorreu um erro ao atualizar o status da tarefa.",
+      });
+    },
+  });
+
+  const deleteTask = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("tasks").delete().eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast({
+        title: "Tarefa excluída",
+        description: "A tarefa foi excluída com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao excluir tarefa",
+        description: "Ocorreu um erro ao excluir a tarefa.",
+      });
+    },
+  });
+
+  const handleStatusChange = (id: string, newStatus: string) => {
+    updateTaskStatus.mutate({ id, newStatus });
+  };
+
+  const handleDelete = (id: string) => {
+    deleteTask.mutate(id);
+  };
+
+  const filteredTasks = tasks.filter((task) =>
+    task.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getTasksByStatus = (status: string) =>
+    filteredTasks.filter((task) => task.status === status);
+
+  const todoTasks = getTasksByStatus("todo");
+  const inProgressTasks = getTasksByStatus("in_progress");
+  const reviewTasks = getTasksByStatus("review");
+  const doneTasks = getTasksByStatus("done");
+
   return (
     <div className="p-6">
       <PageHeader
         title="Gestão de Tarefas"
-        description="Visualize e gerencie as tarefas em andamento"
+        description="Arraste e solte os cards para organizar as tarefas"
       />
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {columns.map((column) => (
-          <Card key={column.title}>
-            <CardHeader>
-              <CardTitle>{column.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {column.tasks.map((task) => (
-                  <Card key={task.id} className="p-4">
-                    <h4 className="font-medium">{task.title}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Prioridade: {task.priority}
-                    </p>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-1 items-center space-x-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar tarefas..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            Filtrar por data
+          </Button>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Nova Tarefa
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <TaskColumn
+          title="A Fazer"
+          tasks={todoTasks}
+          count={todoTasks.length}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
+        />
+        <TaskColumn
+          title="Em Andamento"
+          tasks={inProgressTasks}
+          count={inProgressTasks.length}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
+        />
+        <TaskColumn
+          title="Revisão"
+          tasks={reviewTasks}
+          count={reviewTasks.length}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
+        />
+        <TaskColumn
+          title="Concluído"
+          tasks={doneTasks}
+          count={doneTasks.length}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );
