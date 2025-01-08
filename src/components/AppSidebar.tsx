@@ -83,14 +83,16 @@ export function AppSidebar() {
               </SidebarGroup>
             )}
             {isSuperAdmin && (
-              <SidebarGroup>
-                <div className="pt-6">
-                  <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
-                </div>
-                <SidebarGroupContent>
-                  <SidebarMenuItems items={superAdminItems} />
-                </SidebarGroupContent>
-              </SidebarGroup>
+              <>
+                <SidebarGroup>
+                  <div className="pt-6">
+                    <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
+                  </div>
+                  <SidebarGroupContent>
+                    <SidebarMenuItems items={superAdminItems} />
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              </>
             )}
           </SidebarContent>
         </Sidebar>
