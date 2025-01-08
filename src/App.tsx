@@ -9,6 +9,7 @@ import { Header } from "@/components/Header";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -29,33 +30,79 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        setIsAuthenticated(true);
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        // Check if user is admin
-        const { data: userRoles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single();
+        if (sessionError) throw sessionError;
         
-        setIsAdmin(userRoles?.role === 'admin');
+        if (session?.user) {
+          setIsAuthenticated(true);
+          
+          const { data: userRoles, error: rolesError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (rolesError) throw rolesError;
+          
+          setIsAdmin(userRoles?.role === 'admin');
+        } else {
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+        }
+      } catch (err: any) {
+        setError(err.message);
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+        if (session?.user) {
+          const { data: userRoles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          setIsAdmin(userRoles?.role === 'admin');
+        }
+      }
+      if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {

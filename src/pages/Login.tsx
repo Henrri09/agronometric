@@ -5,17 +5,21 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { LogIn, Lock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (!email || !password) {
-      toast.error("Por favor, preencha todos os campos");
+      setError("Por favor, preencha todos os campos");
       return;
     }
 
@@ -28,12 +32,21 @@ export default function Login() {
 
       if (error) throw error;
 
-      if (data) {
+      if (data?.user) {
         toast.success("Login realizado com sucesso!");
         navigate("/");
       }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao realizar login");
+      let errorMessage = "Erro ao realizar login";
+      
+      // Tratamento específico de erros do Supabase
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Email ou senha inválidos";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Por favor, confirme seu email antes de fazer login";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -46,6 +59,12 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">AgroMetric</h1>
           <p className="text-gray-600">Faça login para continuar</p>
         </div>
+        
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
