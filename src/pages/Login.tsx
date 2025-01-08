@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { LogIn, Lock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SupportChat } from "@/components/SupportChat";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -81,17 +82,21 @@ export default function Login() {
             {loading ? "Entrando..." : "Entrar"}
           </Button>
 
-          <p className="text-center text-sm text-gray-600">
-            Não tem uma conta?{" "}
-            <button
-              type="button"
-              onClick={() => navigate("/register")}
-              className="text-primary hover:underline"
-              disabled={loading}
-            >
-              Registre-se
-            </button>
-          </p>
+          <div className="flex flex-col items-center space-y-4">
+            <p className="text-center text-sm text-gray-600">
+              Não tem uma conta?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/register")}
+                className="text-primary hover:underline"
+                disabled={loading}
+              >
+                Registre-se
+              </button>
+            </p>
+            
+            <SupportChat />
+          </div>
         </form>
       </div>
     </div>
