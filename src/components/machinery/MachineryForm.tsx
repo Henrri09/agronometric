@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -21,6 +21,7 @@ interface MachineryFormProps {
 
 export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
@@ -34,6 +35,28 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
       maintenance_frequency: 0,
     },
   });
+
+  useEffect(() => {
+    if (machinery?.id) {
+      loadMachineryPhoto();
+    }
+  }, [machinery?.id]);
+
+  const loadMachineryPhoto = async () => {
+    if (!machinery?.id) return;
+
+    const { data: files } = await supabase.storage
+      .from('machinery_photos')
+      .list(machinery.id);
+
+    if (files && files.length > 0) {
+      const { data: photoUrl } = supabase.storage
+        .from('machinery_photos')
+        .getPublicUrl(`${machinery.id}/${files[0].name}`);
+      
+      setCurrentPhotoUrl(photoUrl.publicUrl);
+    }
+  };
 
   const onSubmit = async (data: MachineryFormValues) => {
     try {
@@ -55,12 +78,28 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
 
         // If there's a new photo, upload it
         if (photoFile) {
-          const fileExt = photoFile.name.split('.').pop() as string;
-          const filePath = `${machinery.id}.${fileExt}`;
+          const fileExt = photoFile.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+          const filePath = `${machinery.id}/${fileName}`;
+
+          // Delete existing photos first
+          const { data: existingFiles } = await supabase.storage
+            .from('machinery_photos')
+            .list(machinery.id);
+
+          if (existingFiles) {
+            await Promise.all(
+              existingFiles.map((file) =>
+                supabase.storage
+                  .from('machinery_photos')
+                  .remove([`${machinery.id}/${file.name}`])
+              )
+            );
+          }
 
           const { error: uploadError } = await supabase.storage
             .from('machinery_photos')
-            .upload(filePath, photoFile, { upsert: true });
+            .upload(filePath, photoFile);
 
           if (uploadError) throw uploadError;
         }
@@ -102,8 +141,9 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
 
         // If there's a photo, upload it
         if (photoFile && newMachinery) {
-          const fileExt = photoFile.name.split('.').pop() as string;
-          const filePath = `${newMachinery.id}.${fileExt}`;
+          const fileExt = photoFile.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+          const filePath = `${newMachinery.id}/${fileName}`;
 
           const { error: uploadError } = await supabase.storage
             .from('machinery_photos')
@@ -153,7 +193,11 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
         <BasicInfoSection form={form} />
         <StatusSection form={form} />
         <MaintenanceSection form={form} />
-        <PhotoSection photoFile={photoFile} onPhotoChange={setPhotoFile} />
+        <PhotoSection
+          photoFile={photoFile}
+          currentPhotoUrl={currentPhotoUrl}
+          onPhotoChange={setPhotoFile}
+        />
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>

@@ -1,16 +1,17 @@
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Camera, Upload } from "lucide-react";
+import { Camera, Upload, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/components/ui/use-toast";
 
 interface PhotoSectionProps {
   photoFile: File | null;
+  currentPhotoUrl: string | null;
   onPhotoChange: (file: File | null) => void;
 }
 
-export function PhotoSection({ photoFile, onPhotoChange }: PhotoSectionProps) {
+export function PhotoSection({ photoFile, currentPhotoUrl, onPhotoChange }: PhotoSectionProps) {
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -59,6 +60,35 @@ export function PhotoSection({ photoFile, onPhotoChange }: PhotoSectionProps) {
   return (
     <div className="space-y-4">
       <FormLabel>Foto do Maquinário</FormLabel>
+      
+      {(currentPhotoUrl || photoFile) && (
+        <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-100">
+          {currentPhotoUrl && !photoFile && (
+            <img
+              src={currentPhotoUrl}
+              alt="Foto atual do maquinário"
+              className="w-full h-full object-cover"
+            />
+          )}
+          {photoFile && (
+            <img
+              src={URL.createObjectURL(photoFile)}
+              alt="Nova foto do maquinário"
+              className="w-full h-full object-cover"
+            />
+          )}
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            className="absolute top-2 right-2"
+            onClick={() => onPhotoChange(null)}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
       <div className="flex gap-2">
         <Input
           type="file"
@@ -82,11 +112,6 @@ export function PhotoSection({ photoFile, onPhotoChange }: PhotoSectionProps) {
           </Button>
         )}
       </div>
-      {photoFile && (
-        <p className="text-sm text-muted-foreground">
-          Foto selecionada: {photoFile.name}
-        </p>
-      )}
     </div>
   );
 }
