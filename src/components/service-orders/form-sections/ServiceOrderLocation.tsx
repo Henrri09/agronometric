@@ -1,11 +1,16 @@
+import { useState } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Upload, Camera } from "lucide-react";
+import { Upload, Camera, Plus } from "lucide-react";
 import { Control } from "react-hook-form";
 import { ServiceOrderFormValues } from "../schema";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MachineryForm } from "@/components/machinery/MachineryForm";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ServiceOrderLocationProps {
   control: Control<ServiceOrderFormValues>;
@@ -13,6 +18,21 @@ interface ServiceOrderLocationProps {
 
 export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
   const isMobile = useIsMobile();
+  const [isNewMachineryDialogOpen, setIsNewMachineryDialogOpen] = useState(false);
+
+  // Fetch machinery list
+  const { data: machinery, refetch: refetchMachinery } = useQuery({
+    queryKey: ['machinery'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('machinery')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleCameraCapture = async (inputId: string) => {
     try {
@@ -45,18 +65,30 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Equipamento</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o equipamento" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="1">Equipamento 1</SelectItem>
-                <SelectItem value="2">Equipamento 2</SelectItem>
-                <SelectItem value="3">Equipamento 3</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Selecione o equipamento" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {machinery?.map((machine) => (
+                    <SelectItem key={machine.id} value={machine.id}>
+                      {machine.name} - {machine.model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => setIsNewMachineryDialogOpen(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Novo
+              </Button>
+            </div>
             <FormMessage />
           </FormItem>
         )}
@@ -133,6 +165,21 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
           )}
         </div>
       </div>
+
+      <Dialog open={isNewMachineryDialogOpen} onOpenChange={setIsNewMachineryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo Equipamento</DialogTitle>
+          </DialogHeader>
+          <MachineryForm
+            onSuccess={() => {
+              setIsNewMachineryDialogOpen(false);
+              refetchMachinery();
+            }}
+            onCancel={() => setIsNewMachineryDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
