@@ -111,7 +111,7 @@ export default function ServiceOrders() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="p-6">
       <PageHeader
         title="Ordens de Serviço"
         description="Gerencie todas as ordens de serviço do sistema"
