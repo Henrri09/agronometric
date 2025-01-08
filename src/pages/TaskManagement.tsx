@@ -24,17 +24,18 @@ export default function TaskManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
 
-  // Configure DnD sensors for both mouse and touch
+  // Configure DnD sensors with improved sensitivity
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
-      distance: 10, // 10px of movement required before activation
+      distance: 5, // Reduzido para 5px para iniciar o drag mais facilmente
+      delay: 0, // Sem delay para resposta imediata
     },
   });
   
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 250, // 250ms delay before activation
-      tolerance: 5, // 5px of movement allowed before activation
+      delay: 100, // Reduzido para 100ms para resposta mais rápida
+      tolerance: 8, // Aumentado levemente para melhor detecção em touch
     },
   });
 
