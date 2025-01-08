@@ -8,7 +8,7 @@ interface MaintenanceAlertProps {
 
 export function MaintenanceAlert({ title, description, severity }: MaintenanceAlertProps) {
   return (
-    <Alert variant={severity === "error" ? "destructive" : "warning"}>
+    <Alert variant={severity === "error" ? "destructive" : "default"}>
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>{description}</AlertDescription>
     </Alert>

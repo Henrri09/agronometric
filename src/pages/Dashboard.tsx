@@ -21,37 +21,25 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
         <DashboardCard
           title="Total de Usuários"
-          value="150"
-          description="Usuários ativos no sistema"
-          trend="up"
-          trendValue="12%"
+          value={150}
           icon={<Users className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
           title="Maquinários"
-          value="45"
-          description="Equipamentos cadastrados"
-          trend="up"
-          trendValue="5%"
+          value={45}
           icon={<Wrench className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
           title="Ordens de Serviço"
-          value="28"
-          description="Ordens em aberto"
-          trend="down"
-          trendValue="3%"
+          value={28}
           icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
         />
         
         <DashboardCard
           title="Economia Gerada"
-          value="R$ 45.000"
-          description="Últimos 30 dias"
-          trend="up"
-          trendValue="18%"
+          value={45000}
           icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
         />
       </div>
