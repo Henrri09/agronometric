@@ -63,9 +63,18 @@ export function AppSidebar() {
   ];
 
   const isActive = (path: string) => {
-    if (path === "/" && location.pathname === "/") return true;
-    if (path !== "/" && location.pathname.startsWith(path)) return true;
-    return false;
+    // For root path, only match exact
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    
+    // For super admin root, only match exact
+    if (path === "/super-admin") {
+      return location.pathname === "/super-admin";
+    }
+    
+    // For other paths, match exact path
+    return location.pathname === path;
   };
 
   const getLinkClassName = (path: string) => {
@@ -77,6 +86,8 @@ export function AppSidebar() {
   };
 
   const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
+
+  // ... keep existing code (mobile button and sidebar structure)
 
   return (
     <>
