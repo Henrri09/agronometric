@@ -34,7 +34,9 @@ export function AppSidebar() {
           .eq("user_id", session.user.id)
           .single();
         
-        setIsAdmin(roles?.role === "admin");
+        if (roles?.role === "admin" || roles?.role === "super_admin") {
+          setIsAdmin(true);
+        }
         setIsSuperAdmin(roles?.role === "super_admin");
       }
     };
@@ -45,11 +47,11 @@ export function AppSidebar() {
   const menuItems = [
     { title: "Painel Empresa", icon: Home, path: "/", adminOnly: false },
     { title: "Cadastro Usuário", icon: Users, path: "/users", adminOnly: true },
-    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery", adminOnly: true },
+    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery", adminOnly: false },
     { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders", adminOnly: false },
     { title: "Analytics", icon: BarChart2, path: "/analytics", adminOnly: true },
-    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: true },
-    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
+    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: false },
+    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: false },
     { title: "Calendário", icon: Calendar, path: "/calendar", adminOnly: false },
     { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
     { title: "Documentação", icon: BookOpen, path: "/documentation", adminOnly: false },
@@ -63,17 +65,12 @@ export function AppSidebar() {
   ];
 
   const isActive = (path: string) => {
-    // For root path, only match exact
     if (path === "/") {
       return location.pathname === "/";
     }
-    
-    // For super admin root, only match exact
     if (path === "/super-admin") {
       return location.pathname === "/super-admin";
     }
-    
-    // For other paths, match exact path
     return location.pathname === path;
   };
 
@@ -85,9 +82,8 @@ export function AppSidebar() {
       }`;
   };
 
+  // Filtra os itens do menu com base no status de admin
   const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
-
-  // ... keep existing code (mobile button and sidebar structure)
 
   return (
     <>
