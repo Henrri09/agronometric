@@ -16,7 +16,6 @@ import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Machinery from "./pages/Machinery";
 import ServiceOrders from "./pages/ServiceOrders";
-import ServiceOrderRegister from "./pages/ServiceOrderRegister";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import TaskManagement from "./pages/TaskManagement";
@@ -109,14 +108,6 @@ const App = () => (
                             } 
                           />
                           <Route path="/service-orders" element={<ServiceOrders />} />
-                          <Route 
-                            path="/service-orders/register" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <ServiceOrderRegister />
-                              </ProtectedRoute>
-                            } 
-                          />
                           <Route 
                             path="/analytics" 
                             element={
