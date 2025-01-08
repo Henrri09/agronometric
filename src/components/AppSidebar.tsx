@@ -72,14 +72,16 @@ export function AppSidebar() {
       <div className={`fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 ${isMobile ? 'hidden' : 'block'}`}>
         <Sidebar className="!bg-background">
           <SidebarContent>
-            <SidebarGroup>
-              <div className="pt-6">
-                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-              </div>
-              <SidebarGroupContent>
-                <SidebarMenuItems items={menuItems} />
-              </SidebarGroupContent>
-            </SidebarGroup>
+            {!isSuperAdmin && (
+              <SidebarGroup>
+                <div className="pt-6">
+                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+                </div>
+                <SidebarGroupContent>
+                  <SidebarMenuItems items={menuItems} />
+                </SidebarGroupContent>
+              </SidebarGroup>
+            )}
             {isSuperAdmin && (
               <SidebarGroup>
                 <div className="pt-6">
@@ -105,10 +107,14 @@ export function AppSidebar() {
             >
               <X className="h-6 w-6" />
             </Button>
-            <div className="pt-4">
-              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-            </div>
-            <SidebarMenuItems items={menuItems} isMobile />
+            {!isSuperAdmin && (
+              <>
+                <div className="pt-4">
+                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+                </div>
+                <SidebarMenuItems items={menuItems} isMobile />
+              </>
+            )}
             {isSuperAdmin && (
               <>
                 <div className="pt-4">
