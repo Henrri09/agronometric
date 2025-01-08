@@ -50,6 +50,36 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          subscription_status:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       machinery: {
         Row: {
           created_at: string
@@ -290,24 +320,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          company_id: string | null
           created_at: string
           full_name: string | null
           id: string
           updated_at: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           updated_at?: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_orders: {
         Row: {
@@ -470,7 +511,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_company_with_admin: {
+        Args: {
+          company_name: string
+          admin_email: string
+          admin_full_name: string
+        }
+        Returns: string
+      }
       is_admin: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: boolean
+      }
+      is_super_admin: {
         Args: {
           user_uuid: string
         }
@@ -478,7 +533,8 @@ export type Database = {
       }
     }
     Enums: {
-      user_role: "admin" | "common" | "visitor"
+      subscription_status: "active" | "inactive" | "trial"
+      user_role: "admin" | "common" | "visitor" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never

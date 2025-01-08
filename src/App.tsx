@@ -22,12 +22,14 @@ import TaskManagement from "./pages/TaskManagement";
 import Calendar from "./pages/Calendar";
 import PartsInventory from "./pages/PartsInventory";
 import MaintenanceSchedule from "./pages/MaintenanceSchedule";
+import SuperAdmin from "./pages/SuperAdmin";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
@@ -38,7 +40,6 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
       if (session?.user) {
         setIsAuthenticated(true);
         
-        // Check if user is admin
         const { data: userRoles } = await supabase
           .from('user_roles')
           .select('role')
@@ -46,6 +47,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
           .single();
         
         setIsAdmin(userRoles?.role === 'admin');
+        setIsSuperAdmin(userRoles?.role === 'super_admin');
       }
       
       setIsLoading(false);
@@ -62,7 +64,11 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (adminOnly && !isAdmin) {
+  if (superAdminOnly && !isSuperAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (adminOnly && !isAdmin && !isSuperAdmin) {
     return <Navigate to="/" replace />;
   }
 
@@ -103,6 +109,14 @@ const App = () => (
                 <AppLayout>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
+                    <Route 
+                      path="/super-admin" 
+                      element={
+                        <ProtectedRoute superAdminOnly>
+                          <SuperAdmin />
+                        </ProtectedRoute>
+                      } 
+                    />
                     <Route 
                       path="/users" 
                       element={
