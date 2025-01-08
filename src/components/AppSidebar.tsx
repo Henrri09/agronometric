@@ -82,7 +82,9 @@ export function AppSidebar() {
               )}
             </div>
             <SidebarGroup>
-              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              <div className="pt-4"> {/* Added padding top here */}
+                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              </div>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {filteredMenuItems.map((item) => (
