@@ -30,29 +30,14 @@ export function Header() {
     getUserProfile();
   }, []);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase();
-  };
-
   const handleLogout = () => {
     toast.success("Logout realizado com sucesso!");
     navigate("/login");
   };
 
-  const displayName = isMobile ? getInitials(userName) : `Olá ${userName}, seja bem-vindo`;
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200">
       <div className="flex-1 flex items-center">
-        {userName && isMobile && (
-          <span className="text-gray-700 font-medium">
-            {displayName}
-          </span>
-        )}
       </div>
       <div className="flex-1 flex justify-center">
         <img 
@@ -64,7 +49,7 @@ export function Header() {
       <div className="flex-1 flex justify-end">
         {userName && !isMobile && (
           <span className="mr-4 text-gray-700 font-medium">
-            {displayName}
+            {`Olá ${userName}, seja bem-vindo`}
           </span>
         )}
         <Button 
