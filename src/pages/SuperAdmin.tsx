@@ -97,7 +97,10 @@ export default function SuperAdmin() {
       />
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate("/super-admin/financial")}>
+        <Card 
+          className="cursor-pointer transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-lg hover:border-[#7AE09A]" 
+          onClick={() => navigate("/super-admin/financial")}
+        >
           <CardContent className="p-6 flex flex-col items-center justify-center text-center">
             <Wallet className="h-12 w-12 mb-2 text-primary" />
             <h3 className="text-lg font-semibold">Gestão Financeira</h3>
@@ -105,7 +108,10 @@ export default function SuperAdmin() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate("/super-admin/analytics")}>
+        <Card 
+          className="cursor-pointer transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-lg hover:border-[#7AE09A]" 
+          onClick={() => navigate("/super-admin/analytics")}
+        >
           <CardContent className="p-6 flex flex-col items-center justify-center text-center">
             <LineChart className="h-12 w-12 mb-2 text-primary" />
             <h3 className="text-lg font-semibold">Analytics</h3>
@@ -113,7 +119,10 @@ export default function SuperAdmin() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate("/super-admin/support")}>
+        <Card 
+          className="cursor-pointer transition-all duration-200 hover:bg-[#F2FCE2] hover:shadow-lg hover:border-[#7AE09A]" 
+          onClick={() => navigate("/super-admin/support")}
+        >
           <CardContent className="p-6 flex flex-col items-center justify-center text-center">
             <LifeBuoy className="h-12 w-12 mb-2 text-primary" />
             <h3 className="text-lg font-semibold">Suporte</h3>
@@ -123,7 +132,10 @@ export default function SuperAdmin() {
       </div>
 
       <div className="mb-4">
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button 
+          onClick={() => setIsDialogOpen(true)}
+          className="hover:bg-[#7AE09A] hover:text-accent transition-colors"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Nova Empresa
         </Button>
