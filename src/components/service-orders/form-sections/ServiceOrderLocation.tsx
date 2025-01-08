@@ -2,15 +2,39 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Camera } from "lucide-react";
 import { Control } from "react-hook-form";
 import { ServiceOrderFormValues } from "../schema";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ServiceOrderLocationProps {
   control: Control<ServiceOrderFormValues>;
 }
 
 export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
+  const isMobile = useIsMobile();
+
+  const handleCameraCapture = async (inputId: string) => {
+    try {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          console.log(`Photo captured for ${inputId}:`, file);
+          // Here you would handle the file upload to your storage
+        }
+      };
+      
+      input.click();
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-lg border p-4">
       <h2 className="text-lg font-semibold">Informações do Equipamento</h2>
@@ -70,18 +94,44 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
 
       <div className="space-y-2">
         <FormLabel>Fotos do Equipamento</FormLabel>
-        <Button type="button" variant="outline" className="w-32">
-          <Upload className="w-4 h-4 mr-2" />
-          Upload
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" className="w-32">
+            <Upload className="w-4 h-4 mr-2" />
+            Upload
+          </Button>
+          {isMobile && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-32"
+              onClick={() => handleCameraCapture('machinery-photo')}
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Câmera
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
         <FormLabel>Fotos do Problema</FormLabel>
-        <Button type="button" variant="outline" className="w-32">
-          <Upload className="w-4 h-4 mr-2" />
-          Upload
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" className="w-32">
+            <Upload className="w-4 h-4 mr-2" />
+            Upload
+          </Button>
+          {isMobile && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-32"
+              onClick={() => handleCameraCapture('problem-photo')}
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Câmera
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

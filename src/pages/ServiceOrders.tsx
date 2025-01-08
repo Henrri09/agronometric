@@ -8,14 +8,14 @@ export default function ServiceOrders() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <PageHeader
         title="Ordens de Serviço"
         description="Crie novas ordens de serviço para o sistema"
       />
 
-      <Card className="max-w-4xl mx-auto">
-        <CardContent className="p-6">
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardContent className="p-4 md:p-6">
           <ServiceOrderForm onSuccess={handleFormSubmitSuccess} />
         </CardContent>
       </Card>
