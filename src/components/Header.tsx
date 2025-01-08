@@ -47,18 +47,18 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200">
-      <div className="flex items-center">
+      <div className={`flex ${isMobile ? 'flex-1 justify-center' : ''}`}>
         {isMobile ? (
           <img 
             src="/lovable-uploads/2184b402-1719-4108-83fc-c6daff6b9a14.png" 
             alt="Agrometric Symbol" 
-            className="h-8 w-8"
+            className="h-6 w-6 object-contain"
           />
         ) : (
           <img 
             src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
             alt="Agrometric Logo" 
-            className="h-8"
+            className="h-8 object-contain"
           />
         )}
       </div>
