@@ -1,0 +1,41 @@
+import { Link } from "react-router-dom";
+import { 
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
+
+interface MenuItemType {
+  title: string;
+  icon: React.ElementType;
+  path: string;
+}
+
+interface SidebarMenuItemsProps {
+  items: MenuItemType[];
+  isMobile?: boolean;
+}
+
+export function SidebarMenuItems({ items, isMobile }: SidebarMenuItemsProps) {
+  const { setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild>
+            <Link 
+              to={item.path} 
+              className="flex items-center gap-2"
+              onClick={() => isMobile && setOpenMobile(false)}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}

@@ -4,9 +4,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Menu, X } from "lucide-react";
@@ -26,75 +23,14 @@ import {
   Database,
   Trophy
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useUserRole } from "@/hooks/use-user-role";
+import { SidebarMenuItems } from "./sidebar/SidebarMenuItems";
 
 export function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUserRole = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session?.user) {
-          console.log("No session found");
-          setLoading(false);
-          return;
-        }
-
-        console.log("Checking roles for user:", session.user.id);
-        
-        const { data: userRole, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error fetching user role:", error);
-          toast.error("Erro ao carregar permissões do usuário");
-          return;
-        }
-
-        console.log("User role response:", userRole);
-        
-        if (userRole?.role) {
-          setIsAdmin(userRole.role === 'admin');
-          setIsSuperAdmin(userRole.role === 'super_admin');
-          console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
-        } else {
-          console.log("No role found for user");
-          setIsAdmin(false);
-          setIsSuperAdmin(false);
-        }
-      } catch (error) {
-        console.error("Error in checkUserRole:", error);
-        toast.error("Erro ao verificar status do usuário");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Verificar role inicial
-    checkUserRole();
-
-    // Monitorar mudanças na autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkUserRole();
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { isAdmin, isSuperAdmin, loading } = useUserRole();
 
   const menuItems = [
     { title: "Painel Empresa", icon: Home, path: "/", adminOnly: false },
@@ -119,25 +55,6 @@ export function AppSidebar() {
     if (!item.adminOnly) return true;
     return isAdmin || isSuperAdmin;
   });
-
-  const renderMenu = (items: typeof menuItems | typeof superAdminItems) => (
-    <SidebarMenu>
-      {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild>
-            <Link 
-              to={item.path} 
-              className="flex items-center gap-2"
-              onClick={() => isMobile && setOpenMobile(false)}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.title}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  );
 
   if (loading) {
     return (
@@ -168,7 +85,7 @@ export function AppSidebar() {
                   <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
                 </div>
                 <SidebarGroupContent>
-                  {renderMenu(superAdminItems)}
+                  <SidebarMenuItems items={superAdminItems} />
                 </SidebarGroupContent>
               </SidebarGroup>
             )}
@@ -177,7 +94,7 @@ export function AppSidebar() {
                 <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
               </div>
               <SidebarGroupContent>
-                {renderMenu(filteredMenuItems)}
+                <SidebarMenuItems items={filteredMenuItems} />
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
@@ -200,13 +117,13 @@ export function AppSidebar() {
                 <div className="pt-4">
                   <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
                 </div>
-                {renderMenu(superAdminItems)}
+                <SidebarMenuItems items={superAdminItems} isMobile />
               </>
             )}
             <div className="pt-4">
               <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
             </div>
-            {renderMenu(filteredMenuItems)}
+            <SidebarMenuItems items={filteredMenuItems} isMobile />
           </div>
         </div>
       )}
