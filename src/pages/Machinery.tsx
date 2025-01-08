@@ -39,7 +39,7 @@ export default function Machinery() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="p-6">
       <PageHeader
         title="Gestão de Maquinários"
         description="Gerencie todos os equipamentos cadastrados no sistema"
