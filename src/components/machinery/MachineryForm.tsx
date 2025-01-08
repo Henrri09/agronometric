@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { Tables } from "@/integrations/supabase/types";
 
 const machineryFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -24,20 +25,15 @@ const machineryFormSchema = z.object({
     .pipe(z.number().min(0, "Frequência deve ser maior ou igual a 0")),
 });
 
-type MachineryFormValues = {
-  name: string;
-  model: string;
-  serial_number?: string;
-  status: "active" | "maintenance" | "inactive";
-  maintenance_frequency: string;
-};
+type MachineryFormValues = z.infer<typeof machineryFormSchema>;
 
 interface MachineryFormProps {
+  machinery?: Tables<"machinery"> | null;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
+export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const isMobile = useIsMobile();
@@ -46,10 +42,10 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
   const form = useForm<MachineryFormValues>({
     resolver: zodResolver(machineryFormSchema),
     defaultValues: {
-      name: "",
-      model: "",
-      serial_number: "",
-      status: "active",
+      name: machinery?.name ?? "",
+      model: machinery?.model ?? "",
+      serial_number: machinery?.serial_number ?? "",
+      status: machinery?.status as "active" | "maintenance" | "inactive" ?? "active",
       maintenance_frequency: "",
     },
   });
@@ -105,60 +101,109 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
     try {
       setIsUploading(true);
 
-      // First insert the machinery data
-      const { data: machinery, error: machineryError } = await supabase
-        .from('machinery')
-        .insert({
-          name: data.name,
-          model: data.model,
-          serial_number: data.serial_number,
-          status: data.status,
-        })
-        .select()
-        .single();
+      if (machinery) {
+        // Update existing machinery
+        const { error: updateError } = await supabase
+          .from('machinery')
+          .update({
+            name: data.name,
+            model: data.model,
+            serial_number: data.serial_number,
+            status: data.status,
+          })
+          .eq('id', machinery.id);
 
-      if (machineryError) throw machineryError;
+        if (updateError) throw updateError;
 
-      // If there's a photo, upload it
-      if (photoFile && machinery) {
-        const fileExt = photoFile.name.split('.').pop() as string;
-        const filePath = `${machinery.id}.${fileExt}`;
+        // If there's a new photo, upload it
+        if (photoFile) {
+          const fileExt = photoFile.name.split('.').pop() as string;
+          const filePath = `${machinery.id}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from('machinery_photos')
-          .upload(filePath, photoFile);
+          const { error: uploadError } = await supabase.storage
+            .from('machinery_photos')
+            .upload(filePath, photoFile, { upsert: true });
 
-        if (uploadError) throw uploadError;
-      }
+          if (uploadError) throw uploadError;
+        }
 
-      // Create maintenance schedule if frequency is provided
-      const frequencyDays = Number(data.maintenance_frequency);
-      if (frequencyDays > 0 && machinery) {
-        const nextMaintenanceDate = new Date();
-        nextMaintenanceDate.setDate(nextMaintenanceDate.getDate() + frequencyDays);
+        // Update maintenance schedule if frequency is provided
+        const frequencyDays = Number(data.maintenance_frequency);
+        if (frequencyDays > 0) {
+          const nextMaintenanceDate = new Date();
+          nextMaintenanceDate.setDate(nextMaintenanceDate.getDate() + frequencyDays);
 
-        const { error: scheduleError } = await supabase
-          .from('maintenance_schedules')
+          const { error: scheduleError } = await supabase
+            .from('maintenance_schedules')
+            .upsert({
+              machinery_id: machinery.id,
+              frequency_days: frequencyDays,
+              next_maintenance_date: nextMaintenanceDate.toISOString(),
+            });
+
+          if (scheduleError) throw scheduleError;
+        }
+
+        toast({
+          title: "Sucesso",
+          description: "Maquinário atualizado com sucesso",
+        });
+      } else {
+        // Create new machinery
+        const { data: newMachinery, error: machineryError } = await supabase
+          .from('machinery')
           .insert({
-            machinery_id: machinery.id,
-            frequency_days: frequencyDays,
-            next_maintenance_date: nextMaintenanceDate.toISOString(),
-          });
+            name: data.name,
+            model: data.model,
+            serial_number: data.serial_number,
+            status: data.status,
+          })
+          .select()
+          .single();
 
-        if (scheduleError) throw scheduleError;
+        if (machineryError) throw machineryError;
+
+        // If there's a photo, upload it
+        if (photoFile && newMachinery) {
+          const fileExt = photoFile.name.split('.').pop() as string;
+          const filePath = `${newMachinery.id}.${fileExt}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('machinery_photos')
+            .upload(filePath, photoFile);
+
+          if (uploadError) throw uploadError;
+        }
+
+        // Create maintenance schedule if frequency is provided
+        const frequencyDays = Number(data.maintenance_frequency);
+        if (frequencyDays > 0 && newMachinery) {
+          const nextMaintenanceDate = new Date();
+          nextMaintenanceDate.setDate(nextMaintenanceDate.getDate() + frequencyDays);
+
+          const { error: scheduleError } = await supabase
+            .from('maintenance_schedules')
+            .insert({
+              machinery_id: newMachinery.id,
+              frequency_days: frequencyDays,
+              next_maintenance_date: nextMaintenanceDate.toISOString(),
+            });
+
+          if (scheduleError) throw scheduleError;
+        }
+
+        toast({
+          title: "Sucesso",
+          description: "Maquinário cadastrado com sucesso",
+        });
       }
-
-      toast({
-        title: "Sucesso",
-        description: "Maquinário cadastrado com sucesso",
-      });
       
       onSuccess();
     } catch (error) {
-      console.error('Error creating machinery:', error);
+      console.error('Error creating/updating machinery:', error);
       toast({
         title: "Erro",
-        description: "Erro ao cadastrar maquinário",
+        description: "Erro ao salvar maquinário",
         variant: "destructive",
       });
     } finally {
@@ -286,7 +331,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
           </Button>
           <Button type="submit" disabled={isUploading}>
             {isUploading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Cadastrar
+            {machinery ? 'Atualizar' : 'Cadastrar'}
           </Button>
         </div>
       </form>

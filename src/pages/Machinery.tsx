@@ -5,12 +5,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MachineryForm } from "@/components/machinery/MachineryForm";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/integrations/supabase/types";
+
+type Machinery = Tables<"machinery">;
 
 export default function Machinery() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
 
   const { data: machinery, refetch } = useQuery({
     queryKey: ['machinery'],
@@ -24,6 +28,16 @@ export default function Machinery() {
       return data;
     },
   });
+
+  const handleEdit = (machine: Machinery) => {
+    setSelectedMachinery(machine);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedMachinery(null);
+  };
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -61,6 +75,7 @@ export default function Machinery() {
                 <TableHead>Modelo</TableHead>
                 <TableHead>Número de Série</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -70,6 +85,15 @@ export default function Machinery() {
                   <TableCell>{machine.model}</TableCell>
                   <TableCell>{machine.serial_number}</TableCell>
                   <TableCell>{getStatusText(machine.status)}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleEdit(machine)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -77,17 +101,20 @@ export default function Machinery() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Novo Maquinário</DialogTitle>
+            <DialogTitle>
+              {selectedMachinery ? 'Editar Maquinário' : 'Novo Maquinário'}
+            </DialogTitle>
           </DialogHeader>
           <MachineryForm
+            machinery={selectedMachinery}
             onSuccess={() => {
-              setIsDialogOpen(false);
+              handleCloseDialog();
               refetch();
             }}
-            onCancel={() => setIsDialogOpen(false)}
+            onCancel={handleCloseDialog}
           />
         </DialogContent>
       </Dialog>
