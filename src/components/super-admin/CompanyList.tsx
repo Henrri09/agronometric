@@ -6,6 +6,9 @@ import { ptBR } from "date-fns/locale";
 interface Company {
   id: string;
   name: string;
+  cnpj: string;
+  address: string;
+  location: string;
   subscription_status: "active" | "inactive" | "trial";
   created_at: string;
   profiles: Array<{
@@ -36,6 +39,9 @@ export function CompanyList({ companies }: CompanyListProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Nome</TableHead>
+          <TableHead>CNPJ</TableHead>
+          <TableHead>Endereço</TableHead>
+          <TableHead>Local</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Administrador</TableHead>
           <TableHead>Data de Criação</TableHead>
@@ -45,6 +51,9 @@ export function CompanyList({ companies }: CompanyListProps) {
         {companies.map((company) => (
           <TableRow key={company.id}>
             <TableCell>{company.name}</TableCell>
+            <TableCell>{company.cnpj}</TableCell>
+            <TableCell>{company.address}</TableCell>
+            <TableCell>{company.location}</TableCell>
             <TableCell>
               <Badge variant={getStatusColor(company.subscription_status)}>
                 {company.subscription_status}

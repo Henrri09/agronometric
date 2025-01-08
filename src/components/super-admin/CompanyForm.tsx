@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 
 const companyFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
+  cnpj: z.string().min(14, "CNPJ deve ter 14 dígitos").max(14, "CNPJ deve ter 14 dígitos"),
+  address: z.string().min(3, "Endereço deve ter no mínimo 3 caracteres"),
+  location: z.string().min(3, "Local deve ter no mínimo 3 caracteres"),
   adminName: z.string().min(3, "Nome do administrador deve ter no mínimo 3 caracteres"),
   adminEmail: z.string().email("Email inválido"),
 });
@@ -23,6 +26,9 @@ export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
       name: "",
+      cnpj: "",
+      address: "",
+      location: "",
       adminName: "",
       adminEmail: "",
     },
@@ -37,6 +43,48 @@ export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nome da Empresa</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="cnpj"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>CNPJ</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="00000000000000" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Endereço</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Local</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>

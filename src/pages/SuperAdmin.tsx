@@ -56,13 +56,28 @@ export default function SuperAdmin() {
 
   const handleSubmit = async (data: any) => {
     try {
-      const { error } = await supabase.rpc("create_company_with_admin", {
+      // First create the company
+      const { data: company, error: companyError } = await supabase
+        .from("companies")
+        .insert({
+          name: data.name,
+          cnpj: data.cnpj,
+          address: data.address,
+          location: data.location
+        })
+        .select()
+        .single();
+
+      if (companyError) throw companyError;
+
+      // Then create the admin user using the RPC function
+      const { error: rpcError } = await supabase.rpc("create_company_with_admin", {
         company_name: data.name,
         admin_email: data.adminEmail,
         admin_full_name: data.adminName
       });
 
-      if (error) throw error;
+      if (rpcError) throw rpcError;
 
       toast.success("Empresa criada com sucesso!");
       setIsDialogOpen(false);

@@ -52,8 +52,11 @@ export type Database = {
       }
       companies: {
         Row: {
+          address: string | null
+          cnpj: string | null
           created_at: string
           id: string
+          location: string | null
           name: string
           subscription_status:
             | Database["public"]["Enums"]["subscription_status"]
@@ -61,8 +64,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          cnpj?: string | null
           created_at?: string
           id?: string
+          location?: string | null
           name: string
           subscription_status?:
             | Database["public"]["Enums"]["subscription_status"]
@@ -70,8 +76,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          cnpj?: string | null
           created_at?: string
           id?: string
+          location?: string | null
           name?: string
           subscription_status?:
             | Database["public"]["Enums"]["subscription_status"]
