@@ -54,7 +54,7 @@ export function Header() {
           className="h-8 max-w-[200px] object-contain"
         />
       </div>
-      <div className={`flex items-center ${isMobile ? 'ml-auto mr-2' : ''}`}>
+      <div className={`flex items-center ${isMobile ? 'ml-4' : ''}`}>
         {userName && (
           <span className="mr-1 text-gray-700 font-medium">
             {displayName}
