@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { 
   Home, 
   Tractor, 
-  ClipboardList, 
   Users, 
   BarChart2, 
   Settings, 
@@ -31,6 +30,7 @@ import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
@@ -43,26 +43,35 @@ export function AppSidebar() {
     const checkAdminStatus = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          console.log("User ID:", session.user.id); // Debug log
-          
-          const { data: roles, error } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", session.user.id)
-            .single();
-          
-          if (error) {
-            console.error("Error fetching role:", error); // Debug log
-            return;
-          }
-          
-          console.log("User role:", roles?.role); // Debug log
-          setIsAdmin(roles?.role === "admin");
-          setIsSuperAdmin(roles?.role === "super_admin");
+        
+        if (!session?.user) {
+          setLoading(false);
+          return;
+        }
+
+        console.log("Checking roles for user:", session.user.id);
+        
+        const { data: userRole, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user role:", error);
+          toast.error("Erro ao carregar permissões do usuário");
+          return;
+        }
+
+        console.log("User role found:", userRole?.role);
+        
+        if (userRole) {
+          setIsAdmin(userRole.role === 'admin');
+          setIsSuperAdmin(userRole.role === 'super_admin');
         }
       } catch (error) {
-        console.error("Error checking admin status:", error);
+        console.error("Error in checkAdminStatus:", error);
+        toast.error("Erro ao verificar status do usuário");
       } finally {
         setLoading(false);
       }
@@ -90,8 +99,10 @@ export function AppSidebar() {
     { title: "Esportes", icon: Trophy, path: "/super-admin/sports" }
   ];
 
-  // Modificado para mostrar itens de admin mesmo durante o carregamento
-  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin || isSuperAdmin);
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!item.adminOnly) return true;
+    return isAdmin || isSuperAdmin;
+  });
 
   const renderMenu = (items: typeof menuItems | typeof superAdminItems) => (
     <SidebarMenu>
