@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/PageHeader";
-import { Badge } from "@/components/ui/badge";
 import { ptBR } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { isSameDay } from "date-fns";
 import { CalendarDayContent } from "@/components/calendar/CalendarDayContent";
 import { ServiceOrdersList } from "@/components/calendar/ServiceOrdersList";
+import { MaintenanceAlert } from "@/components/MaintenanceAlert";
 
 export default function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -72,6 +72,11 @@ export default function Calendar() {
     order => date && order.start_date && isSameDay(new Date(order.start_date), date)
   ) || [];
 
+  // Verifica se há entregas pendentes na data selecionada
+  const dueDateEvents = serviceOrders?.filter(
+    order => date && order.end_date && isSameDay(new Date(order.end_date), date)
+  ) || [];
+
   return (
     <div className="p-6">
       <PageHeader
@@ -103,28 +108,38 @@ export default function Calendar() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              Ordens de Serviço do Dia {date?.toLocaleDateString('pt-BR')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <p>Carregando...</p>
-            ) : selectedDateEvents.length > 0 ? (
-              <ServiceOrdersList
-                serviceOrders={selectedDateEvents}
-                getServiceTypeLabel={getServiceTypeLabel}
-                getPriorityLabel={getPriorityLabel}
-              />
-            ) : (
-              <p className="text-muted-foreground">
-                Nenhuma ordem de serviço programada para esta data.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {dueDateEvents.length > 0 && (
+            <MaintenanceAlert
+              title="Entregas Pendentes"
+              description={`Existem ${dueDateEvents.length} ordem(s) de serviço com entrega prevista para hoje.`}
+              severity="warning"
+            />
+          )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                Ordens de Serviço do Dia {date?.toLocaleDateString('pt-BR')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <p>Carregando...</p>
+              ) : selectedDateEvents.length > 0 ? (
+                <ServiceOrdersList
+                  serviceOrders={selectedDateEvents}
+                  getServiceTypeLabel={getServiceTypeLabel}
+                  getPriorityLabel={getPriorityLabel}
+                />
+              ) : (
+                <p className="text-muted-foreground">
+                  Nenhuma ordem de serviço programada para esta data.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
