@@ -1,8 +1,7 @@
-import { LogOut } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function Header() {
   const navigate = useNavigate();
@@ -20,15 +19,15 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-end items-center border-b border-gray-200">
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={handleLogout}
-        className="hover:bg-gray-100"
-      >
-        <LogOut className="h-5 w-5 text-gray-600" />
-      </Button>
+    <header className="fixed top-0 left-0 right-0 h-12 bg-background border-b z-50">
+      <div className="h-full flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold">AgroMetric</span>
+        </div>
+        <Button variant="ghost" onClick={handleLogout}>
+          Sair
+        </Button>
+      </div>
     </header>
   );
 }
