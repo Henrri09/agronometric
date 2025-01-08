@@ -8,8 +8,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-// Page imports
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -25,7 +25,6 @@ import MaintenanceSchedule from "./pages/MaintenanceSchedule";
 
 const queryClient = new QueryClient();
 
-// Protected route component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -70,6 +69,24 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
+const AppLayout = ({ children }) => {
+  const isMobile = useIsMobile();
+  
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex flex-col w-full">
+        <Header />
+        <div className="flex flex-1 pt-12">
+          <AppSidebar />
+          <main className={`flex-1 overflow-auto p-6 ${!isMobile ? 'ml-64' : ''}`}>
+            {children}
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -83,71 +100,63 @@ const App = () => (
             path="/*"
             element={
               <ProtectedRoute>
-                <SidebarProvider>
-                  <div className="min-h-screen flex flex-col w-full">
-                    <Header />
-                    <div className="flex flex-1 pt-12">
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto p-6 ml-64">
-                        <Routes>
-                          <Route path="/" element={<Dashboard />} />
-                          <Route 
-                            path="/users" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <Users />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route 
-                            path="/machinery" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <Machinery />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route path="/service-orders" element={<ServiceOrders />} />
-                          <Route 
-                            path="/analytics" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <Analytics />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route 
-                            path="/settings" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <Settings />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route path="/task-management" element={<TaskManagement />} />
-                          <Route path="/calendar" element={<Calendar />} />
-                          <Route 
-                            path="/parts-inventory" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <PartsInventory />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route 
-                            path="/maintenance-schedule" 
-                            element={
-                              <ProtectedRoute adminOnly>
-                                <MaintenanceSchedule />
-                              </ProtectedRoute>
-                            } 
-                          />
-                          <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                      </main>
-                    </div>
-                  </div>
-                </SidebarProvider>
+                <AppLayout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route 
+                      path="/users" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <Users />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/machinery" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <Machinery />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route path="/service-orders" element={<ServiceOrders />} />
+                    <Route 
+                      path="/analytics" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <Analytics />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/settings" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <Settings />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route path="/task-management" element={<TaskManagement />} />
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route 
+                      path="/parts-inventory" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <PartsInventory />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/maintenance-schedule" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <MaintenanceSchedule />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </AppLayout>
               </ProtectedRoute>
             }
           />

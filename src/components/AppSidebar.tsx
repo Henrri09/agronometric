@@ -66,7 +66,7 @@ export function AppSidebar() {
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      <div className="fixed top-0 left-0 h-full bg-background border-r z-40 mt-12">
+      <div className={`fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 ${isMobile ? 'hidden' : 'block'}`}>
         <Sidebar className="!bg-background">
           <SidebarContent>
             <div className="p-4 flex items-center justify-between">
@@ -82,7 +82,7 @@ export function AppSidebar() {
               )}
             </div>
             <SidebarGroup>
-              <div className="pt-4"> {/* Added padding top here */}
+              <div className="pt-6"> {/* Increased padding top for better spacing */}
                 <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
               </div>
               <SidebarGroupContent>
@@ -107,6 +107,41 @@ export function AppSidebar() {
           </SidebarContent>
         </Sidebar>
       </div>
+
+      {/* Mobile Sidebar Sheet */}
+      {isMobile && openMobile && (
+        <div className="fixed inset-0 bg-background z-40">
+          <div className="pt-16 px-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4"
+              onClick={() => setOpenMobile(false)}
+            >
+              <X className="h-6 w-6" />
+            </Button>
+            <div className="pt-4">
+              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+            </div>
+            <SidebarMenu>
+              {filteredMenuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link 
+                      to={item.path} 
+                      className="flex items-center gap-2 p-2"
+                      onClick={() => setOpenMobile(false)}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </div>
+        </div>
+      )}
     </>
   );
 }
