@@ -33,6 +33,7 @@ export function AppSidebar() {
           .eq("user_id", session.user.id)
           .single();
         
+        console.log("User role:", roles?.role); // Debug log
         setIsAdmin(roles?.role === "admin");
         setIsSuperAdmin(roles?.role === "super_admin");
       }
@@ -61,7 +62,11 @@ export function AppSidebar() {
     { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
+  // Debug logs
+  console.log("Is Super Admin:", isSuperAdmin);
+  console.log("Is Admin:", isAdmin);
+
+  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin || isSuperAdmin);
 
   return (
     <>
@@ -90,7 +95,7 @@ export function AppSidebar() {
                 </Button>
               )}
             </div>
-            {isSuperAdmin ? (
+            {isSuperAdmin && (
               <SidebarGroup>
                 <div className="pt-6">
                   <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
@@ -114,31 +119,30 @@ export function AppSidebar() {
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
-            ) : (
-              <SidebarGroup>
-                <div className="pt-6">
-                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-                </div>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {filteredMenuItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild>
-                          <Link 
-                            to={item.path} 
-                            className="flex items-center gap-2"
-                            onClick={() => isMobile && setOpenMobile(false)}
-                          >
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
             )}
+            <SidebarGroup>
+              <div className="pt-6">
+                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {filteredMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link 
+                          to={item.path} 
+                          className="flex items-center gap-2"
+                          onClick={() => isMobile && setOpenMobile(false)}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
         </Sidebar>
       </div>
@@ -155,13 +159,34 @@ export function AppSidebar() {
             >
               <X className="h-6 w-6" />
             </Button>
+            {isSuperAdmin && (
+              <>
+                <div className="pt-4">
+                  <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
+                </div>
+                <SidebarMenu>
+                  {superAdminItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link 
+                          to={item.path} 
+                          className="flex items-center gap-2 p-2"
+                          onClick={() => setOpenMobile(false)}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </>
+            )}
             <div className="pt-4">
-              <SidebarGroupLabel>
-                {isSuperAdmin ? "Super Admin" : "Menu Principal"}
-              </SidebarGroupLabel>
+              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
             </div>
             <SidebarMenu>
-              {(isSuperAdmin ? superAdminItems : filteredMenuItems).map((item) => (
+              {filteredMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link 
