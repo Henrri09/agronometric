@@ -92,9 +92,9 @@ export default function Calendar() {
               locale={ptBR}
               className="rounded-md border"
               components={{
-                DayContent: ({ day }) => (
+                DayContent: ({ date: dayDate }) => (
                   <CalendarDayContent 
-                    day={day} 
+                    day={dayDate} 
                     serviceOrders={serviceOrders || []} 
                   />
                 ),

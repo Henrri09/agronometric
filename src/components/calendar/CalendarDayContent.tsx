@@ -2,11 +2,13 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 
 interface CalendarDayContentProps {
-  day: Date;
+  day: Date | undefined;
   serviceOrders: any[];
 }
 
 export function CalendarDayContent({ day, serviceOrders }: CalendarDayContentProps) {
+  if (!day) return null;
+
   const isStartDate = serviceOrders.some(
     order => order.start_date && new Date(order.start_date).toDateString() === day.toDateString()
   );

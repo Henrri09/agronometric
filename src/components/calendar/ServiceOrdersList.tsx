@@ -2,6 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MapPin, User, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ServiceOrdersListProps {
   serviceOrders: any[];
