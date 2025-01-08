@@ -9,6 +9,7 @@ import { ServiceOrderTypeAndPriority } from "./form-sections/ServiceOrderTypeAnd
 import { ServiceOrderLocation } from "./form-sections/ServiceOrderLocation";
 import { ServiceOrderDates } from "./form-sections/ServiceOrderDates";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { Download } from "lucide-react";
 
 interface ServiceOrderFormProps {
   initialData?: ServiceOrderFormValues;
@@ -28,7 +29,13 @@ export function ServiceOrderForm({ initialData, onSuccess }: ServiceOrderFormPro
       location: "",
       branch: "",
       start_date: "",
+      start_time: "",
       end_date: "",
+      end_time: "",
+      requester: "",
+      assigned_to: "",
+      problem_photos: [],
+      machinery_photos: [],
     },
   });
 
@@ -39,13 +46,17 @@ export function ServiceOrderForm({ initialData, onSuccess }: ServiceOrderFormPro
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <ServiceOrderBasicInfo control={form.control} />
-        <ServiceOrderTypeAndPriority control={form.control} />
         <ServiceOrderLocation control={form.control} />
         <ServiceOrderDates control={form.control} />
+        <ServiceOrderTypeAndPriority control={form.control} />
 
         <div className="flex justify-end gap-4">
+          <Button type="button" variant="outline" className="gap-2">
+            <Download className="w-4 h-4" />
+            Baixar PDF
+          </Button>
           <DialogClose asChild>
             <Button type="button" variant="outline">
               Cancelar

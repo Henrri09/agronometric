@@ -1,6 +1,8 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import { Control } from "react-hook-form";
 import { ServiceOrderFormValues } from "../schema";
 
@@ -10,14 +12,16 @@ interface ServiceOrderLocationProps {
 
 export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
   return (
-    <>
+    <div className="space-y-4 rounded-lg border p-4">
+      <h2 className="text-lg font-semibold">Informações do Equipamento</h2>
+      
       <FormField
         control={control}
         name="machinery_id"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Equipamento</FormLabel>
-            <Select onValueChange={field.onChange}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o equipamento" />
@@ -63,6 +67,22 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
           )}
         />
       </div>
-    </>
+
+      <div className="space-y-2">
+        <FormLabel>Fotos do Equipamento</FormLabel>
+        <Button type="button" variant="outline" className="w-32">
+          <Upload className="w-4 h-4 mr-2" />
+          Upload
+        </Button>
+      </div>
+
+      <div className="space-y-2">
+        <FormLabel>Fotos do Problema</FormLabel>
+        <Button type="button" variant="outline" className="w-32">
+          <Upload className="w-4 h-4 mr-2" />
+          Upload
+        </Button>
+      </div>
+    </div>
   );
 }
