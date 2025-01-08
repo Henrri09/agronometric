@@ -9,18 +9,10 @@ import {
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
-  Home, 
-  Tractor, 
-  Users, 
-  BarChart2, 
-  Settings, 
-  Calendar, 
-  Boxes, 
+  Database, 
   DollarSign, 
   LineChart, 
-  LifeBuoy, 
-  BookOpen,
-  Database
+  LifeBuoy
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -31,28 +23,12 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const { isAdmin, isSuperAdmin, loading } = useUserRole();
 
-  const menuItems = [
-    { title: "Painel Empresa", icon: Home, path: "/", adminOnly: false },
-    { title: "Cadastro Usuário", icon: Users, path: "/users", adminOnly: true },
-    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery", adminOnly: true },
-    { title: "Analytics", icon: BarChart2, path: "/analytics", adminOnly: true },
-    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: true },
-    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
-    { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
-    { title: "Documentação", icon: BookOpen, path: "/documentation", adminOnly: false },
-  ];
-
   const superAdminItems = [
     { title: "Gestão de Empresas", icon: Database, path: "/super-admin" },
     { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
     { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
     { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" }
   ];
-
-  const filteredMenuItems = menuItems.filter(item => {
-    if (!item.adminOnly) return true;
-    return isAdmin || isSuperAdmin;
-  });
 
   if (loading) {
     return (
@@ -87,14 +63,6 @@ export function AppSidebar() {
                 </SidebarGroupContent>
               </SidebarGroup>
             )}
-            <SidebarGroup>
-              <div className="pt-6">
-                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-              </div>
-              <SidebarGroupContent>
-                <SidebarMenuItems items={filteredMenuItems} />
-              </SidebarGroupContent>
-            </SidebarGroup>
           </SidebarContent>
         </Sidebar>
       </div>
@@ -118,10 +86,6 @@ export function AppSidebar() {
                 <SidebarMenuItems items={superAdminItems} isMobile />
               </>
             )}
-            <div className="pt-4">
-              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-            </div>
-            <SidebarMenuItems items={filteredMenuItems} isMobile />
           </div>
         </div>
       )}
