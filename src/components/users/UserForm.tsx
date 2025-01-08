@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 const userFormSchema = z.object({
   email: z.string().email("Email inválido"),
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
-  role: z.enum(["admin", "common", "visitor"]),
+  role: z.enum(["admin", "common", "visitor", "super_admin"]),
   password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres").optional(),
 });
 
@@ -76,6 +76,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  <SelectItem value="super_admin">Super Admin</SelectItem>
                   <SelectItem value="admin">Administrador</SelectItem>
                   <SelectItem value="common">Comum</SelectItem>
                   <SelectItem value="visitor">Visitante</SelectItem>
