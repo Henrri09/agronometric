@@ -37,18 +37,17 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200">
-      <div className="flex-1 flex items-center">
-      </div>
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1" />
+      <div className="flex-[2] flex justify-end">
         <img 
           src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
           alt="Agrometric Logo" 
           className="h-8 max-w-[200px] object-contain"
         />
       </div>
-      <div className="flex-1 flex justify-end">
+      <div className="flex-1 flex justify-end items-center gap-4">
         {userName && !isMobile && (
-          <span className="mr-4 text-gray-700 font-medium">
+          <span className="text-gray-700 font-medium">
             {`Olá ${userName}, seja bem-vindo`}
           </span>
         )}
