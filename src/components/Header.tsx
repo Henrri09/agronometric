@@ -46,20 +46,37 @@ export function Header() {
   const displayName = isMobile ? getInitials(userName) : `Olá ${userName}, seja bem-vindo`;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-end items-center border-b border-gray-200">
-      {userName && (
-        <span className="mr-4 text-gray-700 font-medium">
-          {displayName}
-        </span>
-      )}
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={handleLogout}
-        className="hover:bg-gray-100"
-      >
-        <LogOut className="h-5 w-5 text-gray-600" />
-      </Button>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200">
+      <div className="flex items-center">
+        {isMobile ? (
+          <img 
+            src="/lovable-uploads/2184b402-1719-4108-83fc-c6daff6b9a14.png" 
+            alt="Agrometric Symbol" 
+            className="h-8 w-8"
+          />
+        ) : (
+          <img 
+            src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
+            alt="Agrometric Logo" 
+            className="h-8"
+          />
+        )}
+      </div>
+      <div className="flex items-center">
+        {userName && (
+          <span className="mr-4 text-gray-700 font-medium">
+            {displayName}
+          </span>
+        )}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={handleLogout}
+          className="hover:bg-gray-100"
+        >
+          <LogOut className="h-5 w-5 text-gray-600" />
+        </Button>
+      </div>
     </header>
   );
 }
