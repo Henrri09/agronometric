@@ -20,8 +20,7 @@ import {
   LineChart, 
   LifeBuoy, 
   BookOpen,
-  Database,
-  Trophy
+  Database
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -47,8 +46,7 @@ export function AppSidebar() {
     { title: "Gestão de Empresas", icon: Database, path: "/super-admin" },
     { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
     { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
-    { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
-    { title: "Esportes", icon: Trophy, path: "/super-admin/sports" }
+    { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" }
   ];
 
   const filteredMenuItems = menuItems.filter(item => {

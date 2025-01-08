@@ -27,7 +27,6 @@ import FinancialManagement from "./pages/super-admin/FinancialManagement";
 import SuperAdminAnalytics from "./pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "./pages/super-admin/SupportTickets";
 import Documentation from "./pages/Documentation";
-import Sports from "./pages/super-admin/Sports";
 
 const queryClient = new QueryClient();
 
@@ -144,14 +143,6 @@ const App = () => (
                       element={
                         <ProtectedRoute superAdminOnly>
                           <SupportTickets />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/super-admin/sports" 
-                      element={
-                        <ProtectedRoute superAdminOnly>
-                          <Sports />
                         </ProtectedRoute>
                       } 
                     />
