@@ -27,7 +27,7 @@ export function SidebarMenuItems({ items, isMobile }: SidebarMenuItemsProps) {
           <SidebarMenuButton asChild>
             <Link 
               to={item.path} 
-              className="flex items-center gap-2"
+              className="sidebar-menu-item flex items-center gap-2 px-4 py-2 rounded-md w-full"
               onClick={() => isMobile && setOpenMobile(false)}
             >
               <item.icon className="h-5 w-5" />

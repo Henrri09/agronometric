@@ -90,30 +90,30 @@
   }
 
   /* Menu hover styles */
-  [data-sidebar="sidebar"] [role="menuitem"] a {
-    @apply transition-colors duration-200;
+  [data-sidebar="sidebar"] .sidebar-menu-item {
+    @apply transition-all duration-200;
   }
 
-  [data-sidebar="sidebar"] [role="menuitem"] a:hover {
+  [data-sidebar="sidebar"] .sidebar-menu-item:hover {
     @apply bg-primary/10 text-primary;
   }
 
   /* Menu item active styles */
-  [data-sidebar="sidebar"] [role="menuitem"] a.active {
+  [data-sidebar="sidebar"] .sidebar-menu-item.active {
     @apply bg-primary/20 text-primary font-medium;
   }
 
   /* Menu item hover animation */
-  [data-sidebar="sidebar"] [role="menuitem"] a {
+  [data-sidebar="sidebar"] .sidebar-menu-item {
     @apply relative overflow-hidden;
   }
 
-  [data-sidebar="sidebar"] [role="menuitem"] a::after {
+  [data-sidebar="sidebar"] .sidebar-menu-item::after {
     content: '';
     @apply absolute left-0 bottom-0 h-0.5 w-0 bg-primary transition-all duration-300;
   }
 
-  [data-sidebar="sidebar"] [role="menuitem"] a:hover::after {
+  [data-sidebar="sidebar"] .sidebar-menu-item:hover::after {
     @apply w-full;
   }
 }
