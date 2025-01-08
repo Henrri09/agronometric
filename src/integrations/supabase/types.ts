@@ -11,38 +11,47 @@ export type Database = {
     Tables: {
       bug_reports: {
         Row: {
-          id: string
-          title: string
-          description: string
-          status: string | null
-          reporter_id: string | null
           company_id: string | null
-          screenshot_url: string | null
           created_at: string | null
+          description: string
+          id: string
+          reporter_id: string | null
+          screenshot_url: string | null
+          status: string | null
+          title: string
           updated_at: string | null
         }
         Insert: {
-          id?: string
-          title: string
-          description: string
-          status?: string | null
-          reporter_id?: string | null
           company_id?: string | null
-          screenshot_url?: string | null
           created_at?: string | null
+          description: string
+          id?: string
+          reporter_id?: string | null
+          screenshot_url?: string | null
+          status?: string | null
+          title: string
           updated_at?: string | null
         }
         Update: {
-          id?: string
-          title?: string
-          description?: string
-          status?: string | null
-          reporter_id?: string | null
           company_id?: string | null
-          screenshot_url?: string | null
           created_at?: string | null
+          description?: string
+          id?: string
+          reporter_id?: string | null
+          screenshot_url?: string | null
+          status?: string | null
+          title?: string
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "bug_reports_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       calendar_events: {
         Row: {
@@ -591,7 +600,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
-          title: string
+          title?: string
           updated_at?: string | null
           video_url?: string
         }
@@ -720,10 +729,10 @@ export type TablesUpdate<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
-    : never
+        Update: infer U
+      }
+      ? U
+      : never
     : never
 
 export type Enums<
