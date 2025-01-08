@@ -17,19 +17,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
 
 export default function ServiceOrders() {
   const { toast } = useToast();
   const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const { data: serviceOrders, refetch } = useQuery({
     queryKey: ['service-orders'],
@@ -106,23 +100,31 @@ export default function ServiceOrders() {
   };
 
   const handleFormSubmitSuccess = () => {
-    setIsCreateDialogOpen(false);
+    setShowForm(false);
     refetch();
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
       <PageHeader
         title="Ordens de Serviço"
         description="Gerencie todas as ordens de serviço do sistema"
       />
 
       <div className="flex justify-end">
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
+        <Button onClick={() => setShowForm(!showForm)}>
           <Plus className="w-4 h-4 mr-2" />
-          Nova Ordem de Serviço
+          {showForm ? "Cancelar" : "Nova Ordem de Serviço"}
         </Button>
       </div>
+
+      {showForm && (
+        <Card>
+          <CardContent className="p-6">
+            <ServiceOrderForm onSuccess={handleFormSubmitSuccess} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardContent className="p-6">
@@ -153,7 +155,7 @@ export default function ServiceOrders() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => setIsCreateDialogOpen(true)}
+                      onClick={() => setShowForm(true)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -171,15 +173,6 @@ export default function ServiceOrders() {
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Nova Ordem de Serviço</DialogTitle>
-          </DialogHeader>
-          <ServiceOrderForm onSuccess={handleFormSubmitSuccess} />
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={!!deleteOrderId} onOpenChange={() => setDeleteOrderId(null)}>
         <AlertDialogContent>
