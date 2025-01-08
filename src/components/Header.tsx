@@ -2,13 +2,8 @@ import { LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
-interface HeaderProps {
-  className?: string;
-}
-
-export function Header({ className }: HeaderProps) {
+export function Header() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,7 +12,7 @@ export function Header({ className }: HeaderProps) {
   };
 
   return (
-    <header className={cn("bg-white border-b px-6 py-3 flex justify-end items-center h-16", className)}>
+    <header className="bg-white px-6 py-3 flex justify-end items-center">
       <Button 
         variant="ghost" 
         size="icon"

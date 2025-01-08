@@ -84,11 +84,11 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <SidebarProvider>
-                  <div className="min-h-screen flex flex-col">
-                    <Header className="fixed top-0 left-0 right-0 z-50" />
-                    <div className="flex flex-1 pt-16"> {/* Added padding-top to account for fixed header */}
-                      <AppSidebar className="fixed left-0 top-16 bottom-0 z-40" /> {/* Fixed position for sidebar */}
-                      <main className="flex-1 ml-64 overflow-auto p-4"> {/* Added margin-left to account for fixed sidebar */}
+                  <div className="min-h-screen flex flex-col w-full">
+                    <Header />
+                    <div className="flex flex-1">
+                      <AppSidebar />
+                      <main className="flex-1 overflow-auto">
                         <Routes>
                           <Route path="/" element={<Dashboard />} />
                           <Route 
