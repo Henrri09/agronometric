@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import { MoreVertical, Calendar, ArrowUpDown, ChevronDown, ChevronUp, MapPin, User, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +18,12 @@ interface ServiceOrder {
   description?: string;
   service_type: string;
   priority: string;
+  location?: string;
+  branch?: string;
+  requester?: string;
+  assigned_to?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 interface TaskCardProps {
@@ -94,9 +100,18 @@ export function TaskCard({
         return "Preventiva";
       case "corrective":
         return "Corretiva";
+      case "installation":
+        return "Instalação";
+      case "calibration":
+        return "Calibração";
       default:
         return type;
     }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null;
+    return format(new Date(dateString), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR });
   };
 
   return (
@@ -166,20 +181,66 @@ export function TaskCard({
       )}
 
       {isExpanded && serviceOrders && (
-        <div className="mt-4 space-y-2 border-t pt-4">
+        <div className="mt-4 space-y-3 border-t pt-4">
           <h5 className="text-sm font-medium">Ordem de Serviço Relacionada</h5>
-          <div className="rounded-md border p-3 text-sm space-y-2">
+          <div className="rounded-md border p-4 text-sm space-y-3">
             <div className="font-medium">{serviceOrders.title}</div>
             {serviceOrders.description && (
               <p className="text-muted-foreground">{serviceOrders.description}</p>
             )}
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">
-                {getServiceTypeLabel(serviceOrders.service_type)}
-              </Badge>
-              <Badge variant="outline">
-                {getPriorityLabel(serviceOrders.priority)}
-              </Badge>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">
+                    {getServiceTypeLabel(serviceOrders.service_type)}
+                  </Badge>
+                  <Badge variant="outline">
+                    {getPriorityLabel(serviceOrders.priority)}
+                  </Badge>
+                </div>
+
+                {(serviceOrders.location || serviceOrders.branch) && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>
+                      {serviceOrders.location}
+                      {serviceOrders.branch && ` - ${serviceOrders.branch}`}
+                    </span>
+                  </div>
+                )}
+
+                {(serviceOrders.requester || serviceOrders.assigned_to) && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <User className="h-4 w-4" />
+                    <span>
+                      {serviceOrders.requester && `Solicitante: ${serviceOrders.requester}`}
+                      {serviceOrders.assigned_to && serviceOrders.requester && " | "}
+                      {serviceOrders.assigned_to && `Responsável: ${serviceOrders.assigned_to}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                {serviceOrders.start_date && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>
+                      Início: {formatDate(serviceOrders.start_date)}
+                    </span>
+                  </div>
+                )}
+                
+                {serviceOrders.end_date && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>
+                      Término: {formatDate(serviceOrders.end_date)}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
