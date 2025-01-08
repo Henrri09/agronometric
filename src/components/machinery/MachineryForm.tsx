@@ -3,13 +3,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { PhotoUpload } from "./PhotoUpload";
-import { machineryFormSchema, type MachineryFormProps, type MachineryFormValues } from "./types";
+import { Tables } from "@/integrations/supabase/types";
+import { BasicInfoSection } from "./form-sections/BasicInfoSection";
+import { StatusSection } from "./form-sections/StatusSection";
+import { MaintenanceSection } from "./form-sections/MaintenanceSection";
+import { PhotoSection } from "./form-sections/PhotoSection";
+import { machineryFormSchema, type MachineryFormValues } from "./types";
+
+interface MachineryFormProps {
+  machinery?: Tables<"machinery"> | null;
+  onSuccess: () => void;
+  onCancel: () => void;
+}
 
 export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -23,7 +31,7 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
       model: machinery?.model ?? "",
       serial_number: machinery?.serial_number ?? "",
       status: machinery?.status as "active" | "maintenance" | "inactive" ?? "active",
-      maintenance_frequency: 0, // Changed to number to match the schema
+      maintenance_frequency: 0,
     },
   });
 
@@ -142,91 +150,10 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o nome do maquinário" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="model"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Modelo</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o modelo" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="serial_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Número de Série</FormLabel>
-              <FormControl>
-                <Input placeholder="Digite o número de série" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="active">Ativo</SelectItem>
-                  <SelectItem value="maintenance">Em Manutenção</SelectItem>
-                  <SelectItem value="inactive">Inativo</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="maintenance_frequency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Frequência de Manutenção (dias)</FormLabel>
-              <FormControl>
-                <Input 
-                  type="number" 
-                  placeholder="Digite a frequência em dias" 
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <PhotoUpload onPhotoSelect={setPhotoFile} />
+        <BasicInfoSection form={form} />
+        <StatusSection form={form} />
+        <MaintenanceSection form={form} />
+        <PhotoSection photoFile={photoFile} onPhotoChange={setPhotoFile} />
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>

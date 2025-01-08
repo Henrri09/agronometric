@@ -1,17 +1,16 @@
-import { useState } from "react";
+import { FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Camera, Upload } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FormLabel } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 
-interface PhotoUploadProps {
-  onPhotoSelect: (file: File | null) => void;
+interface PhotoSectionProps {
+  photoFile: File | null;
+  onPhotoChange: (file: File | null) => void;
 }
 
-export function PhotoUpload({ onPhotoSelect }: PhotoUploadProps) {
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+export function PhotoSection({ photoFile, onPhotoChange }: PhotoSectionProps) {
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -34,8 +33,7 @@ export function PhotoUpload({ onPhotoSelect }: PhotoUploadProps) {
           canvas.toBlob((blob) => {
             if (blob) {
               const file = new File([blob], "machinery-photo.jpg", { type: "image/jpeg" });
-              setPhotoFile(file);
-              onPhotoSelect(file);
+              onPhotoChange(file);
             }
             stream.getTracks().forEach(track => track.stop());
           }, 'image/jpeg');
@@ -54,8 +52,7 @@ export function PhotoUpload({ onPhotoSelect }: PhotoUploadProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setPhotoFile(file);
-      onPhotoSelect(file);
+      onPhotoChange(file);
     }
   };
 

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Tables } from "@/integrations/supabase/types";
 
 export const machineryFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -10,9 +9,3 @@ export const machineryFormSchema = z.object({
 });
 
 export type MachineryFormValues = z.infer<typeof machineryFormSchema>;
-
-export interface MachineryFormProps {
-  machinery?: Tables<"machinery"> | null;
-  onSuccess: () => void;
-  onCancel: () => void;
-}
