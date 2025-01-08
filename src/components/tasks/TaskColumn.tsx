@@ -8,6 +8,7 @@ interface Task {
   priority: string;
   status: string;
   start_date?: string;
+  service_orders?: any[];
 }
 
 interface TaskColumnProps {
@@ -46,6 +47,7 @@ export function TaskColumn({
               priority={task.priority}
               status={task.status}
               date={task.start_date}
+              serviceOrders={task.service_orders}
               onStatusChange={onStatusChange}
               onDelete={onDelete}
             />

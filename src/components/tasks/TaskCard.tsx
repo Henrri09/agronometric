@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, ArrowUpDown } from "lucide-react";
+import { MoreVertical, Calendar, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useState } from "react";
 
 interface TaskCardProps {
   id: string;
@@ -18,6 +19,7 @@ interface TaskCardProps {
   priority: string;
   status: string;
   date?: string;
+  serviceOrders?: any[];
   onStatusChange?: (id: string, newStatus: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -29,9 +31,12 @@ export function TaskCard({
   priority,
   status,
   date,
+  serviceOrders = [],
   onStatusChange,
   onDelete,
 }: TaskCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
       case "urgent":
@@ -62,7 +67,21 @@ export function TaskCard({
     <Card className="p-4 space-y-3">
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <h4 className="font-medium">{title}</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium">{title}</h4>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
           {description && (
             <p className="text-sm text-muted-foreground">{description}</p>
           )}
@@ -105,6 +124,27 @@ export function TaskCard({
         <div className="flex items-center text-sm text-muted-foreground">
           <Calendar className="mr-2 h-4 w-4" />
           {format(new Date(date), "dd 'de' MMMM", { locale: ptBR })}
+        </div>
+      )}
+
+      {isExpanded && serviceOrders && serviceOrders.length > 0 && (
+        <div className="mt-4 space-y-2 border-t pt-4">
+          <h5 className="text-sm font-medium">Ordens de Serviço Relacionadas</h5>
+          {serviceOrders.map((order: any) => (
+            <div
+              key={order.id}
+              className="rounded-md border p-2 text-sm space-y-1"
+            >
+              <div className="font-medium">{order.title}</div>
+              {order.description && (
+                <p className="text-muted-foreground">{order.description}</p>
+              )}
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">{order.service_type}</Badge>
+                <Badge variant="outline">{order.priority}</Badge>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </Card>

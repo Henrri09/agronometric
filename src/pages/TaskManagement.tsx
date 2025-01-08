@@ -7,9 +7,12 @@ import { Plus, Calendar, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskColumn } from "@/components/tasks/TaskColumn";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
 
 export default function TaskManagement() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -18,7 +21,7 @@ export default function TaskManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tasks")
-        .select("*")
+        .select("*, service_orders(*)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -74,11 +77,20 @@ export default function TaskManagement() {
   });
 
   const handleStatusChange = (id: string, newStatus: string) => {
-    updateTaskStatus.mutate({ id, status: newStatus }); // Fixed here: changed newStatus to status
+    updateTaskStatus.mutate({ id, status: newStatus });
   };
 
   const handleDelete = (id: string) => {
     deleteTask.mutate(id);
+  };
+
+  const handleNewTaskSuccess = () => {
+    setIsNewTaskDialogOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    toast({
+      title: "Tarefa criada",
+      description: "A nova tarefa foi criada com sucesso.",
+    });
   };
 
   const filteredTasks = tasks.filter((task) =>
@@ -117,7 +129,7 @@ export default function TaskManagement() {
             <Calendar className="h-4 w-4" />
             Filtrar por data
           </Button>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => setIsNewTaskDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Nova Tarefa
           </Button>
@@ -154,6 +166,15 @@ export default function TaskManagement() {
           onDelete={handleDelete}
         />
       </div>
+
+      <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Nova Tarefa</DialogTitle>
+          </DialogHeader>
+          <ServiceOrderForm onSuccess={handleNewTaskSuccess} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
