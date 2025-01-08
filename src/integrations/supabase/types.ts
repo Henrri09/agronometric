@@ -85,36 +85,51 @@ export type Database = {
           cost: number | null
           created_at: string
           description: string | null
+          downtime_cost_per_hour: number | null
+          downtime_hours: number | null
           id: string
+          indirect_costs: number | null
+          labor_cost: number | null
           machinery_id: string | null
           maintenance_date: string
           maintenance_type: string
           performed_by: string | null
           service_order_id: string | null
+          total_cost: number | null
           updated_at: string
         }
         Insert: {
           cost?: number | null
           created_at?: string
           description?: string | null
+          downtime_cost_per_hour?: number | null
+          downtime_hours?: number | null
           id?: string
+          indirect_costs?: number | null
+          labor_cost?: number | null
           machinery_id?: string | null
           maintenance_date: string
           maintenance_type: string
           performed_by?: string | null
           service_order_id?: string | null
+          total_cost?: number | null
           updated_at?: string
         }
         Update: {
           cost?: number | null
           created_at?: string
           description?: string | null
+          downtime_cost_per_hour?: number | null
+          downtime_hours?: number | null
           id?: string
+          indirect_costs?: number | null
+          labor_cost?: number | null
           machinery_id?: string | null
           maintenance_date?: string
           maintenance_type?: string
           performed_by?: string | null
           service_order_id?: string | null
+          total_cost?: number | null
           updated_at?: string
         }
         Relationships: [
