@@ -74,7 +74,7 @@ export default function TaskManagement() {
   });
 
   const handleStatusChange = (id: string, newStatus: string) => {
-    updateTaskStatus.mutate({ id, newStatus });
+    updateTaskStatus.mutate({ id, status: newStatus }); // Fixed here: changed newStatus to status
   };
 
   const handleDelete = (id: string) => {
