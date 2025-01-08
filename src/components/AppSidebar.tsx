@@ -37,20 +37,34 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAdminStatus = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .single();
-        
-        console.log("User role:", roles?.role); // Debug log
-        setIsAdmin(roles?.role === "admin");
-        setIsSuperAdmin(roles?.role === "super_admin");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          console.log("User ID:", session.user.id); // Debug log
+          
+          const { data: roles, error } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", session.user.id)
+            .single();
+          
+          if (error) {
+            console.error("Error fetching role:", error); // Debug log
+            return;
+          }
+          
+          console.log("User role:", roles?.role); // Debug log
+          setIsAdmin(roles?.role === "admin");
+          setIsSuperAdmin(roles?.role === "super_admin");
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -76,6 +90,7 @@ export function AppSidebar() {
     { title: "Esportes", icon: Trophy, path: "/super-admin/sports" }
   ];
 
+  // Modificado para mostrar itens de admin mesmo durante o carregamento
   const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin || isSuperAdmin);
 
   const renderMenu = (items: typeof menuItems | typeof superAdminItems) => (
@@ -96,6 +111,14 @@ export function AppSidebar() {
       ))}
     </SidebarMenu>
   );
+
+  if (loading) {
+    return (
+      <div className="p-4">
+        <p>Carregando menu...</p>
+      </div>
+    );
+  }
 
   return (
     <>
