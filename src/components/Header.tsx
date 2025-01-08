@@ -36,9 +36,9 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200">
       <div className="flex-1" />
-      <div className="flex-[2] flex justify-start">
+      <div className="flex-[2] flex justify-start pl-0">
         <img 
           src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
           alt="Agrometric Logo" 
