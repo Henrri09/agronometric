@@ -56,7 +56,7 @@ export function Header() {
       </div>
       <div className={`flex items-center ${isMobile ? 'ml-auto' : ''}`}>
         {userName && (
-          <span className="mr-2 text-gray-700 font-medium">
+          <span className="mr-1 text-gray-700 font-medium">
             {displayName}
           </span>
         )}
