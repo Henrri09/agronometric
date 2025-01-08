@@ -46,7 +46,7 @@ export function MachineryForm({ machinery, onSuccess, onCancel }: MachineryFormP
       model: machinery?.model ?? "",
       serial_number: machinery?.serial_number ?? "",
       status: machinery?.status as "active" | "maintenance" | "inactive" ?? "active",
-      maintenance_frequency: "",
+      maintenance_frequency: "0", // Changed to string to match the schema
     },
   });
 
