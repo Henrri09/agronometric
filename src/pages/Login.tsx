@@ -30,7 +30,6 @@ export default function Login() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // Fetch user role after successful login
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
@@ -39,7 +38,6 @@ export default function Login() {
 
         toast.success("Login realizado com sucesso!");
         
-        // If user is super_admin, redirect to super-admin page
         if (roleData?.role === 'super_admin') {
           navigate("/super-admin");
         } else {
@@ -54,17 +52,17 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/90 to-accent/90">
+    <div className="min-h-screen flex items-center justify-center auth-gradient">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">AgroMetric</h1>
-          <p className="text-gray-600">Faça login para continuar</p>
+          <h1 className="text-2xl font-bold text-accent mb-2">AgroMetric</h1>
+          <p className="text-accent/70">Faça login para continuar</p>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
               <Input
                 type="email"
                 placeholder="Email"
@@ -78,7 +76,7 @@ export default function Login() {
           
           <div className="space-y-2">
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
               <Input
                 type="password"
                 placeholder="Senha"
@@ -90,18 +88,18 @@ export default function Login() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
+          <Button type="submit" className="w-full bg-primary hover:bg-primary-hover" size="lg" disabled={loading}>
             <LogIn className="mr-2 h-5 w-5" />
             {loading ? "Entrando..." : "Entrar"}
           </Button>
 
           <div className="flex flex-col items-center space-y-4">
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-accent/70">
               Não tem uma conta?{" "}
               <button
                 type="button"
                 onClick={() => navigate("/register")}
-                className="text-primary hover:underline"
+                className="text-primary hover:text-primary-hover hover:underline"
                 disabled={loading}
               >
                 Registre-se
