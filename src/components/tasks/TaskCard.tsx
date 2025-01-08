@@ -61,13 +61,41 @@ export function TaskCard({
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "todo":
-        return <Badge variant="outline">todo</Badge>;
-      case "preventive":
-        return <Badge className="bg-blue-500">preventiva</Badge>;
-      case "corrective":
-        return <Badge variant="destructive">corretiva</Badge>;
+        return <Badge variant="outline">A fazer</Badge>;
+      case "in_progress":
+        return <Badge className="bg-blue-500">Em andamento</Badge>;
+      case "review":
+        return <Badge className="bg-yellow-500">Em revisão</Badge>;
+      case "done":
+        return <Badge className="bg-green-500">Concluído</Badge>;
       default:
         return <Badge>{status}</Badge>;
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case "urgent":
+        return "Urgente";
+      case "high":
+        return "Alta";
+      case "medium":
+        return "Média";
+      case "low":
+        return "Baixa";
+      default:
+        return priority;
+    }
+  };
+
+  const getServiceTypeLabel = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "preventive":
+        return "Preventiva";
+      case "corrective":
+        return "Corretiva";
+      default:
+        return type;
     }
   };
 
@@ -125,7 +153,9 @@ export function TaskCard({
 
       <div className="flex items-center gap-2">
         {getStatusBadge(status)}
-        <Badge className={getPriorityColor(priority)}>{priority}</Badge>
+        <Badge className={getPriorityColor(priority)}>
+          {getPriorityLabel(priority)}
+        </Badge>
       </div>
 
       {date && (
@@ -138,14 +168,18 @@ export function TaskCard({
       {isExpanded && serviceOrders && (
         <div className="mt-4 space-y-2 border-t pt-4">
           <h5 className="text-sm font-medium">Ordem de Serviço Relacionada</h5>
-          <div className="rounded-md border p-2 text-sm space-y-1">
+          <div className="rounded-md border p-3 text-sm space-y-2">
             <div className="font-medium">{serviceOrders.title}</div>
             {serviceOrders.description && (
               <p className="text-muted-foreground">{serviceOrders.description}</p>
             )}
             <div className="flex items-center gap-2">
-              <Badge variant="outline">{serviceOrders.service_type}</Badge>
-              <Badge variant="outline">{serviceOrders.priority}</Badge>
+              <Badge variant="outline">
+                {getServiceTypeLabel(serviceOrders.service_type)}
+              </Badge>
+              <Badge variant="outline">
+                {getPriorityLabel(serviceOrders.priority)}
+              </Badge>
             </div>
           </div>
         </div>
