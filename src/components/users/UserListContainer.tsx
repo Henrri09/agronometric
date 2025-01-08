@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { UserList, User } from "@/components/users/UserList";
 import { toast } from "sonner";
+import { AdminUserAttributes } from "@supabase/supabase-js";
 
 export function UserListContainer() {
   const [users, setUsers] = useState<User[]>([]);
@@ -35,12 +36,16 @@ export function UserListContainer() {
         .select("user_id, role");
 
       // Buscar dados dos usuários do auth
-      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) throw authError;
+      
+      const authUsers = authData?.users || [];
 
       // Combinar os dados
       const combinedUsers = profiles?.map(profile => {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
-        const authUser = authUsers?.users.find(user => user.id === profile.id);
+        const authUser = authUsers.find(user => user.id === profile.id);
         
         return {
           id: profile.id,
