@@ -49,7 +49,7 @@ const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false })
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
         
         setIsAdmin(userRoles?.role === 'admin');
         setIsSuperAdmin(userRoles?.role === 'super_admin');
@@ -172,6 +172,14 @@ const App = () => (
                       } 
                     />
                     <Route 
+                      path="/service-orders" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <ServiceOrders />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
                       path="/analytics" 
                       element={
                         <ProtectedRoute adminOnly>
@@ -184,6 +192,22 @@ const App = () => (
                       element={
                         <ProtectedRoute adminOnly>
                           <Settings />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/task-management" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <TaskManagement />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/calendar" 
+                      element={
+                        <ProtectedRoute adminOnly>
+                          <Calendar />
                         </ProtectedRoute>
                       } 
                     />

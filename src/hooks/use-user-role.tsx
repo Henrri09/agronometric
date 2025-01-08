@@ -8,13 +8,19 @@ export function useUserRole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const checkUserRole = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.user) {
           console.log("No session found");
-          setLoading(false);
+          if (mounted) {
+            setLoading(false);
+            setIsAdmin(false);
+            setIsSuperAdmin(false);
+          }
           return;
         }
 
@@ -32,22 +38,24 @@ export function useUserRole() {
           return;
         }
 
-        console.log("User role response:", userRole);
-        
-        if (userRole?.role) {
-          setIsAdmin(userRole.role === 'admin');
-          setIsSuperAdmin(userRole.role === 'super_admin');
-          console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
-        } else {
-          console.log("No role found for user");
-          setIsAdmin(false);
-          setIsSuperAdmin(false);
+        if (mounted) {
+          if (userRole?.role) {
+            setIsAdmin(userRole.role === 'admin');
+            setIsSuperAdmin(userRole.role === 'super_admin');
+            console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
+          } else {
+            console.log("No role found for user");
+            setIsAdmin(false);
+            setIsSuperAdmin(false);
+          }
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error in checkUserRole:", error);
+        if (mounted) {
+          setLoading(false);
+        }
         toast.error("Erro ao verificar status do usuário");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -56,10 +64,13 @@ export function useUserRole() {
 
     // Monitor authentication changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkUserRole();
+      if (mounted) {
+        checkUserRole();
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
