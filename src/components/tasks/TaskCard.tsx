@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, ArrowUpDown, ChevronDown, ChevronUp, MapPin, User, Clock } from "lucide-react";
+import { MoreVertical, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
+import { TaskCardHeader } from "./TaskCardHeader";
+import { ServiceOrderDetails } from "./ServiceOrderDetails";
 
 interface ServiceOrder {
   id: string;
@@ -94,49 +96,15 @@ export function TaskCard({
     }
   };
 
-  const getServiceTypeLabel = (type: string) => {
-    switch (type.toLowerCase()) {
-      case "preventive":
-        return "Preventiva";
-      case "corrective":
-        return "Corretiva";
-      case "installation":
-        return "Instalação";
-      case "calibration":
-        return "Calibração";
-      default:
-        return type;
-    }
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return null;
-    return format(new Date(dateString), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR });
-  };
-
   return (
     <Card className="p-4 space-y-3">
       <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h4 className="font-medium">{title}</h4>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-5 w-5"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          )}
-        </div>
+        <TaskCardHeader
+          title={title}
+          description={description}
+          isExpanded={isExpanded}
+          onToggleExpand={() => setIsExpanded(!isExpanded)}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -181,69 +149,7 @@ export function TaskCard({
       )}
 
       {isExpanded && serviceOrders && (
-        <div className="mt-4 space-y-3 border-t pt-4">
-          <h5 className="text-sm font-medium">Ordem de Serviço Relacionada</h5>
-          <div className="rounded-md border p-4 text-sm space-y-3">
-            <div className="font-medium">{serviceOrders.title}</div>
-            {serviceOrders.description && (
-              <p className="text-muted-foreground">{serviceOrders.description}</p>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">
-                    {getServiceTypeLabel(serviceOrders.service_type)}
-                  </Badge>
-                  <Badge variant="outline">
-                    {getPriorityLabel(serviceOrders.priority)}
-                  </Badge>
-                </div>
-
-                {(serviceOrders.location || serviceOrders.branch) && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>
-                      {serviceOrders.location}
-                      {serviceOrders.branch && ` - ${serviceOrders.branch}`}
-                    </span>
-                  </div>
-                )}
-
-                {(serviceOrders.requester || serviceOrders.assigned_to) && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    <span>
-                      {serviceOrders.requester && `Solicitante: ${serviceOrders.requester}`}
-                      {serviceOrders.assigned_to && serviceOrders.requester && " | "}
-                      {serviceOrders.assigned_to && `Responsável: ${serviceOrders.assigned_to}`}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                {serviceOrders.start_date && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span>
-                      Início: {formatDate(serviceOrders.start_date)}
-                    </span>
-                  </div>
-                )}
-                
-                {serviceOrders.end_date && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span>
-                      Término: {formatDate(serviceOrders.end_date)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <ServiceOrderDetails serviceOrder={serviceOrders} />
       )}
     </Card>
   );
