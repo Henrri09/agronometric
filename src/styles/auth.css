@@ -1,0 +1,4 @@
+/* Login and Register background gradients */
+.auth-gradient {
+  @apply bg-gradient-to-br from-primary/90 to-accent/90;
+}
