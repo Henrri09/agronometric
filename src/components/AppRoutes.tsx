@@ -61,8 +61,26 @@ const ProtectedRoute = ({ children, requiredRole = 'visitor' }: ProtectedRoutePr
     return <div>Loading...</div>;
   }
 
+  // Visitor access rules
+  const visitorAllowedRoutes = [
+    '/service-orders',
+    '/machinery',
+    '/calendar',
+    '/documentation',
+    '/parts-inventory',
+    '/maintenance-schedule'
+  ];
+
+  // Common user access rules (all except Users and Analytics)
+  const commonUserRestrictedRoutes = [
+    '/users',
+    '/analytics'
+  ];
+
   // Check access based on role and route
   const checkAccess = () => {
+    const currentPath = location.pathname;
+
     if (requiredRole === 'super_admin' && userRole !== 'super_admin') {
       return false;
     }
@@ -72,6 +90,10 @@ const ProtectedRoute = ({ children, requiredRole = 'visitor' }: ProtectedRoutePr
     }
 
     if (!isAuthenticated) {
+      if (!visitorAllowedRoutes.includes(currentPath)) {
+        return false;
+      }
+    } else if (userRole === 'common' && commonUserRestrictedRoutes.includes(currentPath)) {
       return false;
     }
 

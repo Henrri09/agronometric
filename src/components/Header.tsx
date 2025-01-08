@@ -30,8 +30,7 @@ export function Header() {
     getUserProfile();
   }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
     toast.success("Logout realizado com sucesso!");
     navigate("/login");
   };
@@ -41,6 +40,7 @@ export function Header() {
       {isMobile ? (
         <div className="grid grid-cols-[48px_1fr_48px] items-center px-4">
           <div className="flex justify-start">
+            {/* Placeholder para o menu hamburguer com mesma largura do botão de logout */}
             <div className="w-10 h-10" />
           </div>
           <div className="flex justify-center">
