@@ -38,6 +38,7 @@ export function AppSidebar() {
     { title: "Analytics", icon: BarChart2, path: "/analytics" },
     { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory" },
     { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule" },
+    { title: "Calendário", icon: Calendar, path: "/calendar" },
     { title: "Configurações", icon: Settings, path: "/settings" },
     { title: "Documentação", icon: BookOpen, path: "/documentation" },
   ];
