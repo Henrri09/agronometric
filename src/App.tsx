@@ -27,6 +27,7 @@ import FinancialManagement from "./pages/super-admin/FinancialManagement";
 import SuperAdminAnalytics from "./pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "./pages/super-admin/SupportTickets";
 import Documentation from "./pages/Documentation";
+import Sports from "./pages/super-admin/Sports";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +148,14 @@ const App = () => (
                       } 
                     />
                     <Route 
+                      path="/super-admin/sports" 
+                      element={
+                        <ProtectedRoute superAdminOnly>
+                          <Sports />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
                       path="/users" 
                       element={
                         <ProtectedRoute adminOnly>
@@ -162,7 +171,6 @@ const App = () => (
                         </ProtectedRoute>
                       } 
                     />
-                    <Route path="/service-orders" element={<ServiceOrders />} />
                     <Route 
                       path="/analytics" 
                       element={
@@ -179,8 +187,6 @@ const App = () => (
                         </ProtectedRoute>
                       } 
                     />
-                    <Route path="/task-management" element={<TaskManagement />} />
-                    <Route path="/calendar" element={<Calendar />} />
                     <Route 
                       path="/parts-inventory" 
                       element={
