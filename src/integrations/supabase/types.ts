@@ -302,12 +302,17 @@ export type Database = {
           created_by: string | null
           description: string | null
           end_date: string | null
+          end_time: string | null
           id: string
           location: string | null
           machinery_id: string | null
+          machinery_photos: string[] | null
           priority: string | null
+          problem_photos: string[] | null
+          requester: string | null
           service_type: string | null
           start_date: string | null
+          start_time: string | null
           status: string | null
           title: string
           updated_at: string
@@ -319,12 +324,17 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           id?: string
           location?: string | null
           machinery_id?: string | null
+          machinery_photos?: string[] | null
           priority?: string | null
+          problem_photos?: string[] | null
+          requester?: string | null
           service_type?: string | null
           start_date?: string | null
+          start_time?: string | null
           status?: string | null
           title: string
           updated_at?: string
@@ -336,12 +346,17 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           id?: string
           location?: string | null
           machinery_id?: string | null
+          machinery_photos?: string[] | null
           priority?: string | null
+          problem_photos?: string[] | null
+          requester?: string | null
           service_type?: string | null
           start_date?: string | null
+          start_time?: string | null
           status?: string | null
           title?: string
           updated_at?: string

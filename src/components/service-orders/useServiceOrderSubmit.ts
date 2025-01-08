@@ -24,7 +24,13 @@ export const useServiceOrderSubmit = (serviceOrderId?: string) => {
             location: data.location,
             branch: data.branch,
             start_date: data.start_date,
+            start_time: data.start_time,
             end_date: data.end_date,
+            end_time: data.end_time,
+            requester: data.requester,
+            assigned_to: data.assigned_to,
+            problem_photos: data.problem_photos,
+            machinery_photos: data.machinery_photos,
           })
           .eq('id', serviceOrderId);
 
@@ -72,7 +78,13 @@ export const useServiceOrderSubmit = (serviceOrderId?: string) => {
             location: data.location,
             branch: data.branch,
             start_date: data.start_date,
+            start_time: data.start_time,
             end_date: data.end_date,
+            end_time: data.end_time,
+            requester: data.requester,
+            assigned_to: data.assigned_to,
+            problem_photos: data.problem_photos,
+            machinery_photos: data.machinery_photos,
             status: 'pending'
           })
           .select()
