@@ -17,6 +17,75 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+// Separate menu items into their own components
+const CommonMenuItems = ({ onItemClick, getLinkClassName }: { 
+  onItemClick: () => void, 
+  getLinkClassName: (path: string) => string 
+}) => {
+  const menuItems = [
+    { title: "Painel Empresa", icon: Home, path: "/", adminOnly: false },
+    { title: "Cadastro Usuário", icon: Users, path: "/users", adminOnly: true },
+    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery", adminOnly: true },
+    { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders", adminOnly: false },
+    { title: "Analytics", icon: BarChart2, path: "/analytics", adminOnly: true },
+    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: true },
+    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
+    { title: "Calendário", icon: Calendar, path: "/calendar", adminOnly: false },
+    { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
+    { title: "Documentação", icon: BookOpen, path: "/documentation", adminOnly: false },
+  ];
+
+  return (
+    <>
+      {menuItems.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild>
+            <Link 
+              to={item.path} 
+              className={getLinkClassName(item.path)}
+              onClick={onItemClick}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </>
+  );
+};
+
+const SuperAdminMenuItems = ({ onItemClick, getLinkClassName }: {
+  onItemClick: () => void,
+  getLinkClassName: (path: string) => string
+}) => {
+  const superAdminItems = [
+    { title: "Gestão de Empresas", icon: Home, path: "/super-admin" },
+    { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
+    { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
+    { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
+  ];
+
+  return (
+    <>
+      {superAdminItems.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild>
+            <Link 
+              to={item.path} 
+              className={getLinkClassName(item.path)}
+              onClick={onItemClick}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </>
+  );
+};
+
 export function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
@@ -42,38 +111,13 @@ export function AppSidebar() {
     checkAdminStatus();
   }, []);
 
-  const menuItems = [
-    { title: "Painel Empresa", icon: Home, path: "/", adminOnly: false },
-    { title: "Cadastro Usuário", icon: Users, path: "/users", adminOnly: true },
-    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery", adminOnly: true },
-    { title: "Ordem de Serviço", icon: ClipboardList, path: "/service-orders", adminOnly: false },
-    { title: "Analytics", icon: BarChart2, path: "/analytics", adminOnly: true },
-    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: true },
-    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
-    { title: "Calendário", icon: Calendar, path: "/calendar", adminOnly: false },
-    { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
-    { title: "Documentação", icon: BookOpen, path: "/documentation", adminOnly: false },
-  ];
-
-  const superAdminItems = [
-    { title: "Gestão de Empresas", icon: Home, path: "/super-admin" },
-    { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
-    { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
-    { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
-  ];
-
   const isActive = (path: string) => {
-    // For root path, only match exact
     if (path === "/") {
       return location.pathname === "/";
     }
-    
-    // For super admin root, only match exact
     if (path === "/super-admin") {
       return location.pathname === "/super-admin";
     }
-    
-    // For other paths, match exact path
     return location.pathname === path;
   };
 
@@ -85,9 +129,11 @@ export function AppSidebar() {
       }`;
   };
 
-  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
-
-  // ... keep existing code (mobile button and sidebar structure)
+  const handleMobileClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <>
@@ -116,60 +162,32 @@ export function AppSidebar() {
                 </Button>
               )}
             </div>
-            {isSuperAdmin ? (
-              <SidebarGroup>
-                <div className="pt-6">
-                  <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
-                </div>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {superAdminItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild>
-                          <Link 
-                            to={item.path} 
-                            className={getLinkClassName(item.path)}
-                            onClick={() => isMobile && setOpenMobile(false)}
-                          >
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            ) : (
-              <SidebarGroup>
-                <div className="pt-6">
-                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-                </div>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {filteredMenuItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild>
-                          <Link 
-                            to={item.path} 
-                            className={getLinkClassName(item.path)}
-                            onClick={() => isMobile && setOpenMobile(false)}
-                          >
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            )}
+            <SidebarGroup>
+              <div className="pt-6">
+                <SidebarGroupLabel>
+                  {isSuperAdmin ? "Super Admin" : "Menu Principal"}
+                </SidebarGroupLabel>
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {isSuperAdmin ? (
+                    <SuperAdminMenuItems 
+                      onItemClick={handleMobileClick}
+                      getLinkClassName={getLinkClassName}
+                    />
+                  ) : (
+                    <CommonMenuItems 
+                      onItemClick={handleMobileClick}
+                      getLinkClassName={getLinkClassName}
+                    />
+                  )}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
         </Sidebar>
       </div>
 
-      {/* Mobile Sidebar Sheet */}
       {isMobile && openMobile && (
         <div className="fixed inset-0 bg-background z-40">
           <div className="pt-16 px-4">
@@ -187,20 +205,17 @@ export function AppSidebar() {
               </SidebarGroupLabel>
             </div>
             <SidebarMenu>
-              {(isSuperAdmin ? superAdminItems : filteredMenuItems).map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link 
-                      to={item.path} 
-                      className={getLinkClassName(item.path)}
-                      onClick={() => setOpenMobile(false)}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {isSuperAdmin ? (
+                <SuperAdminMenuItems 
+                  onItemClick={handleMobileClick}
+                  getLinkClassName={getLinkClassName}
+                />
+              ) : (
+                <CommonMenuItems 
+                  onItemClick={handleMobileClick}
+                  getLinkClassName={getLinkClassName}
+                />
+              )}
             </SidebarMenu>
           </div>
         </div>

@@ -6,23 +6,11 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 
+// Import pages
+import { AuthenticatedRoutes } from "./routes/AuthenticatedRoutes";
+import { SuperAdminRoutes } from "./routes/SuperAdminRoutes";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import Dashboard from "@/pages/Dashboard";
-import Users from "@/pages/Users";
-import Machinery from "@/pages/Machinery";
-import ServiceOrders from "@/pages/ServiceOrders";
-import Analytics from "@/pages/Analytics";
-import Settings from "@/pages/Settings";
-import TaskManagement from "@/pages/TaskManagement";
-import Calendar from "@/pages/Calendar";
-import PartsInventory from "@/pages/PartsInventory";
-import MaintenanceSchedule from "@/pages/MaintenanceSchedule";
-import SuperAdmin from "@/pages/SuperAdmin";
-import FinancialManagement from "@/pages/super-admin/FinancialManagement";
-import SuperAdminAnalytics from "@/pages/super-admin/SuperAdminAnalytics";
-import SupportTickets from "@/pages/super-admin/SupportTickets";
-import Documentation from "@/pages/Documentation";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -61,26 +49,7 @@ const ProtectedRoute = ({ children, requiredRole = 'visitor' }: ProtectedRoutePr
     return <div>Loading...</div>;
   }
 
-  // Visitor access rules
-  const visitorAllowedRoutes = [
-    '/service-orders',
-    '/machinery',
-    '/calendar',
-    '/documentation',
-    '/parts-inventory',
-    '/maintenance-schedule'
-  ];
-
-  // Common user access rules (all except Users and Analytics)
-  const commonUserRestrictedRoutes = [
-    '/users',
-    '/analytics'
-  ];
-
-  // Check access based on role and route
   const checkAccess = () => {
-    const currentPath = location.pathname;
-
     if (requiredRole === 'super_admin' && userRole !== 'super_admin') {
       return false;
     }
@@ -89,11 +58,7 @@ const ProtectedRoute = ({ children, requiredRole = 'visitor' }: ProtectedRoutePr
       return false;
     }
 
-    if (!isAuthenticated) {
-      if (!visitorAllowedRoutes.includes(currentPath)) {
-        return false;
-      }
-    } else if (userRole === 'common' && commonUserRestrictedRoutes.includes(currentPath)) {
+    if (!isAuthenticated && location.pathname !== '/login') {
       return false;
     }
 
@@ -136,71 +101,8 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <AppLayout>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/documentation" element={<Documentation />} />
-                <Route 
-                  path="/super-admin" 
-                  element={
-                    <ProtectedRoute requiredRole="super_admin">
-                      <SuperAdmin />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/financial" 
-                  element={
-                    <ProtectedRoute requiredRole="super_admin">
-                      <FinancialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/analytics" 
-                  element={
-                    <ProtectedRoute requiredRole="super_admin">
-                      <SuperAdminAnalytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/support" 
-                  element={
-                    <ProtectedRoute requiredRole="super_admin">
-                      <SupportTickets />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/users" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <Users />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/machinery" element={<Machinery />} />
-                <Route path="/service-orders" element={<ServiceOrders />} />
-                <Route 
-                  path="/analytics" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <Analytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/task-management" element={<TaskManagement />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/parts-inventory" element={<PartsInventory />} />
-                <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/*" element={<AuthenticatedRoutes />} />
+                <Route path="/super-admin/*" element={<SuperAdminRoutes />} />
               </Routes>
             </AppLayout>
           </ProtectedRoute>
