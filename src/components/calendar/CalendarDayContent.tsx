@@ -18,7 +18,7 @@ export function CalendarDayContent({ day, serviceOrders }: CalendarDayContentPro
   );
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center bg-white">
+    <div className="relative w-full h-full flex items-center justify-center">
       <span>{day.getDate()}</span>
       <div className="absolute -top-1 right-0 flex gap-0.5">
         {isStartDate && (
