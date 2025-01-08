@@ -40,11 +40,12 @@ export function AppSidebar() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const checkUserRole = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.user) {
+          console.log("No session found");
           setLoading(false);
           return;
         }
@@ -55,7 +56,7 @@ export function AppSidebar() {
           .from('user_roles')
           .select('role')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Error fetching user role:", error);
@@ -63,21 +64,36 @@ export function AppSidebar() {
           return;
         }
 
-        console.log("User role found:", userRole?.role);
+        console.log("User role response:", userRole);
         
-        if (userRole) {
+        if (userRole?.role) {
           setIsAdmin(userRole.role === 'admin');
           setIsSuperAdmin(userRole.role === 'super_admin');
+          console.log("Role set - Admin:", userRole.role === 'admin', "SuperAdmin:", userRole.role === 'super_admin');
+        } else {
+          console.log("No role found for user");
+          setIsAdmin(false);
+          setIsSuperAdmin(false);
         }
       } catch (error) {
-        console.error("Error in checkAdminStatus:", error);
+        console.error("Error in checkUserRole:", error);
         toast.error("Erro ao verificar status do usuário");
       } finally {
         setLoading(false);
       }
     };
 
-    checkAdminStatus();
+    // Verificar role inicial
+    checkUserRole();
+
+    // Monitorar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkUserRole();
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const menuItems = [
