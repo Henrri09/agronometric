@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bug_reports: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          status: string | null
+          reporter_id: string | null
+          company_id: string | null
+          screenshot_url: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          status?: string | null
+          reporter_id?: string | null
+          company_id?: string | null
+          screenshot_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          status?: string | null
+          reporter_id?: string | null
+          company_id?: string | null
+          screenshot_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
       calendar_events: {
         Row: {
           created_at: string
@@ -535,6 +570,33 @@ export type Database = {
           },
         ]
       }
+      tutorial_videos: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          title: string
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -658,10 +720,10 @@ export type TablesUpdate<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+      Update: infer U
+    }
+    ? U
+    : never
     : never
 
 export type Enums<

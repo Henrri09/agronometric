@@ -1,22 +1,15 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Bug, Image } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { Bug } from "lucide-react";
+import { AboutSystem } from "@/components/documentation/AboutSystem";
+import { GlossaryItem } from "@/components/documentation/GlossaryItem";
+import { SystemGuides } from "@/components/documentation/SystemGuides";
+import { BugReportDialog } from "@/components/documentation/BugReportDialog";
 
 const Documentation = () => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [bugReport, setBugReport] = useState({
-    title: "",
-    description: "",
-    screenshot: null as File | null
-  });
 
   const glossaryItems = [
     {
@@ -29,7 +22,10 @@ const Documentation = () => {
         "- Status atual (Pendente, Em Andamento, Concluído)",
         "- Responsável pela execução",
         "- Datas previstas de início e conclusão",
-        "- Recursos necessários (materiais, ferramentas, pessoal)"
+        "- Recursos necessários (materiais, ferramentas, pessoal)",
+        "- Histórico de atualizações e comentários",
+        "- Fotos e documentação anexada",
+        "- Custos associados e orçamento"
       ],
       image: "/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png"
     },
@@ -42,7 +38,11 @@ const Documentation = () => {
         "- Inclui inspeções, limpezas, lubrificações e ajustes",
         "- Reduz custos com reparos emergenciais",
         "- Aumenta a confiabilidade dos equipamentos",
-        "- Minimiza paradas não programadas"
+        "- Minimiza paradas não programadas",
+        "- Otimiza recursos e planejamento",
+        "- Inclui checklist de verificação",
+        "- Gera relatórios de acompanhamento",
+        "- Permite análise de tendências"
       ],
       image: "/lovable-uploads/5c1d0c82-91bb-4749-b5fb-5a6b7bcdc237.png"
     },
@@ -55,7 +55,11 @@ const Documentation = () => {
         "- Requer diagnóstico preciso do problema",
         "- Pode envolver substituição de peças",
         "- Documentação detalhada do reparo realizado",
-        "- Análise de causa raiz para prevenção futura"
+        "- Análise de causa raiz para prevenção futura",
+        "- Impacto na produção e custos",
+        "- Priorização baseada na criticidade",
+        "- Histórico de intervenções anteriores",
+        "- Recomendações para evitar reincidência"
       ],
       image: "/lovable-uploads/2184b402-1719-4108-83fc-c6daff6b9a14.png"
     },
@@ -68,7 +72,11 @@ const Documentation = () => {
         "- Agendamento de calibrações",
         "- Previsão de paradas programadas",
         "- Distribuição de recursos e pessoal",
-        "- Gestão de prioridades"
+        "- Gestão de prioridades",
+        "- Alinhamento com produção",
+        "- Janelas de manutenção",
+        "- Roteiros de execução",
+        "- Indicadores de cumprimento"
       ]
     },
     {
@@ -80,7 +88,27 @@ const Documentation = () => {
         "- Histórico de movimentações",
         "- Rastreabilidade de peças",
         "- Gestão de fornecedores",
-        "- Custos e valores unitários"
+        "- Custos e valores unitários",
+        "- Localização no almoxarifado",
+        "- Vida útil e garantias",
+        "- Compatibilidade com equipamentos",
+        "- Alertas de reposição"
+      ]
+    },
+    {
+      term: "Gestão de Ativos",
+      definition: "Processo sistemático de gerenciamento dos equipamentos e recursos da empresa:",
+      details: [
+        "- Registro completo dos equipamentos",
+        "- Histórico de manutenções",
+        "- Análise de desempenho",
+        "- Custos operacionais",
+        "- Ciclo de vida dos ativos",
+        "- Depreciação e substituição",
+        "- Documentação técnica",
+        "- Certificações e licenças",
+        "- Indicadores de eficiência",
+        "- Planejamento de investimentos"
       ]
     }
   ];
@@ -127,56 +155,6 @@ const Documentation = () => {
     }
   ];
 
-  const handleBugReport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('company_id')
-        .eq('id', user?.id)
-        .single();
-
-      let screenshotUrl = null;
-
-      if (bugReport.screenshot) {
-        const fileExt = bugReport.screenshot.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('bug_screenshots')
-          .upload(fileName, bugReport.screenshot);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('bug_screenshots')
-          .getPublicUrl(fileName);
-
-        screenshotUrl = publicUrl;
-      }
-
-      const { error } = await supabase
-        .from('bug_reports')
-        .insert({
-          title: bugReport.title,
-          description: bugReport.description,
-          screenshot_url: screenshotUrl,
-          reporter_id: user?.id,
-          company_id: profile?.company_id
-        });
-
-      if (error) throw error;
-
-      toast.success("Bug reportado com sucesso!");
-      setIsReportDialogOpen(false);
-      setBugReport({ title: "", description: "", screenshot: null });
-    } catch (error: any) {
-      toast.error("Erro ao reportar bug: " + error.message);
-    }
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Documentação do Sistema</h1>
@@ -192,18 +170,7 @@ const Documentation = () => {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sobre o Sistema</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Este sistema foi desenvolvido para gerenciar e controlar as atividades de manutenção
-            de maquinários, permitindo o acompanhamento de ordens de serviço, gestão de inventário
-            de peças e planejamento de manutenções preventivas.
-          </p>
-        </CardContent>
-      </Card>
+      <AboutSystem />
 
       <Card>
         <CardHeader>
@@ -212,102 +179,24 @@ const Documentation = () => {
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
             {glossaryItems.map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">
-                  {item.term}
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4">
-                  <p>{item.definition}</p>
-                  {item.details && (
-                    <ul className="list-none space-y-2">
-                      {item.details.map((detail, idx) => (
-                        <li key={idx}>{detail}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {item.image && (
-                    <div className="mt-4">
-                      <img 
-                        src={item.image} 
-                        alt={item.term}
-                        className="rounded-lg max-w-full h-auto"
-                      />
-                    </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
+              <GlossaryItem
+                key={index}
+                term={item.term}
+                definition={item.definition}
+                details={item.details}
+                image={item.image}
+              />
             ))}
           </Accordion>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Guias do Sistema</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            {systemGuides.map((guide, index) => (
-              <AccordionItem key={index} value={`guide-${index}`}>
-                <AccordionTrigger className="text-left">
-                  {guide.title}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <p className="whitespace-pre-line">{guide.content}</p>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </CardContent>
-      </Card>
+      <SystemGuides guides={systemGuides} />
 
-      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reportar Bug</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleBugReport} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Título</Label>
-              <Input
-                id="title"
-                value={bugReport.title}
-                onChange={(e) => setBugReport(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Descreva o problema brevemente"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Descrição Detalhada</Label>
-              <Textarea
-                id="description"
-                value={bugReport.description}
-                onChange={(e) => setBugReport(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descreva o problema em detalhes"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="screenshot">Screenshot (opcional)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="screenshot"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setBugReport(prev => ({ 
-                    ...prev, 
-                    screenshot: e.target.files ? e.target.files[0] : null 
-                  }))}
-                />
-                <Image className="h-4 w-4" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Enviar</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <BugReportDialog 
+        open={isReportDialogOpen}
+        onOpenChange={setIsReportDialogOpen}
+      />
     </div>
   );
 };
