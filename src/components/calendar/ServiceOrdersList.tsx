@@ -3,6 +3,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MapPin, User, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ServiceOrdersListProps {
   serviceOrders: any[];
@@ -15,6 +17,27 @@ export function ServiceOrdersList({
   getServiceTypeLabel, 
   getPriorityLabel 
 }: ServiceOrdersListProps) {
+  // Fetch users list
+  const { data: users } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('full_name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Function to get user name by ID
+  const getUserName = (userId: string | null) => {
+    if (!userId || !users) return '';
+    const user = users.find(u => u.id === userId);
+    return user?.full_name || '';
+  };
+
   return (
     <div className="space-y-4">
       {serviceOrders.map((order) => (
@@ -56,7 +79,7 @@ export function ServiceOrdersList({
                   <span>
                     {order.requester && `Solicitante: ${order.requester}`}
                     {order.assigned_to && order.requester && " | "}
-                    {order.assigned_to && `Responsável: ${order.assigned_to}`}
+                    {order.assigned_to && `Responsável: ${getUserName(order.assigned_to)}`}
                   </span>
                 </div>
               )}
