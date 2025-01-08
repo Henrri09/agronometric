@@ -76,7 +76,7 @@ const Index = () => {
       return (data || []).map(schedule => ({
         title: "Manutenção Preventiva Necessária",
         description: `${schedule.machinery?.name} requer manutenção em ${new Date(schedule.next_maintenance_date).toLocaleDateString()}`,
-        severity: new Date(schedule.next_maintenance_date) <= new Date() ? "error" : "warning" as "error" | "warning"
+        severity: new Date(schedule.next_maintenance_date) <= new Date() ? "error" : "warning" as const
       }));
     },
   });
