@@ -1,44 +1,32 @@
 import { useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MachineryForm } from "@/components/machinery/MachineryForm";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { PageHeader } from "@/components/PageHeader";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MachineryForm } from "@/components/machinery/MachineryForm";
+import { MachinerySearch } from "@/components/machinery/MachinerySearch";
+import { MachineryTable } from "@/components/machinery/MachineryTable";
+import { DeleteMachineryDialog } from "@/components/machinery/DeleteMachineryDialog";
 
-type Machinery = Tables<"machinery">;
-
-interface MachineryWithPhoto extends Machinery {
+interface MachineryWithPhoto extends Tables<"machinery"> {
   photo_url?: string | null;
 }
 
 export default function Machinery() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedMachinery, setSelectedMachinery] = useState<Machinery | null>(null);
+  const [selectedMachinery, setSelectedMachinery] = useState<Tables<"machinery"> | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: machinery, refetch } = useQuery({
-    queryKey: ['machinery'],
+    queryKey: ['machinery', searchTerm, statusFilter],
     queryFn: async () => {
       let query = supabase
         .from('machinery')
@@ -57,7 +45,6 @@ export default function Machinery() {
       
       if (error) throw error;
 
-      // Fetch photo URLs for each machinery
       const machineryWithPhotos: MachineryWithPhoto[] = await Promise.all(
         data.map(async (machine) => {
           const { data: files } = await supabase.storage
@@ -116,19 +103,6 @@ export default function Machinery() {
     setSelectedMachinery(null);
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'Em operação';
-      case 'maintenance':
-        return 'Em manutenção';
-      case 'inactive':
-        return 'Inativo';
-      default:
-        return status;
-    }
-  };
-
   return (
     <div className="p-6">
       <PageHeader
@@ -137,28 +111,12 @@ export default function Machinery() {
       />
       
       <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-4 flex-1 max-w-2xl">
-          <div className="flex-1 relative">
-            <Input
-              placeholder="Buscar por nome, modelo ou número de série"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10"
-            />
-            <Search className="w-4 h-4 absolute left-3 top-3 text-gray-500" />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrar por status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
-              <SelectItem value="active">Em operação</SelectItem>
-              <SelectItem value="maintenance">Em manutenção</SelectItem>
-              <SelectItem value="inactive">Inativo</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <MachinerySearch
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+        />
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Maquinário
@@ -167,64 +125,14 @@ export default function Machinery() {
       
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Foto</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Modelo</TableHead>
-                <TableHead>Número de Série</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {machinery?.map((machine) => (
-                <TableRow key={machine.id}>
-                  <TableCell>
-                    <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden">
-                      {machine.photo_url ? (
-                        <img
-                          src={machine.photo_url}
-                          alt={machine.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          Sem foto
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{machine.name}</TableCell>
-                  <TableCell>{machine.model}</TableCell>
-                  <TableCell>{machine.serial_number}</TableCell>
-                  <TableCell>{getStatusText(machine.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleEdit(machine)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setSelectedMachinery(machine);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <MachineryTable
+            machinery={machinery}
+            onEdit={handleEdit}
+            onDelete={(machine) => {
+              setSelectedMachinery(machine);
+              setIsDeleteDialogOpen(true);
+            }}
+          />
         </CardContent>
       </Card>
 
@@ -246,24 +154,12 @@ export default function Machinery() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir este maquinário? Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => selectedMachinery && handleDelete(selectedMachinery)}
-            >
-              Confirmar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteMachineryDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={() => selectedMachinery && handleDelete(selectedMachinery)}
+        machinery={selectedMachinery}
+      />
     </div>
   );
 }
