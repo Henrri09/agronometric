@@ -49,6 +49,7 @@ export function AppSidebar() {
     { title: "Analytics", icon: BarChart2, path: "/analytics", adminOnly: true },
     { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory", adminOnly: true },
     { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
+    { title: "Calendário", icon: Calendar, path: "/calendar", adminOnly: false },
     { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
   ];
 
