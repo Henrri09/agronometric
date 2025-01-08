@@ -22,46 +22,36 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#F7F7F7",
-        foreground: "#18374C",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1EBCBF",
+          DEFAULT: "#2F5233",
           foreground: "#FFFFFF",
-          hover: "#19a5a8",
         },
         secondary: {
-          DEFAULT: "#7AE09A",
-          foreground: "#18374C",
-          hover: "#5dc87d",
+          DEFAULT: "#F5DEB3",
+          foreground: "#000000",
         },
         accent: {
-          DEFAULT: "#18374C",
+          DEFAULT: "#8B4513",
           foreground: "#FFFFFF",
-          hover: "#234760",
         },
         destructive: {
           DEFAULT: "#FF4444",
           foreground: "#FFFFFF",
         },
         success: {
-          DEFAULT: "#7AE09A",
-          foreground: "#18374C",
+          DEFAULT: "#4CAF50",
+          foreground: "#FFFFFF",
         },
         warning: {
           DEFAULT: "#FFA726",
-          foreground: "#18374C",
+          foreground: "#000000",
         },
         muted: {
-          DEFAULT: "#F0F0F0",
-          foreground: "#18374C",
+          DEFAULT: "#F5F5F5",
+          foreground: "#666666",
         },
-        card: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#18374C",
-        },
-      },
-      backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #7AE09A 0%, #1EBCBF 100%)',
       },
       borderRadius: {
         lg: "var(--radius)",

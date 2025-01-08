@@ -9,50 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      bug_reports: {
-        Row: {
-          company_id: string | null
-          created_at: string | null
-          description: string
-          id: string
-          reporter_id: string | null
-          screenshot_url: string | null
-          status: string | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string | null
-          description: string
-          id?: string
-          reporter_id?: string | null
-          screenshot_url?: string | null
-          status?: string | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string | null
-          description?: string
-          id?: string
-          reporter_id?: string | null
-          screenshot_url?: string | null
-          status?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bug_reports_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       calendar_events: {
         Row: {
           created_at: string
@@ -578,33 +534,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      tutorial_videos: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          title: string
-          updated_at: string | null
-          video_url: string
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          title: string
-          updated_at?: string | null
-          video_url: string
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          title?: string
-          updated_at?: string | null
-          video_url?: string
-        }
-        Relationships: []
       }
       user_roles: {
         Row: {

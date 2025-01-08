@@ -1,56 +1,42 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Bug } from "lucide-react";
-import { AboutSystem } from "@/components/documentation/AboutSystem";
-import { GlossaryItem } from "@/components/documentation/GlossaryItem";
-import { SystemGuides } from "@/components/documentation/SystemGuides";
-import { BugReportDialog } from "@/components/documentation/BugReportDialog";
-import { glossaryItems } from "@/data/glossaryItems";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Documentation = () => {
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const glossaryItems = [
+    {
+      term: "Ordem de Serviço",
+      definition: "Documento que registra uma solicitação de manutenção ou reparo em um equipamento, contendo informações como descrição do problema, prioridade e responsável."
+    },
+    {
+      term: "Manutenção Preventiva",
+      definition: "Tipo de manutenção programada realizada periodicamente para prevenir falhas e prolongar a vida útil do equipamento."
+    },
+    {
+      term: "Manutenção Corretiva",
+      definition: "Manutenção realizada após a ocorrência de uma falha, com objetivo de restaurar o funcionamento do equipamento."
+    },
+    {
+      term: "Cronograma de Manutenção",
+      definition: "Planejamento temporal das atividades de manutenção preventiva dos equipamentos."
+    },
+    {
+      term: "Inventário de Peças",
+      definition: "Controle do estoque de peças e componentes disponíveis para manutenção."
+    }
+  ];
 
   const systemGuides = [
     {
       title: "Criação de Ordem de Serviço",
-      content: "Para criar uma nova ordem de serviço, siga os passos:\n\n" +
-        "1. Acesse o menu 'Ordem de Serviço'\n" +
-        "2. Clique no botão 'Nova Ordem'\n" +
-        "3. Preencha as informações obrigatórias:\n" +
-        "   - Título da ordem\n" +
-        "   - Descrição detalhada\n" +
-        "   - Tipo de serviço\n" +
-        "   - Prioridade\n" +
-        "4. Adicione fotos ou documentos se necessário\n" +
-        "5. Selecione o responsável pela execução\n" +
-        "6. Defina as datas previstas\n" +
-        "7. Clique em 'Salvar' para criar a ordem"
+      content: "Para criar uma nova ordem de serviço, acesse o menu 'Ordem de Serviço' e clique no botão 'Nova Ordem'. Preencha as informações necessárias como título, descrição, tipo de serviço e prioridade."
     },
     {
       title: "Gestão de Maquinários",
-      content: "O cadastro e controle de maquinários é realizado através do menu 'Cadastro Maquinários'. O processo inclui:\n\n" +
-        "1. Registro de informações básicas:\n" +
-        "   - Nome/identificação do equipamento\n" +
-        "   - Modelo e número de série\n" +
-        "   - Data de aquisição\n" +
-        "   - Localização\n" +
-        "2. Configuração de manutenções preventivas\n" +
-        "3. Histórico de manutenções realizadas\n" +
-        "4. Documentação técnica associada"
+      content: "O cadastro e controle de maquinários é realizado através do menu 'Cadastro Maquinários'. Aqui você pode adicionar novos equipamentos, atualizar informações e visualizar o histórico de manutenções."
     },
     {
       title: "Acompanhamento de Tarefas",
-      content: "O sistema oferece um quadro Kanban para gestão visual das atividades:\n\n" +
-        "1. Visualização por status:\n" +
-        "   - A Fazer\n" +
-        "   - Em Andamento\n" +
-        "   - Concluído\n" +
-        "2. Priorização de atividades\n" +
-        "3. Atribuição de responsáveis\n" +
-        "4. Acompanhamento de prazos\n" +
-        "5. Filtros e busca de tarefas"
+      content: "O sistema permite o acompanhamento de tarefas através do quadro Kanban, onde é possível visualizar e gerenciar o status das atividades em andamento."
     }
   ];
 
@@ -58,18 +44,18 @@ const Documentation = () => {
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Documentação do Sistema</h1>
 
-      <div className="mb-6">
-        <Button 
-          variant="outline" 
-          onClick={() => setIsReportDialogOpen(true)}
-          className="flex items-center gap-2"
-        >
-          <Bug className="h-4 w-4" />
-          Reportar Bug
-        </Button>
-      </div>
-
-      <AboutSystem />
+      <Card>
+        <CardHeader>
+          <CardTitle>Sobre o Sistema</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Este sistema foi desenvolvido para gerenciar e controlar as atividades de manutenção
+            de maquinários, permitindo o acompanhamento de ordens de serviço, gestão de inventário
+            de peças e planejamento de manutenções preventivas.
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -78,23 +64,38 @@ const Documentation = () => {
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
             {glossaryItems.map((item, index) => (
-              <GlossaryItem
-                key={index}
-                term={item.term}
-                definition={item.definition}
-                details={item.details}
-              />
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="text-left">
+                  {item.term}
+                </AccordionTrigger>
+                <AccordionContent>
+                  {item.definition}
+                </AccordionContent>
+              </AccordionItem>
             ))}
           </Accordion>
         </CardContent>
       </Card>
 
-      <SystemGuides guides={systemGuides} />
-
-      <BugReportDialog 
-        open={isReportDialogOpen}
-        onOpenChange={setIsReportDialogOpen}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Guias do Sistema</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            {systemGuides.map((guide, index) => (
+              <AccordionItem key={index} value={`guide-${index}`}>
+                <AccordionTrigger className="text-left">
+                  {guide.title}
+                </AccordionTrigger>
+                <AccordionContent>
+                  {guide.content}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
     </div>
   );
 };
