@@ -77,9 +77,9 @@ export function AppSidebar() {
           <SidebarContent>
             {!isSuperAdmin && (
               <SidebarGroup>
-                <div className="pt-6">
-                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-                </div>
+                <SidebarGroupLabel className="px-2 text-sm font-medium text-muted-foreground">
+                  Menu Principal
+                </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenuItems items={menuItems} />
                 </SidebarGroupContent>
@@ -88,9 +88,9 @@ export function AppSidebar() {
             {isSuperAdmin && (
               <>
                 <SidebarGroup>
-                  <div className="pt-6">
-                    <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
-                  </div>
+                  <SidebarGroupLabel className="px-2 text-sm font-medium text-muted-foreground">
+                    Super Admin
+                  </SidebarGroupLabel>
                   <SidebarGroupContent>
                     <SidebarMenuItems items={superAdminItems} />
                   </SidebarGroupContent>
@@ -114,16 +114,16 @@ export function AppSidebar() {
             </Button>
             {!isSuperAdmin && (
               <>
-                <div className="pt-4">
-                  <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+                <div className="text-sm font-medium text-muted-foreground mb-2">
+                  Menu Principal
                 </div>
                 <SidebarMenuItems items={menuItems} isMobile />
               </>
             )}
             {isSuperAdmin && (
               <>
-                <div className="pt-4">
-                  <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
+                <div className="text-sm font-medium text-muted-foreground mb-2">
+                  Super Admin
                 </div>
                 <SidebarMenuItems items={superAdminItems} isMobile />
               </>
