@@ -6,25 +6,40 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Machinery from "./pages/Machinery";
-import ServiceOrders from "./pages/ServiceOrders";
-import Analytics from "./pages/Analytics";
-import Settings from "./pages/Settings";
-import TaskManagement from "./pages/TaskManagement";
-import Calendar from "./pages/Calendar";
-import PartsInventory from "./pages/PartsInventory";
-import MaintenanceSchedule from "./pages/MaintenanceSchedule";
+// Lazy load pages
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Users = lazy(() => import("./pages/Users"));
+const Machinery = lazy(() => import("./pages/Machinery"));
+const ServiceOrders = lazy(() => import("./pages/ServiceOrders"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Settings = lazy(() => import("./pages/Settings"));
+const TaskManagement = lazy(() => import("./pages/TaskManagement"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const PartsInventory = lazy(() => import("./pages/PartsInventory"));
+const MaintenanceSchedule = lazy(() => import("./pages/MaintenanceSchedule"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Desativa o refetch automático ao focar a janela
+      retry: 1, // Reduz o número de tentativas de retry
+      staleTime: 5 * 60 * 1000, // Define 5 minutos como tempo de cache
+    },
+  },
+});
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+  </div>
+);
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -126,7 +141,9 @@ const AppLayout = ({ children }) => {
         <div className="flex flex-1 pt-12">
           <AppSidebar />
           <main className={`flex-1 overflow-auto p-6 ${!isMobile ? 'ml-64' : ''}`}>
-            {children}
+            <Suspense fallback={<LoadingFallback />}>
+              {children}
+            </Suspense>
           </main>
         </div>
       </div>
@@ -141,8 +158,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route 
+            path="/login" 
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Login />
+              </Suspense>
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Register />
+              </Suspense>
+            } 
+          />
           <Route
             path="/*"
             element={
