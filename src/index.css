@@ -97,6 +97,25 @@
   [data-sidebar="sidebar"] [role="menuitem"] a:hover {
     @apply bg-primary/10 text-primary;
   }
+
+  /* Menu item active styles */
+  [data-sidebar="sidebar"] [role="menuitem"] a.active {
+    @apply bg-primary/20 text-primary font-medium;
+  }
+
+  /* Menu item hover animation */
+  [data-sidebar="sidebar"] [role="menuitem"] a {
+    @apply relative overflow-hidden;
+  }
+
+  [data-sidebar="sidebar"] [role="menuitem"] a::after {
+    content: '';
+    @apply absolute left-0 bottom-0 h-0.5 w-0 bg-primary transition-all duration-300;
+  }
+
+  [data-sidebar="sidebar"] [role="menuitem"] a:hover::after {
+    @apply w-full;
+  }
 }
 
 /* Login and Register background gradients */
