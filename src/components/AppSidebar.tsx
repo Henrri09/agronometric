@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, KanbanSquare, Calendar, Boxes, DollarSign, LineChart, LifeBuoy } from "lucide-react";
+import { Home, Tractor, ClipboardList, Users, BarChart2, Settings, Calendar, Boxes, DollarSign, LineChart, LifeBuoy, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
@@ -51,6 +51,7 @@ export function AppSidebar() {
     { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule", adminOnly: true },
     { title: "Calendário", icon: Calendar, path: "/calendar", adminOnly: false },
     { title: "Configurações", icon: Settings, path: "/settings", adminOnly: true },
+    { title: "Documentação", icon: BookOpen, path: "/documentation", adminOnly: false },
   ];
 
   const superAdminItems = [

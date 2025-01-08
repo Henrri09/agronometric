@@ -26,6 +26,7 @@ import SuperAdmin from "./pages/SuperAdmin";
 import FinancialManagement from "./pages/super-admin/FinancialManagement";
 import SuperAdminAnalytics from "./pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "./pages/super-admin/SupportTickets";
+import Documentation from "./pages/Documentation";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,7 @@ const App = () => (
                 <AppLayout>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
+                    <Route path="/documentation" element={<Documentation />} />
                     <Route 
                       path="/super-admin" 
                       element={
