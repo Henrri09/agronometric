@@ -20,7 +20,8 @@ import {
   Boxes,
   Calendar,
   Settings,
-  BookOpen
+  BookOpen,
+  ListTodo
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -39,6 +40,7 @@ export function AppSidebar() {
     { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory" },
     { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule" },
     { title: "Calendário", icon: Calendar, path: "/calendar" },
+    { title: "Gestão de Tarefas", icon: ListTodo, path: "/task-management" },
     { title: "Configurações", icon: Settings, path: "/settings" },
     { title: "Documentação", icon: BookOpen, path: "/documentation" },
   ];
