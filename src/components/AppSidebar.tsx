@@ -66,7 +66,7 @@ export function AppSidebar() {
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      <div className="bg-background border-r">
+      <div className="fixed top-0 left-0 h-full bg-background border-r z-40 mt-12">
         <Sidebar className="!bg-background">
           <SidebarContent>
             <div className="p-4 flex items-center justify-between">

@@ -86,9 +86,9 @@ const App = () => (
                 <SidebarProvider>
                   <div className="min-h-screen flex flex-col w-full">
                     <Header />
-                    <div className="flex flex-1">
+                    <div className="flex flex-1 pt-12">
                       <AppSidebar />
-                      <main className="flex-1 overflow-auto">
+                      <main className="flex-1 overflow-auto p-6 ml-64">
                         <Routes>
                           <Route path="/" element={<Dashboard />} />
                           <Route 

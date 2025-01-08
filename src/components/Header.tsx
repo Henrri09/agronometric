@@ -12,7 +12,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white px-6 py-3 flex justify-end items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-6 py-3 flex justify-end items-center border-b border-gray-200">
       <Button 
         variant="ghost" 
         size="icon"
