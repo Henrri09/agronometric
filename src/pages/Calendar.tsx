@@ -26,7 +26,12 @@ export default function Calendar() {
         `)
         .not("start_date", "is", null);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching service orders:", error);
+        throw error;
+      }
+
+      console.log("Fetched service orders:", data);
       return data;
     },
   });
@@ -50,12 +55,12 @@ export default function Calendar() {
     switch (priority?.toLowerCase()) {
       case "urgent":
         return "Urgente";
-      case "high":
-        return "Alta";
-      case "medium":
-        return "Média";
-      case "low":
-        return "Baixa";
+      case "preventive":
+        return "Preventiva";
+      case "corrective":
+        return "Corretiva";
+      case "routine":
+        return "Rotina";
       default:
         return priority;
     }
@@ -180,6 +185,13 @@ export default function Calendar() {
                         )}
                       </div>
                     </div>
+
+                    {order.machinery && (
+                      <div className="mt-2 text-sm text-muted-foreground">
+                        <strong>Equipamento:</strong> {order.machinery.name}
+                        {order.machinery.model && ` - Modelo: ${order.machinery.model}`}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
