@@ -16,8 +16,13 @@ import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  className?: string;
+}
+
+export function AppSidebar({ className }: AppSidebarProps) {
   const { openMobile, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -66,7 +71,7 @@ export function AppSidebar() {
           <Menu className="h-6 w-6" />
         </Button>
       )}
-      <div className="bg-background border-r">
+      <div className={cn("bg-background border-r h-full", className)}>
         <Sidebar className="!bg-background">
           <SidebarContent>
             <div className="p-4 flex items-center justify-between">
