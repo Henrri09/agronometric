@@ -10,6 +10,28 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
 
+interface ServiceOrder {
+  id: string;
+  title: string;
+  description?: string;
+  service_type: string;
+  priority: string;
+  assigned_to?: string;
+  branch?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  priority: string;
+  status: string;
+  start_date?: string;
+  service_orders: ServiceOrder | null;
+}
+
 export default function TaskManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
@@ -25,7 +47,7 @@ export default function TaskManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Task[];
     },
   });
 

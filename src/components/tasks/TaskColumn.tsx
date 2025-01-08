@@ -1,6 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskCard } from "./TaskCard";
 
+interface ServiceOrder {
+  id: string;
+  title: string;
+  description?: string;
+  service_type: string;
+  priority: string;
+}
+
 interface Task {
   id: string;
   title: string;
@@ -8,7 +16,7 @@ interface Task {
   priority: string;
   status: string;
   start_date?: string;
-  service_orders?: any[];
+  service_orders: ServiceOrder | null;
 }
 
 interface TaskColumnProps {

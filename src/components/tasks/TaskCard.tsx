@@ -12,6 +12,14 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 
+interface ServiceOrder {
+  id: string;
+  title: string;
+  description?: string;
+  service_type: string;
+  priority: string;
+}
+
 interface TaskCardProps {
   id: string;
   title: string;
@@ -19,7 +27,7 @@ interface TaskCardProps {
   priority: string;
   status: string;
   date?: string;
-  serviceOrders?: any[];
+  serviceOrders?: ServiceOrder | null;
   onStatusChange?: (id: string, newStatus: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -31,7 +39,7 @@ export function TaskCard({
   priority,
   status,
   date,
-  serviceOrders = [],
+  serviceOrders,
   onStatusChange,
   onDelete,
 }: TaskCardProps) {
@@ -127,24 +135,19 @@ export function TaskCard({
         </div>
       )}
 
-      {isExpanded && serviceOrders && serviceOrders.length > 0 && (
+      {isExpanded && serviceOrders && (
         <div className="mt-4 space-y-2 border-t pt-4">
-          <h5 className="text-sm font-medium">Ordens de Serviço Relacionadas</h5>
-          {serviceOrders.map((order: any) => (
-            <div
-              key={order.id}
-              className="rounded-md border p-2 text-sm space-y-1"
-            >
-              <div className="font-medium">{order.title}</div>
-              {order.description && (
-                <p className="text-muted-foreground">{order.description}</p>
-              )}
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">{order.service_type}</Badge>
-                <Badge variant="outline">{order.priority}</Badge>
-              </div>
+          <h5 className="text-sm font-medium">Ordem de Serviço Relacionada</h5>
+          <div className="rounded-md border p-2 text-sm space-y-1">
+            <div className="font-medium">{serviceOrders.title}</div>
+            {serviceOrders.description && (
+              <p className="text-muted-foreground">{serviceOrders.description}</p>
+            )}
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">{serviceOrders.service_type}</Badge>
+              <Badge variant="outline">{serviceOrders.priority}</Badge>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </Card>
