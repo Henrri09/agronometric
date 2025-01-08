@@ -12,7 +12,15 @@ import {
   Database, 
   DollarSign, 
   LineChart, 
-  LifeBuoy
+  LifeBuoy,
+  Home,
+  Users,
+  Tractor,
+  BarChart2,
+  Boxes,
+  Calendar,
+  Settings,
+  BookOpen
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserRole } from "@/hooks/use-user-role";
@@ -22,6 +30,17 @@ export function AppSidebar() {
   const { openMobile, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
   const { isAdmin, isSuperAdmin, loading } = useUserRole();
+
+  const menuItems = [
+    { title: "Painel Empresa", icon: Home, path: "/" },
+    { title: "Cadastro Usuário", icon: Users, path: "/users" },
+    { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
+    { title: "Analytics", icon: BarChart2, path: "/analytics" },
+    { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory" },
+    { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule" },
+    { title: "Configurações", icon: Settings, path: "/settings" },
+    { title: "Documentação", icon: BookOpen, path: "/documentation" },
+  ];
 
   const superAdminItems = [
     { title: "Gestão de Empresas", icon: Database, path: "/super-admin" },
@@ -53,6 +72,14 @@ export function AppSidebar() {
       <div className={`fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 ${isMobile ? 'hidden' : 'block'}`}>
         <Sidebar className="!bg-background">
           <SidebarContent>
+            <SidebarGroup>
+              <div className="pt-6">
+                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenuItems items={menuItems} />
+              </SidebarGroupContent>
+            </SidebarGroup>
             {isSuperAdmin && (
               <SidebarGroup>
                 <div className="pt-6">
@@ -78,6 +105,10 @@ export function AppSidebar() {
             >
               <X className="h-6 w-6" />
             </Button>
+            <div className="pt-4">
+              <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+            </div>
+            <SidebarMenuItems items={menuItems} isMobile />
             {isSuperAdmin && (
               <>
                 <div className="pt-4">
