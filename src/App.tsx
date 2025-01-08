@@ -23,6 +23,9 @@ import Calendar from "./pages/Calendar";
 import PartsInventory from "./pages/PartsInventory";
 import MaintenanceSchedule from "./pages/MaintenanceSchedule";
 import SuperAdmin from "./pages/SuperAdmin";
+import FinancialManagement from "./pages/super-admin/FinancialManagement";
+import SuperAdminAnalytics from "./pages/super-admin/SuperAdminAnalytics";
+import SupportTickets from "./pages/super-admin/SupportTickets";
 
 const queryClient = new QueryClient();
 
@@ -114,6 +117,30 @@ const App = () => (
                       element={
                         <ProtectedRoute superAdminOnly>
                           <SuperAdmin />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/super-admin/financial" 
+                      element={
+                        <ProtectedRoute superAdminOnly>
+                          <FinancialManagement />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/super-admin/analytics" 
+                      element={
+                        <ProtectedRoute superAdminOnly>
+                          <SuperAdminAnalytics />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/super-admin/support" 
+                      element={
+                        <ProtectedRoute superAdminOnly>
+                          <SupportTickets />
                         </ProtectedRoute>
                       } 
                     />
