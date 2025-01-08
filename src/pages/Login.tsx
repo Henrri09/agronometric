@@ -22,16 +22,29 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
 
-      if (data) {
+      if (authData.user) {
+        // Fetch user role after successful login
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authData.user.id)
+          .single();
+
         toast.success("Login realizado com sucesso!");
-        navigate("/");
+        
+        // If user is super_admin, redirect to super-admin page
+        if (roleData?.role === 'super_admin') {
+          navigate("/super-admin");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Erro ao realizar login");
