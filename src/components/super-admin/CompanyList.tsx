@@ -23,9 +23,9 @@ export function CompanyList({ companies }: CompanyListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "success";
+        return "secondary";
       case "trial":
-        return "warning";
+        return "outline";
       default:
         return "destructive";
     }
