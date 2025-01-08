@@ -37,7 +37,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white py-3 flex justify-between items-center border-b border-gray-200">
-      <div className="flex items-center pl-2">
+      <div className={`flex items-center ${isMobile ? 'flex-1 justify-center' : 'pl-2'}`}>
         <img 
           src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
           alt="Agrometric Logo" 
