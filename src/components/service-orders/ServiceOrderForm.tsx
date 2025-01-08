@@ -8,7 +8,6 @@ import { ServiceOrderBasicInfo } from "./form-sections/ServiceOrderBasicInfo";
 import { ServiceOrderTypeAndPriority } from "./form-sections/ServiceOrderTypeAndPriority";
 import { ServiceOrderLocation } from "./form-sections/ServiceOrderLocation";
 import { ServiceOrderDates } from "./form-sections/ServiceOrderDates";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { Download } from "lucide-react";
 
 interface ServiceOrderFormProps {
@@ -41,6 +40,7 @@ export function ServiceOrderForm({ initialData, onSuccess }: ServiceOrderFormPro
 
   const onSubmit = async (data: ServiceOrderFormValues) => {
     await handleSubmit(data);
+    form.reset();
     onSuccess?.();
   };
 
@@ -57,11 +57,6 @@ export function ServiceOrderForm({ initialData, onSuccess }: ServiceOrderFormPro
             <Download className="w-4 h-4" />
             Baixar PDF
           </Button>
-          <DialogClose asChild>
-            <Button type="button" variant="outline">
-              Cancelar
-            </Button>
-          </DialogClose>
           <Button type="submit">
             {initialData ? "Atualizar" : "Criar"} Ordem de Serviço
           </Button>

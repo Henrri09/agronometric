@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -17,19 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ServiceOrderForm } from "@/components/service-orders/ServiceOrderForm";
+import { useState } from "react";
 
 export default function ServiceOrders() {
   const { toast } = useToast();
   const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { data: serviceOrders, refetch } = useQuery({
     queryKey: ['service-orders'],
@@ -106,80 +99,76 @@ export default function ServiceOrders() {
   };
 
   const handleFormSubmitSuccess = () => {
-    setIsCreateDialogOpen(false);
     refetch();
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 space-y-6">
       <PageHeader
         title="Ordens de Serviço"
         description="Gerencie todas as ordens de serviço do sistema"
       />
 
-      <div className="flex justify-end">
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Ordem de Serviço
-        </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <Card className="w-full">
+            <CardContent className="p-6">
+              <ServiceOrderForm onSuccess={handleFormSubmitSuccess} />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Maquinário</TableHead>
+                      <TableHead>Responsável</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Prioridade</TableHead>
+                      <TableHead>Data Início</TableHead>
+                      <TableHead>Data Fim</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {serviceOrders?.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell>{order.title}</TableCell>
+                        <TableCell>{order.machinery?.name}</TableCell>
+                        <TableCell>{order.assigned_profile?.full_name}</TableCell>
+                        <TableCell>{getStatusBadge(order.status)}</TableCell>
+                        <TableCell>{getPriorityBadge(order.priority)}</TableCell>
+                        <TableCell>{order.start_date ? new Date(order.start_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                        <TableCell>{order.end_date ? new Date(order.end_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeleteOrderId(order.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      <Card>
-        <CardContent className="p-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Maquinário</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Prioridade</TableHead>
-                <TableHead>Data Início</TableHead>
-                <TableHead>Data Fim</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {serviceOrders?.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell>{order.title}</TableCell>
-                  <TableCell>{order.machinery?.name}</TableCell>
-                  <TableCell>{order.assigned_profile?.full_name}</TableCell>
-                  <TableCell>{getStatusBadge(order.status)}</TableCell>
-                  <TableCell>{getPriorityBadge(order.priority)}</TableCell>
-                  <TableCell>{order.start_date ? new Date(order.start_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
-                  <TableCell>{order.end_date ? new Date(order.end_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsCreateDialogOpen(true)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteOrderId(order.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Nova Ordem de Serviço</DialogTitle>
-          </DialogHeader>
-          <ServiceOrderForm onSuccess={handleFormSubmitSuccess} />
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={!!deleteOrderId} onOpenChange={() => setDeleteOrderId(null)}>
         <AlertDialogContent>
