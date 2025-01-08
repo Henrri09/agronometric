@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { LogIn, Lock, Mail } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthError } from "@supabase/supabase-js";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,8 +13,19 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!email || !password) {
       toast.error("Por favor, preencha todos os campos");
       return;
@@ -21,6 +33,7 @@ export default function Login() {
 
     try {
       setLoading(true);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -28,12 +41,26 @@ export default function Login() {
 
       if (error) throw error;
 
-      if (data) {
+      if (data.session) {
         toast.success("Login realizado com sucesso!");
         navigate("/");
       }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao realizar login");
+      const authError = error as AuthError;
+      let errorMessage = "Erro ao realizar login";
+      
+      switch (authError.message) {
+        case "Invalid login credentials":
+          errorMessage = "Email ou senha inválidos";
+          break;
+        case "Email not confirmed":
+          errorMessage = "Por favor, confirme seu email antes de fazer login";
+          break;
+        default:
+          errorMessage = authError.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -77,7 +104,6 @@ export default function Login() {
           </div>
 
           <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            <LogIn className="mr-2 h-5 w-5" />
             {loading ? "Entrando..." : "Entrar"}
           </Button>
 

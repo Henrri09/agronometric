@@ -1,169 +1,132 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
-import { Header } from "@/components/Header";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useIsMobile } from "@/hooks/use-mobile";
-
+import { AuthGuard } from "./components/auth/AuthGuard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Machinery from "./pages/Machinery";
 import ServiceOrders from "./pages/ServiceOrders";
+import ServiceOrderEdit from "./pages/ServiceOrderEdit";
+import Machinery from "./pages/Machinery";
+import PartsInventory from "./pages/PartsInventory";
+import Calendar from "./pages/Calendar";
+import TaskManagement from "./pages/TaskManagement";
+import KanbanBoard from "./pages/KanbanBoard";
+import MaintenanceSchedule from "./pages/MaintenanceSchedule";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
-import TaskManagement from "./pages/TaskManagement";
-import Calendar from "./pages/Calendar";
-import PartsInventory from "./pages/PartsInventory";
-import MaintenanceSchedule from "./pages/MaintenanceSchedule";
+import Users from "./pages/Users";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const location = useLocation();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        setIsAuthenticated(true);
-        
-        // Check if user is admin
-        const { data: userRoles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        setIsAdmin(userRoles?.role === 'admin');
-      }
-      
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
-
-const AppLayout = ({ children }) => {
-  const isMobile = useIsMobile();
-  
+function App() {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full">
-        <Header />
-        <div className="flex flex-1 pt-12">
-          <AppSidebar />
-          <main className={`flex-1 overflow-auto p-6 ${!isMobile ? 'ml-64' : ''}`}>
-            {children}
-          </main>
-        </div>
-      </div>
-    </SidebarProvider>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
-            path="/*"
+            path="/"
             element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route 
-                      path="/users" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <Users />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/machinery" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <Machinery />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route path="/service-orders" element={<ServiceOrders />} />
-                    <Route 
-                      path="/analytics" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <Analytics />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/settings" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <Settings />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route path="/task-management" element={<TaskManagement />} />
-                    <Route path="/calendar" element={<Calendar />} />
-                    <Route 
-                      path="/parts-inventory" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <PartsInventory />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/maintenance-schedule" 
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <MaintenanceSchedule />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </AppLayout>
-              </ProtectedRoute>
+              <AuthGuard>
+                <Dashboard />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/service-orders"
+            element={
+              <AuthGuard>
+                <ServiceOrders />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/service-orders/:id"
+            element={
+              <AuthGuard>
+                <ServiceOrderEdit />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/machinery"
+            element={
+              <AuthGuard>
+                <Machinery />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/parts-inventory"
+            element={
+              <AuthGuard>
+                <PartsInventory />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <AuthGuard>
+                <Calendar />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/task-management"
+            element={
+              <AuthGuard>
+                <TaskManagement />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/kanban"
+            element={
+              <AuthGuard>
+                <KanbanBoard />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/maintenance-schedule"
+            element={
+              <AuthGuard>
+                <MaintenanceSchedule />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <AuthGuard>
+                <Analytics />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <AuthGuard>
+                <Settings />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <AuthGuard>
+                <Users />
+              </AuthGuard>
             }
           />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        <Toaster position="top-right" />
+      </Router>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
