@@ -1,15 +1,15 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { SidebarMenuItems } from "./SidebarMenuItems";
 import { MenuItemType } from "./types";
-import { Button } from "../ui/button";
+import { PanelLeftClose, PanelRightClose } from "lucide-react";
 
 interface SidebarDesktopProps {
   isSuperAdmin: boolean;
@@ -18,24 +18,20 @@ interface SidebarDesktopProps {
 }
 
 export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: SidebarDesktopProps) {
-  const { state, toggleSidebar } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const { open } = useSidebar();
 
   return (
     <div className="fixed top-0 left-0 h-screen bg-background border-r z-40 hidden md:block">
-      <Sidebar className="!bg-background w-[280px]">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 top-3"
-          onClick={toggleSidebar}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+      <Sidebar className="!bg-background">
+        <div className="absolute right-[-12px] top-4 z-50">
+          <SidebarTrigger>
+            {open ? (
+              <PanelLeftClose className="h-5 w-5" />
+            ) : (
+              <PanelRightClose className="h-5 w-5" />
+            )}
+          </SidebarTrigger>
+        </div>
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
