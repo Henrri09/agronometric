@@ -13,12 +13,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
-        <Header />
-        <div className="flex flex-1 pt-12">
+        <div className="flex flex-1">
           <AppSidebar />
-          <main className={`flex-1 overflow-auto p-6 ${!isMobile ? 'ml-64' : ''}`}>
-            {children}
-          </main>
+          <div className="flex-1 flex flex-col">
+            <Header />
+            <main className={`flex-1 overflow-auto p-6 ${!isMobile ? 'ml-64' : ''}`}>
+              {children}
+            </main>
+          </div>
         </div>
       </div>
     </SidebarProvider>

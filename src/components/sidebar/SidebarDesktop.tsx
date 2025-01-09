@@ -17,7 +17,7 @@ interface SidebarDesktopProps {
 export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: SidebarDesktopProps) {
   return (
     <div className="fixed top-0 left-0 h-full bg-background border-r z-40 hidden md:block">
-      <Sidebar className="!bg-background pt-16">
+      <Sidebar className="!bg-background">
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
