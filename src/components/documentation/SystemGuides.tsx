@@ -20,6 +20,38 @@ export function SystemGuides() {
             </ol>
           </AccordionContent>
         </AccordionItem>
+
+        <AccordionItem value="gestao-maquinarios">
+          <AccordionTrigger>Gestão de Maquinários</AccordionTrigger>
+          <AccordionContent>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>Acesse o menu "Maquinários"</li>
+              <li>Para adicionar novo equipamento, clique em "Novo Maquinário"</li>
+              <li>Preencha as informações do equipamento: nome, modelo, número de série</li>
+              <li>Defina o status do equipamento</li>
+              <li>Para editar um equipamento existente, clique no botão de edição</li>
+              <li>Para visualizar o histórico de manutenções, clique no equipamento</li>
+              <li>Acompanhe indicadores de desempenho e custos de manutenção</li>
+              <li>Gerencie a programação de manutenções preventivas</li>
+            </ol>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="acompanhamento-tarefas">
+          <AccordionTrigger>Acompanhamento de Tarefas</AccordionTrigger>
+          <AccordionContent>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>Acesse o menu "Tarefas"</li>
+              <li>Visualize todas as tarefas no quadro Kanban</li>
+              <li>Arraste e solte tarefas entre as colunas para atualizar status</li>
+              <li>Clique em uma tarefa para ver detalhes</li>
+              <li>Adicione comentários e atualizações nas tarefas</li>
+              <li>Filtre tarefas por responsável ou prioridade</li>
+              <li>Acompanhe prazos e progresso das atividades</li>
+              <li>Receba notificações de atualizações importantes</li>
+            </ol>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
     </div>
   )
