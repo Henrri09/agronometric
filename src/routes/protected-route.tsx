@@ -6,6 +6,7 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   adminOnly?: boolean;
   superAdminOnly?: boolean;
+  nonSuperAdmin?: boolean;
   minRole?: 'visitor' | 'common' | 'admin';
 }
 
@@ -13,6 +14,7 @@ export const ProtectedRoute = ({
   children, 
   adminOnly = false, 
   superAdminOnly = false,
+  nonSuperAdmin = false,
   minRole = 'visitor'
 }: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,7 +56,22 @@ export const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Role hierarchy check
+  // Super admin specific check
+  if (superAdminOnly && userRole !== 'super_admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  // Non-super admin check
+  if (nonSuperAdmin && userRole === 'super_admin') {
+    return <Navigate to="/super-admin" replace />;
+  }
+
+  // Admin only check
+  if (adminOnly && userRole !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  // Role hierarchy check for minimum role requirement
   const roleHierarchy = {
     'visitor': 0,
     'common': 1,
@@ -64,14 +81,6 @@ export const ProtectedRoute = ({
 
   const userRoleLevel = userRole ? roleHierarchy[userRole] : 0;
   const requiredRoleLevel = roleHierarchy[minRole];
-
-  if (superAdminOnly && userRole !== 'super_admin') {
-    return <Navigate to="/" replace />;
-  }
-
-  if (adminOnly && userRole !== 'admin' && userRole !== 'super_admin') {
-    return <Navigate to="/" replace />;
-  }
 
   if (userRoleLevel < requiredRoleLevel) {
     return <Navigate to="/" replace />;

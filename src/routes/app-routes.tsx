@@ -28,22 +28,43 @@ export const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      
+      {/* Super Admin Routes */}
+      <Route
+        path="/super-admin/*"
+        element={
+          <ProtectedRoute superAdminOnly>
+            <AppLayout>
+              <Routes>
+                <Route path="/" element={<SuperAdmin />} />
+                <Route path="/financial" element={<FinancialManagement />} />
+                <Route path="/analytics" element={<SuperAdminAnalytics />} />
+                <Route path="/support" element={<SupportTickets />} />
+                <Route path="/tutorials" element={<TutorialManagement />} />
+                <Route path="*" element={<Navigate to="/super-admin" replace />} />
+              </Routes>
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Regular User Routes */}
       <Route
         path="/*"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute nonSuperAdmin>
             <AppLayout>
               <Routes>
-                {/* Routes accessible by all authenticated users */}
+                {/* Base routes accessible by all authenticated non-super-admin users */}
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/documentation" element={<Documentation />} />
                 <Route path="/machinery" element={<Machinery />} />
                 <Route path="/parts-inventory" element={<PartsInventory />} />
                 <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
                 <Route path="/calendar" element={<Calendar />} />
                 <Route path="/task-management" element={<TaskManagement />} />
+                <Route path="/documentation" element={<Documentation />} />
 
-                {/* Routes accessible by common users and admins only */}
+                {/* Routes accessible by common users and admins */}
                 <Route 
                   path="/analytics" 
                   element={
@@ -61,7 +82,7 @@ export const AppRoutes = () => {
                   } 
                 />
 
-                {/* Routes accessible by admins only */}
+                {/* Admin only routes */}
                 <Route 
                   path="/users" 
                   element={
@@ -79,47 +100,6 @@ export const AppRoutes = () => {
                   } 
                 />
 
-                {/* Super admin routes */}
-                <Route 
-                  path="/super-admin" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SuperAdmin />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/financial" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <FinancialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/analytics" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SuperAdminAnalytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/support" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SupportTickets />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/tutorials" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <TutorialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppLayout>
