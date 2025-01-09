@@ -5,12 +5,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const userFormSchema = z.object({
   email: z.string().email("Email inválido"),
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
   role: z.enum(["admin", "common", "visitor"]),
-  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres").optional(),
 });
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
@@ -29,14 +29,23 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
       email: "",
       full_name: "",
       role: "visitor",
-      password: "",
       ...defaultValues,
     },
   });
 
+  const handleSubmit = async (data: UserFormValues) => {
+    try {
+      await onSubmit(data);
+      form.reset();
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      toast.error(error.message || "Erro ao salvar usuário");
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -44,7 +53,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} type="email" />
+                <Input {...field} type="email" placeholder="email@exemplo.com" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -57,7 +66,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
             <FormItem>
               <FormLabel>Nome completo</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} placeholder="Digite o nome completo" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +98,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button type="submit">
+          <Button type="submit" disabled={form.formState.isSubmitting}>
             {isEditing ? "Salvar" : "Criar"}
           </Button>
         </div>

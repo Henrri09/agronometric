@@ -66,6 +66,7 @@ export default function Users() {
 
       setUsers(combinedUsers);
     } catch (error: any) {
+      console.error('Error fetching users:', error);
       toast.error(error.message || "Erro ao carregar usuários");
     }
   };
@@ -110,6 +111,7 @@ export default function Users() {
     } catch (error: any) {
       console.error('Error:', error);
       toast.error(error.message || "Erro ao salvar usuário");
+      throw error; // Re-throw to be caught by the form
     }
   };
 
@@ -125,6 +127,7 @@ export default function Users() {
       toast.success("Usuário excluído com sucesso!");
       fetchUsers();
     } catch (error: any) {
+      console.error('Error deleting user:', error);
       toast.error(error.message || "Erro ao excluir usuário");
     }
   };
