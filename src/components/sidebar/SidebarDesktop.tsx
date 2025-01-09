@@ -16,25 +16,25 @@ interface SidebarDesktopProps {
 
 export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: SidebarDesktopProps) {
   return (
-    <div className="fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 hidden md:block">
+    <div className="fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 block">
       <Sidebar className="!bg-background">
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 px-4">
-                <SidebarGroupLabel className="text-sm font-medium">Menu Principal</SidebarGroupLabel>
+              <div className="pt-6">
+                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
               </div>
-              <SidebarGroupContent className="mt-2">
+              <SidebarGroupContent>
                 <SidebarMenuItems items={menuItems} />
               </SidebarGroupContent>
             </SidebarGroup>
           )}
           {isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 px-4">
-                <SidebarGroupLabel className="text-sm font-medium">Super Admin</SidebarGroupLabel>
+              <div className="pt-6">
+                <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
               </div>
-              <SidebarGroupContent className="mt-2">
+              <SidebarGroupContent>
                 <SidebarMenuItems items={superAdminItems} />
               </SidebarGroupContent>
             </SidebarGroup>
