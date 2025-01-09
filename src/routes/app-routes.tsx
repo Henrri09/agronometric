@@ -1,157 +1,47 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { ProtectedRoute } from "./protected-route";
+import { Route, Routes } from "react-router-dom";
 import { AppLayout } from "./app-layout";
+import { ProtectedRoute } from "./protected-route";
 
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import Dashboard from "@/pages/Dashboard";
-import Users from "@/pages/Users";
-import Machinery from "@/pages/Machinery";
-import ServiceOrders from "@/pages/ServiceOrders";
+// Pages
+import Index from "@/pages/Index";
 import Analytics from "@/pages/Analytics";
-import Settings from "@/pages/Settings";
-import TaskManagement from "@/pages/TaskManagement";
 import Calendar from "@/pages/Calendar";
-import PartsInventory from "@/pages/PartsInventory";
-import MaintenanceSchedule from "@/pages/MaintenanceSchedule";
-import SuperAdmin from "@/pages/SuperAdmin";
-import FinancialManagement from "@/pages/super-admin/FinancialManagement";
-import SuperAdminAnalytics from "@/pages/super-admin/SuperAdminAnalytics";
-import SupportTickets from "@/pages/super-admin/SupportTickets";
-import TutorialManagement from "@/pages/super-admin/TutorialManagement";
 import Documentation from "@/pages/Documentation";
+import Login from "@/pages/Login";
+import Machinery from "@/pages/Machinery";
+import MaintenanceSchedule from "@/pages/MaintenanceSchedule";
+import PartsInventory from "@/pages/PartsInventory";
+import Register from "@/pages/Register";
+import ServiceOrders from "@/pages/ServiceOrders";
+import ServiceOrderEdit from "@/pages/ServiceOrderEdit";
+import Settings from "@/pages/Settings";
+import SuperAdmin from "@/pages/SuperAdmin";
+import TaskManagement from "@/pages/TaskManagement";
+import Users from "@/pages/Users";
 
-export const AppRoutes = () => {
+export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/documentation" element={<Documentation />} />
-                <Route 
-                  path="/super-admin" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SuperAdmin />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/financial" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <FinancialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/analytics" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SuperAdminAnalytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/support" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <SupportTickets />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/super-admin/tutorials" 
-                  element={
-                    <ProtectedRoute superAdminOnly>
-                      <TutorialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/users" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Users />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/machinery" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Machinery />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/service-orders" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <ServiceOrders />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/analytics" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Analytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/task-management" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <TaskManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/calendar" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Calendar />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/parts-inventory" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <PartsInventory />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/maintenance-schedule" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <MaintenanceSchedule />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+      
+      <Route element={<AppLayout />}>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/documentation" element={<Documentation />} />
+          <Route path="/machinery" element={<Machinery />} />
+          <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
+          <Route path="/parts-inventory" element={<PartsInventory />} />
+          <Route path="/service-orders" element={<ServiceOrders />} />
+          <Route path="/service-orders/:id" element={<ServiceOrderEdit />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/super-admin" element={<SuperAdmin />} />
+          <Route path="/task-management" element={<TaskManagement />} />
+          <Route path="/users" element={<Users />} />
+        </Route>
+      </Route>
     </Routes>
   );
-};
+}
