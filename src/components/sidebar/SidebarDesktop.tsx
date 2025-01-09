@@ -2,8 +2,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { SidebarMenuItems } from "./SidebarMenuItems";
 import { MenuItemType } from "./types";
@@ -21,20 +21,20 @@ export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: Sid
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 md:pt-8">
-                <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+              <div className="pt-6 px-4">
+                <SidebarGroupLabel className="text-sm font-medium">Menu Principal</SidebarGroupLabel>
               </div>
-              <SidebarGroupContent>
+              <SidebarGroupContent className="mt-2">
                 <SidebarMenuItems items={menuItems} />
               </SidebarGroupContent>
             </SidebarGroup>
           )}
           {isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 md:pt-8">
-                <SidebarGroupLabel>Super Admin</SidebarGroupLabel>
+              <div className="pt-6 px-4">
+                <SidebarGroupLabel className="text-sm font-medium">Super Admin</SidebarGroupLabel>
               </div>
-              <SidebarGroupContent>
+              <SidebarGroupContent className="mt-2">
                 <SidebarMenuItems items={superAdminItems} />
               </SidebarGroupContent>
             </SidebarGroup>
