@@ -92,7 +92,7 @@ export default function Users() {
         // Create new user
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: data.email,
-          password: data.password!,
+          password: Math.random().toString(36).slice(-8), // Generate a random temporary password
           options: {
             data: {
               full_name: data.full_name,
@@ -110,9 +110,19 @@ export default function Users() {
             ]);
 
           if (roleError) throw roleError;
+
+          // Send invitation email
+          const { error: inviteError } = await supabase.functions.invoke('send-user-invite', {
+            body: {
+              email: data.email,
+              fullName: data.full_name,
+            },
+          });
+
+          if (inviteError) throw inviteError;
         }
 
-        toast.success("Usuário criado com sucesso!");
+        toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
       }
 
       setIsDialogOpen(false);
