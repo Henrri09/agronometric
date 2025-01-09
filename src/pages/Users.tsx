@@ -52,16 +52,21 @@ export default function Users() {
 
       if (rolesError) throw rolesError;
 
-      // Combine the data
+      // Combine the data and filter out super_admin roles
       const combinedUsers = profiles?.map(profile => {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
+        const role = userRole?.role;
+        
+        // Skip super_admin users
+        if (role === "super_admin") return null;
+        
         return {
           id: profile.id,
           email: "", // We'll update this in the UI component
-          full_name: profile.full_name,
-          role: userRole?.role || "visitor",
+          full_name: profile.full_name || "",
+          role: (role as "admin" | "common" | "visitor") || "visitor",
         };
-      }) || [];
+      }).filter((user): user is User => user !== null) || [];
 
       setUsers(combinedUsers);
     } catch (error: any) {
@@ -110,16 +115,6 @@ export default function Users() {
             ]);
 
           if (roleError) throw roleError;
-
-          // Send invitation email
-          const { error: inviteError } = await supabase.functions.invoke('send-user-invite', {
-            body: {
-              email: data.email,
-              fullName: data.full_name,
-            },
-          });
-
-          if (inviteError) throw inviteError;
         }
 
         toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
