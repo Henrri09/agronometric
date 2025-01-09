@@ -26,11 +26,12 @@ serve(async (req) => {
 
     const { email, fullName, role, companyId }: InviteUserRequest = await req.json()
 
-    // First, check if user exists in auth.users
-    const { data: existingUsers } = await supabaseClient.auth.admin.listUsers()
-    const userExists = existingUsers?.users.find(user => user.email === email)
+    // Primeiro, verificar se o usuário já existe
+    const { data: existingUsers, error: searchError } = await supabaseClient.auth.admin.listUsers()
+    if (searchError) throw searchError
 
-    if (userExists) {
+    const existingUser = existingUsers?.users.find(user => user.email === email)
+    if (existingUser) {
       return new Response(
         JSON.stringify({ error: 'Usuário já existe' }),
         { 
@@ -40,18 +41,24 @@ serve(async (req) => {
       )
     }
 
-    // Send invite to the user
+    // Se não existe, criar o usuário
+    console.log('Creating new user with email:', email)
     const { data: inviteData, error: inviteError } = await supabaseClient.auth.admin.inviteUserByEmail(email, {
       data: {
         full_name: fullName,
       },
     })
 
-    if (inviteError) throw inviteError
+    if (inviteError) {
+      console.error('Error inviting user:', inviteError)
+      throw inviteError
+    }
 
-    if (inviteData) {
+    if (inviteData?.user) {
+      console.log('User created successfully:', inviteData.user.id)
+      
       try {
-        // Create profile with association to company
+        // Criar perfil
         const { error: profileError } = await supabaseClient
           .from('profiles')
           .insert({
@@ -61,12 +68,13 @@ serve(async (req) => {
           })
 
         if (profileError) {
-          // If profile creation fails, delete the auth user
+          console.error('Error creating profile:', profileError)
+          // Se falhar ao criar o perfil, limpar o usuário auth
           await supabaseClient.auth.admin.deleteUser(inviteData.user.id)
           throw profileError
         }
 
-        // Define user role
+        // Definir role do usuário
         const { error: roleError } = await supabaseClient
           .from('user_roles')
           .insert({
@@ -75,13 +83,14 @@ serve(async (req) => {
           })
 
         if (roleError) {
-          // If role assignment fails, clean up both profile and auth user
+          console.error('Error setting user role:', roleError)
+          // Se falhar ao definir a role, limpar tanto o perfil quanto o usuário auth
           await supabaseClient.from('profiles').delete().eq('id', inviteData.user.id)
           await supabaseClient.auth.admin.deleteUser(inviteData.user.id)
           throw roleError
         }
 
-        // Send welcome email
+        // Enviar email de boas-vindas
         const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
         if (!RESEND_API_KEY) {
           throw new Error('Missing RESEND_API_KEY')
@@ -116,7 +125,8 @@ serve(async (req) => {
           }
         )
       } catch (error) {
-        // Clean up any created resources if something fails
+        console.error('Error in user creation process:', error)
+        // Limpar usuário auth se algo der errado
         if (inviteData?.user?.id) {
           await supabaseClient.auth.admin.deleteUser(inviteData.user.id)
         }
