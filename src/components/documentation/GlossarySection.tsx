@@ -8,16 +8,16 @@ export function GlossarySection() {
         <AccordionItem value="ordem-servico">
           <AccordionTrigger>Ordem de Serviço</AccordionTrigger>
           <AccordionContent>
-            Uma **Ordem de Serviço (OS)** é um documento digital essencial que funciona como um registro detalhado de todas as 
-            atividades de manutenção. Ela contém **informações cruciais** como:
+            Uma <strong>Ordem de Serviço (OS)</strong> é um documento digital essencial que funciona como um registro detalhado de todas as 
+            atividades de manutenção. Ela contém <strong>informações cruciais</strong> como:
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li>Descrição detalhada do problema ou serviço necessário</li>
-              <li>**Prioridade** do serviço (Baixa, Média, Alta, Urgente)</li>
-              <li>**Tipo de manutenção** a ser realizada</li>
-              <li>Identificação do **equipamento** envolvido</li>
-              <li>**Responsável** pela execução do serviço</li>
-              <li>**Prazos** de início e conclusão</li>
-              <li>Possibilidade de anexar **fotos e documentos** relevantes</li>
+              <li><strong>Prioridade</strong> do serviço (Baixa, Média, Alta, Urgente)</li>
+              <li><strong>Tipo de manutenção</strong> a ser realizada</li>
+              <li>Identificação do <strong>equipamento</strong> envolvido</li>
+              <li><strong>Responsável</strong> pela execução do serviço</li>
+              <li><strong>Prazos</strong> de início e conclusão</li>
+              <li>Possibilidade de anexar <strong>fotos e documentos</strong> relevantes</li>
             </ul>
           </AccordionContent>
         </AccordionItem>
@@ -25,15 +25,15 @@ export function GlossarySection() {
         <AccordionItem value="manutencao-preventiva">
           <AccordionTrigger>Manutenção Preventiva</AccordionTrigger>
           <AccordionContent>
-            A **Manutenção Preventiva** é um tipo de manutenção **planejada e programada** que visa evitar falhas antes que elas aconteçam. 
-            Seus **principais benefícios** incluem:
+            A <strong>Manutenção Preventiva</strong> é um tipo de manutenção <strong>planejada e programada</strong> que visa evitar falhas antes que elas aconteçam. 
+            Seus <strong>principais benefícios</strong> incluem:
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>**Redução de paradas não programadas**</li>
-              <li>**Aumento da vida útil** dos equipamentos</li>
-              <li>**Economia** com reparos de emergência</li>
-              <li>**Maior segurança** para os operadores</li>
+              <li><strong>Redução de paradas não programadas</strong></li>
+              <li><strong>Aumento da vida útil</strong> dos equipamentos</li>
+              <li><strong>Economia</strong> com reparos de emergência</li>
+              <li><strong>Maior segurança</strong> para os operadores</li>
             </ul>
-            É realizada em **intervalos regulares**, seguindo um cronograma baseado em:
+            É realizada em <strong>intervalos regulares</strong>, seguindo um cronograma baseado em:
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li>Recomendações do fabricante</li>
               <li>Horas de operação</li>
@@ -45,13 +45,13 @@ export function GlossarySection() {
         <AccordionItem value="manutencao-corretiva">
           <AccordionTrigger>Manutenção Corretiva</AccordionTrigger>
           <AccordionContent>
-            A **Manutenção Corretiva** é realizada quando ocorre uma **falha ou problema** em um equipamento que precisa 
+            A <strong>Manutenção Corretiva</strong> é realizada quando ocorre uma <strong>falha ou problema</strong> em um equipamento que precisa 
             ser corrigido imediatamente. Este tipo de manutenção:
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>É realizada de forma **não programada**</li>
-              <li>Visa **restaurar o funcionamento** do equipamento</li>
-              <li>Pode ser **emergencial** em casos críticos</li>
-              <li>Geralmente tem **custos mais elevados** que a preventiva</li>
+              <li>É realizada de forma <strong>não programada</strong></li>
+              <li>Visa <strong>restaurar o funcionamento</strong> do equipamento</li>
+              <li>Pode ser <strong>emergencial</strong> em casos críticos</li>
+              <li>Geralmente tem <strong>custos mais elevados</strong> que a preventiva</li>
             </ul>
             O sistema permite:
             <ul className="list-disc pl-6 mt-2 space-y-1">
@@ -66,12 +66,12 @@ export function GlossarySection() {
         <AccordionItem value="cronograma">
           <AccordionTrigger>Cronograma de Manutenção</AccordionTrigger>
           <AccordionContent>
-            O **Cronograma de Manutenção** é uma ferramenta de **planejamento essencial** que permite:
+            O <strong>Cronograma de Manutenção</strong> é uma ferramenta de <strong>planejamento essencial</strong> que permite:
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>**Visualização clara** de todas as manutenções programadas</li>
-              <li>**Organização eficiente** dos recursos e equipes</li>
-              <li>**Previsão antecipada** de necessidades de peças e materiais</li>
-              <li>**Redução de conflitos** de agendamento</li>
+              <li><strong>Visualização clara</strong> de todas as manutenções programadas</li>
+              <li><strong>Organização eficiente</strong> dos recursos e equipes</li>
+              <li><strong>Previsão antecipada</strong> de necessidades de peças e materiais</li>
+              <li><strong>Redução de conflitos</strong> de agendamento</li>
             </ul>
             Recursos do sistema:
             <ul className="list-disc pl-6 mt-2 space-y-1">
@@ -86,13 +86,13 @@ export function GlossarySection() {
         <AccordionItem value="inventario">
           <AccordionTrigger>Inventário de Peças</AccordionTrigger>
           <AccordionContent>
-            O **Inventário de Peças** é um módulo do sistema que permite o **controle completo** do estoque de componentes 
+            O <strong>Inventário de Peças</strong> é um módulo do sistema que permite o <strong>controle completo</strong> do estoque de componentes 
             e materiais necessários para manutenção. Principais funcionalidades:
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>**Controle em tempo real** das quantidades disponíveis</li>
-              <li>**Alertas automáticos** de estoque baixo</li>
-              <li>**Histórico detalhado** de consumo de peças</li>
-              <li>**Rastreamento** de custos e gastos com materiais</li>
+              <li><strong>Controle em tempo real</strong> das quantidades disponíveis</li>
+              <li><strong>Alertas automáticos</strong> de estoque baixo</li>
+              <li><strong>Histórico detalhado</strong> de consumo de peças</li>
+              <li><strong>Rastreamento</strong> de custos e gastos com materiais</li>
             </ul>
             O sistema permite:
             <ul className="list-disc pl-6 mt-2 space-y-1">
