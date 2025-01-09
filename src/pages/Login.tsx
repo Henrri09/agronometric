@@ -6,12 +6,27 @@ import { toast } from "sonner";
 import { LogIn, Lock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SupportChat } from "@/components/SupportChat";
+import { AuthError, AuthApiError } from "@supabase/supabase-js";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 400:
+          return "Email ou senha inválidos. Por favor, verifique suas credenciais.";
+        case 422:
+          return "Formato de email inválido.";
+        default:
+          return "Erro ao realizar login. Por favor, tente novamente.";
+      }
+    }
+    return error.message;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,11 +38,15 @@ export default function Login() {
     try {
       setLoading(true);
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        const errorMessage = getErrorMessage(authError);
+        toast.error(errorMessage);
+        return;
+      }
 
       if (authData.user) {
         const { data: roleData } = await supabase
