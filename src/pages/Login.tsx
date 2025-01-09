@@ -40,23 +40,22 @@ export default function Login() {
       setLoading(true);
       console.log("Iniciando login...");
       
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
 
-      if (authError) {
-        console.error("Erro no login:", authError);
-        const errorMessage = getErrorMessage(authError);
-        toast.error(errorMessage);
+      if (error) {
+        console.error("Erro no login:", error);
+        toast.error(getErrorMessage(error));
         return;
       }
 
-      if (authData.user) {
+      if (data.user) {
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', authData.user.id)
+          .eq('user_id', data.user.id)
           .single();
 
         console.log("Login realizado com sucesso!");
@@ -70,7 +69,7 @@ export default function Login() {
       }
     } catch (error: any) {
       console.error("Erro inesperado no login:", error);
-      toast.error(error.message || "Erro ao realizar login");
+      toast.error("Erro ao realizar login. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -92,7 +91,8 @@ export default function Login() {
 
       if (error) {
         console.error("Erro ao enviar email de redefinição:", error);
-        throw error;
+        toast.error("Erro ao enviar email de redefinição de senha");
+        return;
       }
 
       setResetEmailSent(true);
@@ -100,7 +100,7 @@ export default function Login() {
       toast.success("Email de redefinição de senha enviado!");
     } catch (error: any) {
       console.error("Error sending reset password email:", error);
-      toast.error(error.message || "Erro ao enviar email de redefinição de senha");
+      toast.error("Erro ao enviar email de redefinição de senha");
     } finally {
       setLoading(false);
     }
