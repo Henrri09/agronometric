@@ -16,12 +16,12 @@ interface SidebarDesktopProps {
 
 export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: SidebarDesktopProps) {
   return (
-    <div className="fixed top-0 left-0 h-full bg-background border-r z-40 mt-12 hidden md:block">
-      <Sidebar className="!bg-background">
+    <div className="fixed top-0 left-0 h-full bg-background border-r z-40 hidden md:block">
+      <Sidebar className="!bg-background pt-16">
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 px-4">
+              <div className="px-4">
                 <SidebarGroupLabel className="text-sm font-medium">Menu Principal</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
@@ -31,7 +31,7 @@ export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: Sid
           )}
           {isSuperAdmin && (
             <SidebarGroup>
-              <div className="pt-6 px-4">
+              <div className="px-4">
                 <SidebarGroupLabel className="text-sm font-medium">Super Admin</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
