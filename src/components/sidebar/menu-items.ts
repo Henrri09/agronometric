@@ -11,7 +11,8 @@ import {
   Calendar,
   Settings,
   BookOpen,
-  ListTodo
+  ListTodo,
+  Video
 } from "lucide-react";
 import { MenuItemType } from "./types";
 
@@ -32,5 +33,6 @@ export const superAdminItems: MenuItemType[] = [
   { title: "Gestão de Empresas", icon: Database, path: "/super-admin" },
   { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
   { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
-  { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" }
+  { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
+  { title: "Tutoriais", icon: Video, path: "/super-admin/tutorials" }
 ];
