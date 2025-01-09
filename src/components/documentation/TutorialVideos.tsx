@@ -11,6 +11,30 @@ interface TutorialVideo {
   video_url: string;
 }
 
+function convertYouTubeUrl(url: string): string {
+  try {
+    // Handle different YouTube URL formats
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      // Return the embedded format
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+
+    // If it's already in embed format, return as is
+    if (url.includes('youtube.com/embed/')) {
+      return url;
+    }
+
+    console.log("Invalid YouTube URL format:", url);
+    return url;
+  } catch (error) {
+    console.error("Error converting YouTube URL:", error);
+    return url;
+  }
+}
+
 export function TutorialVideos() {
   const [videos, setVideos] = useState<TutorialVideo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +57,14 @@ export function TutorialVideos() {
       }
       
       console.log("Fetched videos:", data);
-      setVideos(data || []);
+      
+      // Convert URLs before setting the state
+      const processedVideos = data?.map(video => ({
+        ...video,
+        video_url: convertYouTubeUrl(video.video_url)
+      })) || [];
+      
+      setVideos(processedVideos);
     } catch (error: any) {
       console.error("Error in fetchVideos:", error);
       toast.error("Erro ao carregar vídeos tutoriais");
