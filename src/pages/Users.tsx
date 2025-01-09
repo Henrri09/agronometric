@@ -90,6 +90,8 @@ export default function Users() {
         if (roleError) throw roleError;
 
         toast.success("Usuário atualizado com sucesso!");
+        setIsDialogOpen(false);
+        setSelectedUser(null);
       } else {
         // Create new user
         const { data: inviteData, error: inviteError } = await supabase.functions.invoke('invite-user', {
@@ -103,10 +105,10 @@ export default function Users() {
         if (inviteError) throw inviteError;
 
         toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
+        setIsDialogOpen(false);
+        setSelectedUser(null);
       }
 
-      setIsDialogOpen(false);
-      setSelectedUser(null);
       fetchUsers();
     } catch (error: any) {
       console.error('Error:', error);
