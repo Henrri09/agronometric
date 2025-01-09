@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { UserForm, UserFormValues } from "@/components/users/UserForm";
+import { UserFormValues } from "@/components/users/UserForm";
 import { UserList, User } from "@/components/users/UserList";
+import { UserDialog } from "@/components/users/UserDialog";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
@@ -50,17 +50,15 @@ export default function Users() {
 
       if (rolesError) throw rolesError;
 
-      // Combine the data and filter out super_admin roles
       const combinedUsers = profiles?.map(profile => {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
         const role = userRole?.role;
         
-        // Skip super_admin users
         if (role === "super_admin") return null;
         
         return {
           id: profile.id,
-          email: "", // We'll update this in the UI component
+          email: "",
           full_name: profile.full_name || "",
           role: (role as "admin" | "common" | "visitor") || "visitor",
         };
@@ -92,40 +90,16 @@ export default function Users() {
 
         toast.success("Usuário atualizado com sucesso!");
       } else {
-        // Create new user with random temporary password
-        const tempPassword = Math.random().toString(36).slice(-8);
-        
-        const { data: authData, error: signUpError } = await supabase.auth.signUp({
-          email: data.email,
-          password: tempPassword,
-          options: {
-            data: {
-              full_name: data.full_name,
-            },
+        // Create new user
+        const { data: inviteData, error: inviteError } = await supabase.functions.invoke('invite-user', {
+          body: {
+            email: data.email,
+            fullName: data.full_name,
+            role: data.role,
           },
         });
 
-        if (signUpError) throw signUpError;
-
-        if (authData.user) {
-          const { error: roleError } = await supabase
-            .from("user_roles")
-            .insert([
-              { user_id: authData.user.id, role: data.role }
-            ]);
-
-          if (roleError) throw roleError;
-
-          // Send invitation email
-          const { error: inviteError } = await supabase.functions.invoke('send-user-invite', {
-            body: {
-              email: data.email,
-              fullName: data.full_name,
-            },
-          });
-
-          if (inviteError) throw inviteError;
-        }
+        if (inviteError) throw inviteError;
 
         toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
       }
@@ -134,6 +108,7 @@ export default function Users() {
       setSelectedUser(null);
       fetchUsers();
     } catch (error: any) {
+      console.error('Error:', error);
       toast.error(error.message || "Erro ao salvar usuário");
     }
   };
@@ -195,21 +170,12 @@ export default function Users() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {selectedUser ? "Editar Usuário" : "Novo Usuário"}
-            </DialogTitle>
-          </DialogHeader>
-          <UserForm
-            defaultValues={selectedUser || undefined}
-            onSubmit={handleSubmit}
-            onCancel={() => setIsDialogOpen(false)}
-            isEditing={!!selectedUser}
-          />
-        </DialogContent>
-      </Dialog>
+      <UserDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        selectedUser={selectedUser}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }
