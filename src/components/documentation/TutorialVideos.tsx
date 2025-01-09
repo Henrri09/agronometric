@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface TutorialVideo {
   id: string;
@@ -38,15 +39,15 @@ export function TutorialVideos() {
         {videos.map((video) => (
           <Card key={video.id}>
             <CardContent className="p-4">
-              <div className="aspect-video mb-4">
+              <AspectRatio ratio={16 / 9} className="bg-muted">
                 <iframe
                   src={video.video_url}
                   className="w-full h-full rounded-lg"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
+              </AspectRatio>
+              <h3 className="text-lg font-semibold mt-4 mb-2">{video.title}</h3>
               {video.description && (
                 <p className="text-sm text-muted-foreground">{video.description}</p>
               )}
