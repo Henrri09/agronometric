@@ -94,43 +94,41 @@ export default function Users() {
         setSelectedUser(null);
       } else {
         // Create new user
-        try {
-          const { data: inviteData, error: inviteError } = await supabase.functions.invoke('invite-user', {
-            body: {
-              email: data.email,
-              fullName: data.full_name,
-              role: data.role,
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            data: {
+              full_name: data.full_name,
             },
-          });
-
-          if (inviteError) {
-            // Check if it's a user exists error
-            const errorBody = JSON.parse(inviteError.message);
-            if (errorBody.error === "Usuário já existe") {
-              toast.error("Este email já está cadastrado no sistema");
-              return;
-            }
-            throw inviteError;
           }
+        });
 
-          toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
+        if (signUpError) {
+          throw signUpError;
+        }
+
+        if (signUpData.user) {
+          // Set user role
+          const { error: roleError } = await supabase
+            .from("user_roles")
+            .insert({
+              user_id: signUpData.user.id,
+              role: data.role
+            });
+
+          if (roleError) throw roleError;
+
+          toast.success("Usuário criado com sucesso! Um email de confirmação foi enviado.");
           setIsDialogOpen(false);
           setSelectedUser(null);
-        } catch (error: any) {
-          console.error('Invite error:', error);
-          if (error.message && typeof error.message === 'string' && error.message.includes('Usuário já existe')) {
-            toast.error("Este email já está cadastrado no sistema");
-            return;
-          }
-          throw error;
+          await fetchUsers();
         }
       }
-
-      fetchUsers();
     } catch (error: any) {
       console.error('Error:', error);
       toast.error(error.message || "Erro ao salvar usuário");
-      throw error; // Re-throw to be caught by the form
+      throw error;
     }
   };
 

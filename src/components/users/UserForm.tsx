@@ -11,6 +11,7 @@ const userFormSchema = z.object({
   email: z.string().email("Email inválido"),
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
   role: z.enum(["admin", "common", "visitor"]),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
@@ -29,6 +30,7 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
       email: "",
       full_name: "",
       role: "visitor",
+      password: "",
       ...defaultValues,
     },
   });
@@ -67,6 +69,24 @@ export function UserForm({ defaultValues, onSubmit, onCancel, isEditing }: UserF
               <FormLabel>Nome completo</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Digite o nome completo" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Senha</FormLabel>
+              <FormControl>
+                <Input 
+                  {...field} 
+                  type="password" 
+                  placeholder="Digite a senha"
+                  disabled={isEditing} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
