@@ -21,7 +21,7 @@ export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: Sid
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
-              <div className="px-4">
+              <div className="px-4 pt-4">
                 <SidebarGroupLabel className="text-sm font-medium">Menu Principal</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
@@ -31,7 +31,7 @@ export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: Sid
           )}
           {isSuperAdmin && (
             <SidebarGroup>
-              <div className="px-4">
+              <div className="px-4 pt-4">
                 <SidebarGroupLabel className="text-sm font-medium">Super Admin</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
