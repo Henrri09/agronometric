@@ -13,6 +13,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const getErrorMessage = (error: AuthError) => {
     if (error instanceof AuthApiError) {
@@ -70,6 +71,30 @@ export default function Login() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      toast.error("Por favor, insira seu email para redefinir a senha");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      setResetEmailSent(true);
+      toast.success("Email de redefinição de senha enviado!");
+    } catch (error: any) {
+      console.error("Error sending reset password email:", error);
+      toast.error(error.message || "Erro ao enviar email de redefinição de senha");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center auth-gradient">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
@@ -113,17 +138,34 @@ export default function Login() {
           </Button>
 
           <div className="flex flex-col items-center space-y-4">
-            <p className="text-center text-sm text-accent/70">
-              Não tem uma conta?{" "}
+            <div className="flex flex-col items-center space-y-2 w-full">
+              <p className="text-center text-sm text-accent/70">
+                Não tem uma conta?{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  className="text-primary hover:text-primary-hover hover:underline"
+                  disabled={loading}
+                >
+                  Registre-se
+                </button>
+              </p>
+              
               <button
                 type="button"
-                onClick={() => navigate("/register")}
-                className="text-primary hover:text-primary-hover hover:underline"
+                onClick={handleResetPassword}
+                className="text-sm text-primary hover:text-primary-hover hover:underline"
                 disabled={loading}
               >
-                Registre-se
+                Esqueceu sua senha?
               </button>
-            </p>
+
+              {resetEmailSent && (
+                <p className="text-sm text-green-600">
+                  Email de redefinição enviado! Verifique sua caixa de entrada.
+                </p>
+              )}
+            </div>
             
             <SupportChat />
           </div>
