@@ -117,10 +117,26 @@ export default function Users() {
 
   const handleDelete = async (userId: string) => {
     try {
-      const { error: deleteError } = await supabase
+      // Delete user role first
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId);
+
+      if (roleError) throw roleError;
+
+      // Delete profile
+      const { error: profileError } = await supabase
         .from("profiles")
         .delete()
         .eq("id", userId);
+
+      if (profileError) throw profileError;
+
+      // Delete auth user using edge function
+      const { error: deleteError } = await supabase.functions.invoke('delete-user', {
+        body: { userId }
+      });
 
       if (deleteError) throw deleteError;
       
