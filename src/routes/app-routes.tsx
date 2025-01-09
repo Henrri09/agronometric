@@ -25,23 +25,27 @@ export function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
-      <Route element={<AppLayout />}>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Index />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/documentation" element={<Documentation />} />
-          <Route path="/machinery" element={<Machinery />} />
-          <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
-          <Route path="/parts-inventory" element={<PartsInventory />} />
-          <Route path="/service-orders" element={<ServiceOrders />} />
-          <Route path="/service-orders/:id" element={<ServiceOrderEdit />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/super-admin" element={<SuperAdmin />} />
-          <Route path="/task-management" element={<TaskManagement />} />
-          <Route path="/users" element={<Users />} />
-        </Route>
-      </Route>
+      <Route path="/" element={
+        <AppLayout>
+          <ProtectedRoute>
+            <Routes>
+              <Route index element={<Index />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="documentation" element={<Documentation />} />
+              <Route path="machinery" element={<Machinery />} />
+              <Route path="maintenance-schedule" element={<MaintenanceSchedule />} />
+              <Route path="parts-inventory" element={<PartsInventory />} />
+              <Route path="service-orders" element={<ServiceOrders />} />
+              <Route path="service-orders/:id" element={<ServiceOrderEdit />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="super-admin" element={<SuperAdmin />} />
+              <Route path="task-management" element={<TaskManagement />} />
+              <Route path="users" element={<Users />} />
+            </Routes>
+          </ProtectedRoute>
+        </AppLayout>
+      } />
     </Routes>
   );
 }
