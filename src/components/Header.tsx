@@ -5,10 +5,13 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSidebar } from "./ui/sidebar";
 
 export function Header() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
   const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
@@ -36,7 +39,12 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 right-0 z-50 bg-white h-14 border-b border-gray-200 transition-all duration-300" style={{ left: isMobile ? '0' : '256px' }}>
+    <header 
+      className="fixed top-0 right-0 z-40 bg-white h-14 border-b border-gray-200 transition-all duration-300" 
+      style={{ 
+        left: isMobile ? '0' : isCollapsed ? '80px' : '280px'
+      }}
+    >
       {isMobile ? (
         <div className="grid grid-cols-[48px_1fr_48px] items-center h-full px-4">
           <div className="flex justify-start">
