@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Bug } from "lucide-react";
+import { GlossarySection } from "@/components/documentation/GlossarySection";
+import { SystemGuides } from "@/components/documentation/SystemGuides";
 
 interface TutorialVideo {
   id: string;
@@ -60,8 +61,8 @@ export default function Documentation() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <PageHeader
-          title="Documentação"
-          description="Tutoriais e guias para ajudar você a utilizar o sistema"
+          title="Documentação do Sistema"
+          description="Documentação completa e tutoriais do sistema"
         />
         <Dialog>
           <DialogTrigger asChild>
@@ -100,159 +101,58 @@ export default function Documentation() {
         </Dialog>
       </div>
 
-      {/* Glossário e Guia do Sistema */}
       <Card>
-        <CardHeader>
-          <CardTitle>Glossário e Guia do Sistema</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Dashboard */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Dashboard</h3>
-            <p className="text-muted-foreground mb-2">
-              Página inicial que apresenta uma visão geral do sistema com indicadores importantes:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Visualize gráficos de desempenho e estatísticas</li>
-              <li>Acompanhe ordens de serviço em andamento</li>
-              <li>Monitore indicadores de manutenção preventiva</li>
-              <li>Acesse atalhos para as principais funcionalidades</li>
-            </ul>
+        <CardContent className="p-6">
+          <div className="space-y-8">
+            {/* Sobre o Sistema */}
+            <div>
+              <h2 className="text-2xl font-semibold mb-4">Sobre o Sistema</h2>
+              <p className="text-muted-foreground">
+                Este sistema foi desenvolvido para gerenciar e controlar as atividades de manutenção de maquinários, 
+                permitindo o acompanhamento de ordens de serviço, gestão de inventário de peças e planejamento de 
+                manutenções preventivas.
+              </p>
+            </div>
+
+            {/* Glossário */}
+            <GlossarySection />
+
+            {/* Guias do Sistema */}
+            <SystemGuides />
+
+            {/* Tutoriais em Vídeo */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold">Tutoriais em Vídeo</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {videos.map((video) => (
+                  <Card key={video.id}>
+                    <CardContent className="p-4">
+                      <div className="aspect-video mb-4">
+                        <iframe
+                          src={video.video_url}
+                          className="w-full h-full rounded-lg"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
+                      {video.description && (
+                        <p className="text-sm text-muted-foreground">{video.description}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {videos.length === 0 && (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    Nenhum tutorial disponível no momento.
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
-
-          <Separator />
-
-          {/* Ordens de Serviço */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Ordens de Serviço</h3>
-            <p className="text-muted-foreground mb-2">
-              Gerencie todas as solicitações de manutenção e reparos:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Crie novas ordens de serviço com detalhes completos</li>
-              <li>Atribua responsáveis e defina prioridades</li>
-              <li>Acompanhe o status e progresso das ordens</li>
-              <li>Anexe fotos e documentos relevantes</li>
-              <li>Registre o tempo e recursos utilizados</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          {/* Maquinário */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Maquinário</h3>
-            <p className="text-muted-foreground mb-2">
-              Cadastro e controle completo dos equipamentos:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Cadastre novos equipamentos com informações detalhadas</li>
-              <li>Mantenha histórico de manutenções</li>
-              <li>Acompanhe status e condições dos equipamentos</li>
-              <li>Gerencie documentação técnica</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          {/* Estoque de Peças */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Estoque de Peças</h3>
-            <p className="text-muted-foreground mb-2">
-              Controle do inventário de peças e componentes:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Gerencie o estoque de peças de reposição</li>
-              <li>Configure alertas de estoque mínimo</li>
-              <li>Registre entradas e saídas</li>
-              <li>Acompanhe custos e fornecedores</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          {/* Calendário */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Calendário</h3>
-            <p className="text-muted-foreground mb-2">
-              Visualização e planejamento de atividades:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Visualize manutenções programadas</li>
-              <li>Agende novas manutenções preventivas</li>
-              <li>Gerencie prazos e compromissos</li>
-              <li>Sincronize com ordens de serviço</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          {/* Kanban */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Kanban</h3>
-            <p className="text-muted-foreground mb-2">
-              Gestão visual do fluxo de trabalho:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Visualize o status de todas as tarefas</li>
-              <li>Arraste e solte para atualizar status</li>
-              <li>Organize por prioridade e responsável</li>
-              <li>Acompanhe o progresso em tempo real</li>
-            </ul>
-          </div>
-
-          <Separator />
-
-          {/* Usuários */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Usuários</h3>
-            <p className="text-muted-foreground mb-2">
-              Gestão de acesso e permissões:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Cadastre novos usuários</li>
-              <li>Defina níveis de acesso e permissões</li>
-              <li>Gerencie perfis e informações</li>
-              <li>Monitore atividades dos usuários</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Seção de Tutoriais */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tutoriais em Vídeo</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video) => (
-              <Card key={video.id}>
-                <CardContent className="p-6">
-                  <div className="aspect-video mb-4">
-                    <iframe
-                      src={video.video_url}
-                      className="w-full h-full rounded-lg"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{video.title}</h3>
-                  {video.description && (
-                    <p className="text-sm text-muted-foreground">{video.description}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {videos.length === 0 && (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                Nenhum tutorial disponível no momento.
-              </CardContent>
-            </Card>
-          )}
         </CardContent>
       </Card>
     </div>
