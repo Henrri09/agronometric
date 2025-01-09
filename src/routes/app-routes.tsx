@@ -34,8 +34,52 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <AppLayout>
               <Routes>
+                {/* Routes accessible by all authenticated users */}
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/documentation" element={<Documentation />} />
+                <Route path="/machinery" element={<Machinery />} />
+                <Route path="/parts-inventory" element={<PartsInventory />} />
+                <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/task-management" element={<TaskManagement />} />
+
+                {/* Routes accessible by common users and admins only */}
+                <Route 
+                  path="/analytics" 
+                  element={
+                    <ProtectedRoute minRole="common">
+                      <Analytics />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/service-orders" 
+                  element={
+                    <ProtectedRoute minRole="common">
+                      <ServiceOrders />
+                    </ProtectedRoute>
+                  } 
+                />
+
+                {/* Routes accessible by admins only */}
+                <Route 
+                  path="/users" 
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <Users />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/settings" 
+                  element={
+                    <ProtectedRoute adminOnly>
+                      <Settings />
+                    </ProtectedRoute>
+                  } 
+                />
+
+                {/* Super admin routes */}
                 <Route 
                   path="/super-admin" 
                   element={
@@ -73,78 +117,6 @@ export const AppRoutes = () => {
                   element={
                     <ProtectedRoute superAdminOnly>
                       <TutorialManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/users" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Users />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/machinery" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Machinery />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/service-orders" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <ServiceOrders />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/analytics" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Analytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/task-management" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <TaskManagement />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/calendar" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Calendar />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/parts-inventory" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <PartsInventory />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/maintenance-schedule" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <MaintenanceSchedule />
                     </ProtectedRoute>
                   } 
                 />

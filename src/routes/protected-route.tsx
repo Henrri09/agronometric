@@ -6,33 +6,41 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   adminOnly?: boolean;
   superAdminOnly?: boolean;
+  minRole?: 'visitor' | 'common' | 'admin';
 }
 
-export const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ 
+  children, 
+  adminOnly = false, 
+  superAdminOnly = false,
+  minRole = 'visitor'
+}: ProtectedRouteProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<'visitor' | 'common' | 'admin' | 'super_admin' | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        setIsAuthenticated(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
-        const { data: userRoles } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        setIsAdmin(userRoles?.role === 'admin');
-        setIsSuperAdmin(userRoles?.role === 'super_admin');
+        if (session?.user) {
+          setIsAuthenticated(true);
+          
+          const { data: userRoles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+          
+          setUserRole(userRoles?.role || 'visitor');
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     checkAuth();
@@ -46,11 +54,26 @@ export const ProtectedRoute = ({ children, adminOnly = false, superAdminOnly = f
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (superAdminOnly && !isSuperAdmin) {
+  // Role hierarchy check
+  const roleHierarchy = {
+    'visitor': 0,
+    'common': 1,
+    'admin': 2,
+    'super_admin': 3
+  };
+
+  const userRoleLevel = userRole ? roleHierarchy[userRole] : 0;
+  const requiredRoleLevel = roleHierarchy[minRole];
+
+  if (superAdminOnly && userRole !== 'super_admin') {
     return <Navigate to="/" replace />;
   }
 
-  if (adminOnly && !isAdmin && !isSuperAdmin) {
+  if (adminOnly && userRole !== 'admin' && userRole !== 'super_admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  if (userRoleLevel < requiredRoleLevel) {
     return <Navigate to="/" replace />;
   }
 
