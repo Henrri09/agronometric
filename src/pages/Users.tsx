@@ -38,14 +38,12 @@ export default function Users() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*");
 
       if (profilesError) throw profilesError;
 
-      // Fetch user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("*");
@@ -94,10 +92,12 @@ export default function Users() {
 
         toast.success("Usuário atualizado com sucesso!");
       } else {
-        // Create new user
+        // Create new user with random temporary password
+        const tempPassword = Math.random().toString(36).slice(-8);
+        
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: data.email,
-          password: Math.random().toString(36).slice(-8), // Generate a random temporary password
+          password: tempPassword,
           options: {
             data: {
               full_name: data.full_name,
@@ -115,6 +115,16 @@ export default function Users() {
             ]);
 
           if (roleError) throw roleError;
+
+          // Send invitation email
+          const { error: inviteError } = await supabase.functions.invoke('send-user-invite', {
+            body: {
+              email: data.email,
+              fullName: data.full_name,
+            },
+          });
+
+          if (inviteError) throw inviteError;
         }
 
         toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");

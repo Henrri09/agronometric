@@ -25,7 +25,7 @@ serve(async (req) => {
     const { email, fullName }: InviteUserRequest = await req.json()
 
     // Generate password reset link
-    const { data: { user }, error: resetError } = await supabaseClient.auth.admin
+    const { data: resetData, error: resetError } = await supabaseClient.auth.admin
       .generateLink({
         type: 'recovery',
         email: email,
@@ -54,7 +54,7 @@ serve(async (req) => {
           <p>Olá ${fullName},</p>
           <p>Uma conta foi criada para você no AgroMetric.</p>
           <p>Por favor, clique no link abaixo para definir sua senha:</p>
-          <p><a href="${user?.confirmation_sent_at}">Definir senha</a></p>
+          <p><a href="${resetData.properties.action_link}">Definir senha</a></p>
           <p>Se você não solicitou esta conta, por favor ignore este email.</p>
           <p>Atenciosamente,<br>Equipe AgroMetric</p>
         `,
