@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { 
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
-import { MenuItemType } from "./types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+interface MenuItemType {
+  title: string;
+  icon: React.ElementType;
+  path: string;
+}
 
 interface SidebarMenuItemsProps {
   items: MenuItemType[];
@@ -23,33 +23,31 @@ export function SidebarMenuItems({ items, isMobile, isCollapsed }: SidebarMenuIt
   const { setOpenMobile } = useSidebar();
 
   const MenuItem = ({ item }: { item: MenuItemType }) => {
-    const content = (
+    const menuItem = (
       <Link 
         to={item.path} 
         className="sidebar-menu-item flex items-center gap-3 px-4 py-2.5 rounded-md w-full"
         onClick={() => isMobile && setOpenMobile(false)}
       >
-        <item.icon className="h-5 w-5 shrink-0" />
-        {!isCollapsed && <span className="text-sm truncate">{item.title}</span>}
+        <item.icon className="h-5 w-5" />
+        {!isCollapsed && <span className="text-sm">{item.title}</span>}
       </Link>
     );
 
-    if (isCollapsed) {
+    if (isCollapsed && !isMobile) {
       return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {content}
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {item.title}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {menuItem}
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            {item.title}
+          </TooltipContent>
+        </Tooltip>
       );
     }
 
-    return content;
+    return menuItem;
   };
 
   return (
