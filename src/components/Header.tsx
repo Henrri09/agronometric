@@ -36,12 +36,9 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-14">
+    <div className="flex-1">
       {isMobile ? (
-        <div className="grid grid-cols-[48px_1fr_48px] items-center h-full px-4">
-          <div className="flex justify-start">
-            <div className="w-10 h-10" />
-          </div>
+        <div className="grid grid-cols-[1fr_48px] items-center h-full px-4">
           <div className="flex justify-center">
             <img 
               src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
@@ -86,6 +83,6 @@ export function Header() {
           </div>
         </div>
       )}
-    </header>
+    </div>
   );
 }
