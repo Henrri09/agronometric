@@ -1,15 +1,14 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { SidebarMenuItems } from "./SidebarMenuItems";
 import { MenuItemType } from "./types";
-import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface SidebarDesktopProps {
   isSuperAdmin: boolean;
@@ -18,45 +17,33 @@ interface SidebarDesktopProps {
 }
 
 export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: SidebarDesktopProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const { open } = useSidebar();
+  
   return (
-    <div className={`fixed top-0 left-0 h-screen bg-background border-r z-40 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-      <Sidebar className="!bg-background h-full relative">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute -right-3 top-4 z-50"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+    <div className="fixed top-0 left-0 h-full bg-background border-r z-40 hidden md:block transition-all duration-300" 
+         style={{ width: open ? '280px' : '64px' }}>
+      <Sidebar className="!bg-background pt-16">
+        <div className="absolute right-[-12px] top-20">
+          <SidebarTrigger />
+        </div>
         <SidebarContent>
           {!isSuperAdmin && (
             <SidebarGroup>
               <div className="px-4">
-                <SidebarGroupLabel className={`text-sm font-medium ${isCollapsed ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}>
-                  Menu Principal
-                </SidebarGroupLabel>
+                <SidebarGroupLabel className="text-sm font-medium">Menu Principal</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
-                <SidebarMenuItems items={menuItems} isCollapsed={isCollapsed} />
+                <SidebarMenuItems items={menuItems} isCollapsed={!open} />
               </SidebarGroupContent>
             </SidebarGroup>
           )}
           {isSuperAdmin && (
             <SidebarGroup>
               <div className="px-4">
-                <SidebarGroupLabel className={`text-sm font-medium ${isCollapsed ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}>
-                  Super Admin
-                </SidebarGroupLabel>
+                <SidebarGroupLabel className="text-sm font-medium">Super Admin</SidebarGroupLabel>
               </div>
               <SidebarGroupContent className="mt-2">
-                <SidebarMenuItems items={superAdminItems} isCollapsed={isCollapsed} />
+                <SidebarMenuItems items={superAdminItems} isCollapsed={!open} />
               </SidebarGroupContent>
             </SidebarGroup>
           )}
