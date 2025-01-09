@@ -59,47 +59,10 @@ export default function Documentation() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <PageHeader
-          title="Documentação do Sistema"
-          description="Documentação completa e tutoriais do sistema"
-        />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Bug className="h-4 w-4" />
-              Reportar Bug
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reportar Bug</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="bug-title" className="text-sm font-medium">Título</label>
-                <Input
-                  id="bug-title"
-                  value={bugReport.title}
-                  onChange={(e) => setBugReport(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Descreva o problema brevemente"
-                />
-              </div>
-              <div>
-                <label htmlFor="bug-description" className="text-sm font-medium">Descrição</label>
-                <Textarea
-                  id="bug-description"
-                  value={bugReport.description}
-                  onChange={(e) => setBugReport(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Descreva o problema em detalhes"
-                  rows={5}
-                />
-              </div>
-              <Button onClick={handleBugReport} className="w-full">Enviar</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <PageHeader
+        title="Documentação do Sistema"
+        description="Documentação completa e tutoriais do sistema"
+      />
 
       <Card>
         <CardContent className="p-6">
@@ -155,6 +118,42 @@ export default function Documentation() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="gap-2">
+            <Bug className="h-4 w-4" />
+            Reportar Bug
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reportar Bug</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="bug-title" className="text-sm font-medium">Título</label>
+              <Input
+                id="bug-title"
+                value={bugReport.title}
+                onChange={(e) => setBugReport(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Descreva o problema brevemente"
+              />
+            </div>
+            <div>
+              <label htmlFor="bug-description" className="text-sm font-medium">Descrição</label>
+              <Textarea
+                id="bug-description"
+                value={bugReport.description}
+                onChange={(e) => setBugReport(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Descreva o problema em detalhes"
+                rows={5}
+              />
+            </div>
+            <Button onClick={handleBugReport} className="w-full">Enviar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
