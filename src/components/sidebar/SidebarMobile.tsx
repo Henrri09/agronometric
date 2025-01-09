@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, PanelLeftClose } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { SidebarGroupLabel } from "@/components/ui/sidebar";
 import { SidebarMenuItems } from "./SidebarMenuItems";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -34,7 +34,7 @@ export function SidebarMobile({ isSuperAdmin, menuItems, superAdminItems }: Side
               className="absolute top-4 right-4"
               onClick={() => setOpenMobile(false)}
             >
-              <PanelLeftClose className="h-6 w-6" />
+              <X className="h-6 w-6" />
             </Button>
             {!isSuperAdmin && (
               <>

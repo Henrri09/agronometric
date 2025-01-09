@@ -3,7 +3,6 @@ import { useUserRole } from "@/hooks/use-user-role";
 import { SidebarMobile } from "./sidebar/SidebarMobile";
 import { SidebarDesktop } from "./sidebar/SidebarDesktop";
 import { menuItems, superAdminItems } from "./sidebar/menu-items";
-import { SidebarProvider } from "./ui/sidebar";
 
 export function AppSidebar() {
   const isMobile = useIsMobile();
@@ -18,7 +17,7 @@ export function AppSidebar() {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <>
       {isMobile ? (
         <SidebarMobile
           isSuperAdmin={isSuperAdmin}
@@ -32,6 +31,6 @@ export function AppSidebar() {
           superAdminItems={superAdminItems}
         />
       )}
-    </SidebarProvider>
+    </>
   );
 }
