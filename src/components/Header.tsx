@@ -36,11 +36,10 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white py-3 border-b border-gray-200">
+    <header className="fixed top-0 right-0 z-50 bg-white h-14 border-b border-gray-200 transition-all duration-300" style={{ left: isMobile ? '0' : '256px' }}>
       {isMobile ? (
-        <div className="grid grid-cols-[48px_1fr_48px] items-center px-4">
+        <div className="grid grid-cols-[48px_1fr_48px] items-center h-full px-4">
           <div className="flex justify-start">
-            {/* Placeholder para o menu hamburguer com mesma largura do botão de logout */}
             <div className="w-10 h-10" />
           </div>
           <div className="flex justify-center">
@@ -62,7 +61,7 @@ export function Header() {
           </div>
         </div>
       ) : (
-        <div className="flex justify-between items-center px-4">
+        <div className="flex justify-between items-center h-full px-4">
           <div className="flex items-center">
             <img 
               src="/lovable-uploads/86211256-d922-4329-9985-48f0539a6443.png" 
