@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { LineChart, Wallet, LifeBuoy } from "lucide-react";
+import { LineChart, Wallet, LifeBuoy, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function DashboardCards() {
@@ -42,6 +42,19 @@ export function DashboardCards() {
           <h3 className="text-lg font-semibold">Suporte</h3>
           <p className="text-sm text-muted-foreground">
             Gerencie tickets de suporte
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card 
+        className="cursor-pointer hover:bg-accent/50 transition-colors" 
+        onClick={() => navigate("/super-admin/tutorials")}
+      >
+        <CardContent className="p-6 flex flex-col items-center justify-center text-center">
+          <Video className="h-12 w-12 mb-2 text-primary" />
+          <h3 className="text-lg font-semibold">Tutoriais</h3>
+          <p className="text-sm text-muted-foreground">
+            Gerencie vídeos tutoriais
           </p>
         </CardContent>
       </Card>
