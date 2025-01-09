@@ -94,19 +94,36 @@ export default function Users() {
         setSelectedUser(null);
       } else {
         // Create new user
-        const { data: inviteData, error: inviteError } = await supabase.functions.invoke('invite-user', {
-          body: {
-            email: data.email,
-            fullName: data.full_name,
-            role: data.role,
-          },
-        });
+        try {
+          const { data: inviteData, error: inviteError } = await supabase.functions.invoke('invite-user', {
+            body: {
+              email: data.email,
+              fullName: data.full_name,
+              role: data.role,
+            },
+          });
 
-        if (inviteError) throw inviteError;
+          if (inviteError) {
+            // Check if it's a user exists error
+            const errorBody = JSON.parse(inviteError.message);
+            if (errorBody.error === "Usuário já existe") {
+              toast.error("Este email já está cadastrado no sistema");
+              return;
+            }
+            throw inviteError;
+          }
 
-        toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
-        setIsDialogOpen(false);
-        setSelectedUser(null);
+          toast.success("Usuário criado com sucesso! Um email foi enviado para definição da senha.");
+          setIsDialogOpen(false);
+          setSelectedUser(null);
+        } catch (error: any) {
+          console.error('Invite error:', error);
+          if (error.message && typeof error.message === 'string' && error.message.includes('Usuário já existe')) {
+            toast.error("Este email já está cadastrado no sistema");
+            return;
+          }
+          throw error;
+        }
       }
 
       fetchUsers();
