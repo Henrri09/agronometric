@@ -18,6 +18,7 @@ import SuperAdmin from "@/pages/SuperAdmin";
 import FinancialManagement from "@/pages/super-admin/FinancialManagement";
 import SuperAdminAnalytics from "@/pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "@/pages/super-admin/SupportTickets";
+import TutorialManagement from "@/pages/super-admin/TutorialManagement";
 import Documentation from "@/pages/Documentation";
 
 export const AppRoutes = () => {
@@ -62,6 +63,14 @@ export const AppRoutes = () => {
                   element={
                     <ProtectedRoute superAdminOnly>
                       <SupportTickets />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/super-admin/tutorials" 
+                  element={
+                    <ProtectedRoute superAdminOnly>
+                      <TutorialManagement />
                     </ProtectedRoute>
                   } 
                 />
