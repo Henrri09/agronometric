@@ -23,14 +23,11 @@ export function SidebarDesktop({ isSuperAdmin, menuItems, superAdminItems }: Sid
 
   return (
     <div className="fixed top-0 left-0 h-screen bg-background border-r z-40 hidden md:block">
-      <Sidebar 
-        className={`!bg-background transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[280px]'}`}
-        data-state={state}
-      >
+      <Sidebar className="!bg-background w-[280px]">
         <Button
           variant="ghost"
           size="icon"
-          className="absolute -right-3 top-20 z-50 h-6 w-6 rounded-full border bg-background shadow-md"
+          className="absolute right-2 top-3"
           onClick={toggleSidebar}
         >
           {isCollapsed ? (
