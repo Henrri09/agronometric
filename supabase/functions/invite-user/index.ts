@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,10 +7,11 @@ const corsHeaders = {
 }
 
 interface InviteUserRequest {
-  email: string;
-  fullName: string;
-  role: 'common' | 'visitor';
-  companyId: string;
+  email: string
+  fullName: string
+  role: 'admin' | 'common' | 'visitor'
+  password: string
+  companyId?: string
 }
 
 serve(async (req) => {
@@ -24,7 +25,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { email, fullName, role, companyId }: InviteUserRequest = await req.json()
+    const { email, fullName, role, password, companyId }: InviteUserRequest = await req.json()
 
     // Primeiro, verificar se o usuário já existe
     const { data: existingUser } = await supabaseClient.auth.admin.listUsers()
@@ -40,13 +41,12 @@ serve(async (req) => {
       )
     }
 
-    // Se não existe, criar o usuário
+    // Se não existe, criar o usuário com a senha fornecida
     const { data: userData, error: userError } = await supabaseClient.auth.admin.createUser({
       email: email,
+      password: password,
       email_confirm: true,
-      user_metadata: {
-        full_name: fullName
-      }
+      user_metadata: { full_name: fullName }
     })
 
     if (userError) throw userError
@@ -72,15 +72,7 @@ serve(async (req) => {
 
     if (roleError) throw roleError
 
-    // Gerar link para definição de senha
-    const { data: resetData, error: resetError } = await supabaseClient.auth.admin.generateLink({
-      type: 'recovery',
-      email: email
-    })
-
-    if (resetError) throw resetError
-
-    // Enviar email de convite
+    // Enviar email de boas-vindas
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
     if (!RESEND_API_KEY) {
       throw new Error('Missing RESEND_API_KEY')
@@ -89,29 +81,28 @@ serve(async (req) => {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'AgroMetric <no-reply@agrometric.com.br>',
-        to: [email],
-        subject: 'Convite para o AgroMetric',
+        from: 'AgroMetric <onboarding@resend.dev>',
+        to: email,
+        subject: 'Bem-vindo ao AgroMetric',
         html: `
           <h1>Bem-vindo ao AgroMetric!</h1>
           <p>Olá ${fullName},</p>
-          <p>Você foi convidado para acessar o AgroMetric.</p>
-          <p>Por favor, clique no link abaixo para definir sua senha:</p>
-          <p><a href="${resetData.properties.action_link}">Definir senha</a></p>
-          <p>Atenciosamente,<br>Equipe AgroMetric</p>
-        `,
-      }),
+          <p>Sua conta foi criada com sucesso. Você pode fazer login usando seu email e a senha que você cadastrou.</p>
+          <p>Email: ${email}</p>
+          <p>Acesse: <a href="${Deno.env.get('PUBLIC_SITE_URL') || ''}/login">Login</a></p>
+        `
+      })
     })
 
     const emailData = await res.json()
     console.log('Email enviado:', emailData)
 
     return new Response(
-      JSON.stringify({ message: 'User invited successfully' }),
+      JSON.stringify({ message: 'User created successfully' }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -122,9 +113,9 @@ serve(async (req) => {
     console.error('Error in invite-user function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400 
+        status: 400
       }
     )
   }
