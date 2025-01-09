@@ -38,12 +38,15 @@ export default function Login() {
 
     try {
       setLoading(true);
+      console.log("Iniciando login...");
+      
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
 
       if (authError) {
+        console.error("Erro no login:", authError);
         const errorMessage = getErrorMessage(authError);
         toast.error(errorMessage);
         return;
@@ -56,6 +59,7 @@ export default function Login() {
           .eq('user_id', authData.user.id)
           .single();
 
+        console.log("Login realizado com sucesso!");
         toast.success("Login realizado com sucesso!");
         
         if (roleData?.role === 'super_admin') {
@@ -65,6 +69,7 @@ export default function Login() {
         }
       }
     } catch (error: any) {
+      console.error("Erro inesperado no login:", error);
       toast.error(error.message || "Erro ao realizar login");
     } finally {
       setLoading(false);
@@ -79,13 +84,19 @@ export default function Login() {
 
     try {
       setLoading(true);
+      console.log("Enviando email de redefinição de senha...");
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao enviar email de redefinição:", error);
+        throw error;
+      }
 
       setResetEmailSent(true);
+      console.log("Email de redefinição enviado com sucesso!");
       toast.success("Email de redefinição de senha enviado!");
     } catch (error: any) {
       console.error("Error sending reset password email:", error);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -8,10 +8,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const validatePassword = (password: string) => {
+    if (password.length < 6) {
+      return "A senha deve ter pelo menos 6 caracteres";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "A senha deve conter pelo menos uma letra maiúscula";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "A senha deve conter pelo menos um número";
+    }
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,25 +38,31 @@ export default function ResetPassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres");
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      toast.error(passwordError);
       return;
     }
 
     try {
       setLoading(true);
+      console.log("Iniciando atualização de senha...");
       
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao atualizar senha:", error);
+        throw error;
+      }
 
+      console.log("Senha atualizada com sucesso!");
       toast.success("Senha atualizada com sucesso!");
       navigate("/login");
     } catch (error: any) {
       console.error("Error resetting password:", error);
-      toast.error(error.message || "Erro ao redefinir senha");
+      toast.error(error.message || "Erro ao redefinir senha. Por favor, tente novamente.");
     } finally {
       setLoading(false);
     }
