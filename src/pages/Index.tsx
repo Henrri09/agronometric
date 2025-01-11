@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Index = () => {
   const [companyId, setCompanyId] = useState<string | null>(null);
@@ -20,77 +21,111 @@ const Index = () => {
   // Buscar o company_id do usuário logado
   useEffect(() => {
     const getCompanyId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile?.company_id) {
-          console.log("Company ID encontrado:", profile.company_id);
-          setCompanyId(profile.company_id);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('company_id')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          if (error) {
+            console.error("Erro ao buscar perfil:", error);
+            toast.error("Erro ao carregar dados da empresa");
+            return;
+          }
+
+          if (profile?.company_id) {
+            console.log("Company ID encontrado:", profile.company_id);
+            setCompanyId(profile.company_id);
+          }
         }
+      } catch (error) {
+        console.error("Erro ao buscar usuário:", error);
+        toast.error("Erro ao carregar dados do usuário");
       }
     };
     getCompanyId();
   }, []);
 
   // Buscar maquinários da empresa
-  const { data: machineryCount = 0 } = useQuery({
+  const { data: machineryCount = 0, isLoading: loadingMachinery } = useQuery({
     queryKey: ['machinery-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
-      console.log("Buscando maquinários para company_id:", companyId);
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('machinery')
         .select('*', { count: 'exact', head: true });
+      
+      if (error) {
+        console.error("Erro ao buscar maquinários:", error);
+        toast.error("Erro ao carregar quantidade de maquinários");
+        return 0;
+      }
+      
       return count || 0;
     },
     enabled: !!companyId,
   });
 
   // Buscar usuários da empresa
-  const { data: usersCount = 0 } = useQuery({
+  const { data: usersCount = 0, isLoading: loadingUsers } = useQuery({
     queryKey: ['users-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
-      console.log("Buscando usuários para company_id:", companyId);
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
         .eq('company_id', companyId);
+      
+      if (error) {
+        console.error("Erro ao buscar usuários:", error);
+        toast.error("Erro ao carregar quantidade de usuários");
+        return 0;
+      }
+      
       return count || 0;
     },
     enabled: !!companyId,
   });
 
-  // Buscar ordens de serviço da empresa
-  const { data: ordersCount = 0 } = useQuery({
-    queryKey: ['orders-count', companyId],
+  // Buscar ordens de serviço pendentes da empresa
+  const { data: ordersCount = 0, isLoading: loadingOrders } = useQuery({
+    queryKey: ['pending-orders-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
-      console.log("Buscando ordens de serviço para company_id:", companyId);
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('service_orders')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
+      
+      if (error) {
+        console.error("Erro ao buscar ordens de serviço:", error);
+        toast.error("Erro ao carregar quantidade de ordens de serviço");
+        return 0;
+      }
+      
       return count || 0;
     },
     enabled: !!companyId,
   });
 
   // Calcular economia gerada (baseado no histórico de manutenções)
-  const { data: economyGenerated = 0 } = useQuery({
+  const { data: economyGenerated = 0, isLoading: loadingEconomy } = useQuery({
     queryKey: ['economy-generated', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
-      console.log("Calculando economia para company_id:", companyId);
-      const { data: maintenanceHistory } = await supabase
+      const { data: maintenanceHistory, error } = await supabase
         .from('maintenance_history')
         .select('total_cost, maintenance_type')
         .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (error) {
+        console.error("Erro ao buscar histórico de manutenções:", error);
+        toast.error("Erro ao calcular economia gerada");
+        return 0;
+      }
 
       if (!maintenanceHistory) return 0;
 
@@ -105,12 +140,11 @@ const Index = () => {
   });
 
   // Buscar alertas de manutenção
-  const { data: alerts = [] } = useQuery({
+  const { data: alerts = [], isLoading: loadingAlerts } = useQuery({
     queryKey: ['maintenance-alerts', companyId],
     queryFn: async () => {
       if (!companyId) return [];
-      console.log("Buscando alertas de manutenção para company_id:", companyId);
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('maintenance_schedules')
         .select(`
           id,
@@ -121,6 +155,12 @@ const Index = () => {
         .lte('next_maintenance_date', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString())
         .order('next_maintenance_date');
       
+      if (error) {
+        console.error("Erro ao buscar alertas:", error);
+        toast.error("Erro ao carregar alertas de manutenção");
+        return [];
+      }
+
       return (data || []).map(schedule => ({
         title: "Manutenção Preventiva Necessária",
         description: `${schedule.machinery?.name} requer manutenção em ${new Date(schedule.next_maintenance_date).toLocaleDateString()}`,
@@ -131,18 +171,23 @@ const Index = () => {
   });
 
   // Buscar dados do gráfico de manutenções
-  const { data: chartData = [] } = useQuery({
+  const { data: chartData = [], isLoading: loadingChart } = useQuery({
     queryKey: ['maintenance-chart', companyId],
     queryFn: async () => {
       if (!companyId) return [];
-      console.log("Buscando dados do gráfico para company_id:", companyId);
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 3);
 
-      const { data: maintenanceData } = await supabase
+      const { data: maintenanceData, error } = await supabase
         .from('maintenance_history')
         .select('maintenance_date, maintenance_type')
         .gte('maintenance_date', startDate.toISOString());
+
+      if (error) {
+        console.error("Erro ao buscar dados do gráfico:", error);
+        toast.error("Erro ao carregar dados do gráfico");
+        return [];
+      }
 
       const monthlyData: Record<string, { preventive: number; corrective: number }> = {};
       
@@ -166,6 +211,12 @@ const Index = () => {
     },
     enabled: !!companyId,
   });
+
+  const isLoading = loadingMachinery || loadingUsers || loadingOrders || loadingEconomy || loadingAlerts || loadingChart;
+
+  if (isLoading) {
+    return <div className="p-6">Carregando dados...</div>;
+  }
 
   return (
     <div className="p-6 space-y-6">
