@@ -135,7 +135,6 @@ export type Database = {
       }
       machinery: {
         Row: {
-          company_id: string | null
           created_at: string
           id: string
           model: string | null
@@ -145,7 +144,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          company_id?: string | null
           created_at?: string
           id?: string
           model?: string | null
@@ -155,7 +153,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          company_id?: string | null
           created_at?: string
           id?: string
           model?: string | null
@@ -164,15 +161,7 @@ export type Database = {
           status?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "machinery_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       maintenance_history: {
         Row: {
@@ -303,7 +292,6 @@ export type Database = {
       }
       parts_inventory: {
         Row: {
-          company_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -315,7 +303,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          company_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -327,7 +314,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          company_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -338,15 +324,7 @@ export type Database = {
           unit_price?: number | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "parts_inventory_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       parts_used: {
         Row: {

@@ -11,8 +11,6 @@ import { CompanyList } from "@/components/super-admin/CompanyList";
 export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchCompanies = async () => {
     try {
@@ -33,40 +31,32 @@ export function CompanyManagement() {
 
   const handleSubmit = async (data: any) => {
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { error } = await supabase.functions.invoke('create-company', {
-        body: {
-          companyName: data.name,
-          adminEmail: data.adminEmail,
-          adminName: data.adminName
-        }
+      const { data: company, error: companyError } = await supabase
+        .from("companies")
+        .insert({
+          name: data.name,
+          cnpj: data.cnpj,
+          address: data.address,
+          location: data.location
+        })
+        .select()
+        .single();
+
+      if (companyError) throw companyError;
+
+      const { error: rpcError } = await supabase.rpc("create_company_with_admin", {
+        company_name: data.name,
+        admin_email: data.adminEmail,
+        admin_full_name: data.adminName
       });
 
-      if (error) {
-        // Try to parse the error message from the response body
-        let errorMessage = error.message;
-        try {
-          const errorBody = JSON.parse(error.message);
-          if (errorBody.error) {
-            errorMessage = errorBody.error;
-          }
-        } catch {
-          // If parsing fails, use the original error message
-        }
-        setError(errorMessage);
-        return;
-      }
+      if (rpcError) throw rpcError;
 
       toast.success("Empresa criada com sucesso!");
       setIsDialogOpen(false);
       fetchCompanies();
     } catch (error: any) {
-      console.error('Error creating company:', error);
-      setError(error.message || "Erro ao criar empresa");
-    } finally {
-      setIsLoading(false);
+      toast.error(error.message || "Erro ao criar empresa");
     }
   };
 
@@ -88,15 +78,7 @@ export function CompanyManagement() {
         </CardContent>
       </Card>
 
-      <Dialog 
-        open={isDialogOpen} 
-        onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) {
-            setError(null);
-          }
-        }}
-      >
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Empresa</DialogTitle>
@@ -104,8 +86,6 @@ export function CompanyManagement() {
           <CompanyForm
             onSubmit={handleSubmit}
             onCancel={() => setIsDialogOpen(false)}
-            isLoading={isLoading}
-            error={error}
           />
         </DialogContent>
       </Dialog>

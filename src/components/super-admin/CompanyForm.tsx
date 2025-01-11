@@ -4,8 +4,6 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const companyFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -21,11 +19,9 @@ export type CompanyFormValues = z.infer<typeof companyFormSchema>;
 interface CompanyFormProps {
   onSubmit: (data: CompanyFormValues) => Promise<void>;
   onCancel: () => void;
-  isLoading?: boolean;
-  error?: string | null;
 }
 
-export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: CompanyFormProps) {
+export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -41,12 +37,6 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
         <FormField
           control={form.control}
           name="name"
@@ -54,7 +44,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>Nome da Empresa</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -68,7 +58,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>CNPJ</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="00000000000000" disabled={isLoading} />
+                <Input {...field} placeholder="00000000000000" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -82,7 +72,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>Endereço</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,7 +86,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>Local</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,7 +100,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>Nome do Administrador</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,7 +114,7 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
             <FormItem>
               <FormLabel>Email do Administrador</FormLabel>
               <FormControl>
-                <Input {...field} type="email" disabled={isLoading} />
+                <Input {...field} type="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,18 +122,11 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: Co
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Criando...
-              </>
-            ) : (
-              'Criar'
-            )}
+          <Button type="submit">
+            Criar
           </Button>
         </div>
       </form>

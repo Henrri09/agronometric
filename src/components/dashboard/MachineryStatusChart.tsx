@@ -5,13 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 
 const COLORS = ['#2F5233', '#FF4444', '#FFA500'];
 
 export function MachineryStatusChart() {
-  const { companyId, isLoading: isLoadingCompany, error: companyError } = useCompanyId();
+  const { companyId } = useCompanyId();
 
   const { data: chartData = [], isLoading } = useQuery({
     queryKey: ['machinery-status', companyId],
@@ -52,24 +50,22 @@ export function MachineryStatusChart() {
     enabled: !!companyId
   });
 
-  if (companyError) {
+  if (!companyId) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Status dos Equipamentos</CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erro ao carregar dados</AlertTitle>
-            <AlertDescription>{companyError}</AlertDescription>
-          </Alert>
+          <div className="text-center text-muted-foreground">
+            Carregando dados da empresa...
+          </div>
         </CardContent>
       </Card>
     );
   }
 
-  if (isLoadingCompany || isLoading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -77,25 +73,6 @@ export function MachineryStatusChart() {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[300px] w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!chartData.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Status dos Equipamentos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Sem dados disponíveis</AlertTitle>
-            <AlertDescription>
-              Não há equipamentos cadastrados no sistema.
-            </AlertDescription>
-          </Alert>
         </CardContent>
       </Card>
     );

@@ -3,6 +3,7 @@ import {
   DollarSign, 
   LineChart, 
   LifeBuoy,
+  Home,
   Users,
   Tractor,
   BarChart2,
@@ -11,13 +12,12 @@ import {
   Settings,
   BookOpen,
   ListTodo,
-  Video,
-  LayoutDashboard
+  Video
 } from "lucide-react";
 import { MenuItemType } from "./types";
 
 export const menuItems: MenuItemType[] = [
-  { title: "Painel Geral", icon: LayoutDashboard, path: "/index" },
+  { title: "Painel Empresa", icon: Home, path: "/" },
   { title: "Cadastro Usuário", icon: Users, path: "/users" },
   { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
   { title: "Analytics", icon: BarChart2, path: "/analytics" },

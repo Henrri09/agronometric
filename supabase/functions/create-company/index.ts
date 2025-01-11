@@ -25,34 +25,11 @@ serve(async (req) => {
 
     const { companyName, adminEmail, adminName }: CreateCompanyRequest = await req.json()
 
-    // First check if user already exists
-    const { data: existingUser } = await supabaseClient.auth.admin.listUsers()
-    const userExists = existingUser?.users.some(user => user.email === adminEmail)
-    
-    if (userExists) {
-      return new Response(
-        JSON.stringify({ 
-          error: "Um usuário com este email já está registrado. Por favor, use um email diferente." 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
-      )
-    }
-
-    // 1. Create company first
-    const { data: companyData, error: companyError } = await supabaseClient
-      .from('companies')
-      .insert({ name: companyName })
-      .select()
-      .single()
-
-    if (companyError) throw companyError
-
-    // 2. Create auth user with temporary password
+    // Generate a temporary password
     const temporaryPassword = Math.random().toString(36).slice(-8)
-    const { data: userData, error: userError } = await supabaseClient.auth.admin.createUser({
+
+    // Create the admin user
+    const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
       email: adminEmail,
       password: temporaryPassword,
       email_confirm: true,
@@ -61,53 +38,19 @@ serve(async (req) => {
       }
     })
 
-    if (userError) {
-      // If user creation fails, delete the company
-      await supabaseClient
-        .from('companies')
-        .delete()
-        .eq('id', companyData.id)
-      throw userError
-    }
+    if (authError) throw authError
 
-    // 3. Create profile with company association
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .insert({
-        id: userData.user.id,
-        full_name: adminName,
-        company_id: companyData.id
+    // Create company and set up admin
+    const { data: companyData, error: companyError } = await supabaseClient
+      .rpc('create_company_with_admin', {
+        company_name: companyName,
+        admin_email: adminEmail,
+        admin_full_name: adminName
       })
 
-    if (profileError) {
-      // If profile creation fails, clean up user and company
-      await supabaseClient.auth.admin.deleteUser(userData.user.id)
-      await supabaseClient
-        .from('companies')
-        .delete()
-        .eq('id', companyData.id)
-      throw profileError
-    }
+    if (companyError) throw companyError
 
-    // 4. Set user role as admin
-    const { error: roleError } = await supabaseClient
-      .from('user_roles')
-      .insert({
-        user_id: userData.user.id,
-        role: 'admin'
-      })
-
-    if (roleError) {
-      // If role assignment fails, clean up everything
-      await supabaseClient.auth.admin.deleteUser(userData.user.id)
-      await supabaseClient
-        .from('companies')
-        .delete()
-        .eq('id', companyData.id)
-      throw roleError
-    }
-
-    // 5. Send welcome email with temporary password
+    // Send welcome email with temporary password
     const { error: emailError } = await supabaseClient.functions.invoke('send-welcome-email', {
       body: {
         to: adminEmail,
@@ -117,16 +60,10 @@ serve(async (req) => {
       }
     })
 
-    if (emailError) {
-      console.error('Failed to send welcome email:', emailError)
-      // Don't throw here as the core functionality is complete
-    }
+    if (emailError) throw emailError
 
     return new Response(
-      JSON.stringify({ 
-        message: 'Company and admin created successfully',
-        companyId: companyData.id 
-      }),
+      JSON.stringify({ message: 'Company and admin created successfully' }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -134,7 +71,6 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in create-company function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
