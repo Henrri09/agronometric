@@ -163,6 +163,7 @@ export default function SupportTickets() {
         <TabsList>
           <TabsTrigger value="bugs">Reports de Bug</TabsTrigger>
           <TabsTrigger value="support">Tickets de Suporte</TabsTrigger>
+          <TabsTrigger value="archived">Tickets Arquivados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bugs">
@@ -276,6 +277,59 @@ export default function SupportTickets() {
               <p className="text-muted-foreground">
                 Funcionalidade de tickets de suporte em desenvolvimento.
               </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="archived">
+          <Card>
+            <CardContent className="p-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Empresa</TableHead>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bugReports
+                    .filter(report => report.status === 'closed')
+                    .map((report) => (
+                      <TableRow key={report.id}>
+                        <TableCell>{report.company?.name || 'N/A'}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{report.title}</p>
+                            <p className="text-sm text-muted-foreground">{report.description}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(report.status)}>
+                            {report.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedReportId(report.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            Excluir
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </TabsContent>
