@@ -9,6 +9,10 @@ import {
   ClipboardList,
   BookOpen,
   Ticket,
+  Building2,
+  HeartHandshake,
+  BookCheck,
+  LineChart,
 } from "lucide-react";
 
 export const menuItems = [
@@ -71,5 +75,38 @@ export const menuItems = [
     href: "/settings",
     icon: Settings,
     role: "admin",
+  },
+];
+
+export const superAdminItems = [
+  {
+    title: "Dashboard",
+    href: "/super-admin",
+    icon: LayoutDashboard,
+    role: "super_admin",
+  },
+  {
+    title: "Empresas",
+    href: "/super-admin/companies",
+    icon: Building2,
+    role: "super_admin",
+  },
+  {
+    title: "Suporte",
+    href: "/super-admin/support",
+    icon: HeartHandshake,
+    role: "super_admin",
+  },
+  {
+    title: "Tutoriais",
+    href: "/super-admin/tutorials",
+    icon: BookCheck,
+    role: "super_admin",
+  },
+  {
+    title: "Analytics",
+    href: "/super-admin/analytics",
+    icon: LineChart,
+    role: "super_admin",
   },
 ];

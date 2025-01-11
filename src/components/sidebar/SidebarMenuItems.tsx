@@ -5,12 +5,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
-
-interface MenuItemType {
-  title: string;
-  icon: React.ElementType;
-  path: string;
-}
+import { MenuItemType } from "./types";
 
 interface SidebarMenuItemsProps {
   items: MenuItemType[];
@@ -26,7 +21,7 @@ export function SidebarMenuItems({ items, isMobile }: SidebarMenuItemsProps) {
         <SidebarMenuItem key={item.title}>
           <SidebarMenuButton asChild>
             <Link 
-              to={item.path} 
+              to={item.href} 
               className="sidebar-menu-item flex items-center gap-3 px-4 py-2.5 rounded-md w-full"
               onClick={() => isMobile && setOpenMobile(false)}
             >
