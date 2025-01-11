@@ -4,7 +4,6 @@ import { DashboardCard } from "@/components/DashboardCard";
 import { Users, Tractor, ClipboardList, DollarSign, AlertCircle } from "lucide-react";
 import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function DashboardMetrics() {
@@ -105,7 +104,7 @@ export function DashboardMetrics() {
 
   if (companyError) {
     return (
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="animate-in fade-in-50 duration-300">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Erro ao carregar dados</AlertTitle>
         <AlertDescription>
@@ -115,69 +114,35 @@ export function DashboardMetrics() {
     );
   }
 
-  if (isLoadingCompany) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-32" />
-        ))}
-      </div>
-    );
-  }
-
-  if (!companyId) {
-    return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Empresa não encontrada</AlertTitle>
-        <AlertDescription>
-          Não foi possível identificar sua empresa. Por favor, verifique se você está logado corretamente.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {isLoadingUsers ? (
-        <Skeleton className="h-32" />
-      ) : (
-        <DashboardCard
-          title="Total de Usuários"
-          value={usersCount}
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
-        />
-      )}
+      <DashboardCard
+        title="Total de Usuários"
+        value={usersCount}
+        icon={<Users className="h-4 w-4 text-muted-foreground" />}
+        isLoading={isLoadingCompany || isLoadingUsers}
+      />
       
-      {isLoadingMachinery ? (
-        <Skeleton className="h-32" />
-      ) : (
-        <DashboardCard
-          title="Maquinários"
-          value={machineryCount}
-          icon={<Tractor className="h-4 w-4 text-muted-foreground" />}
-        />
-      )}
+      <DashboardCard
+        title="Maquinários"
+        value={machineryCount}
+        icon={<Tractor className="h-4 w-4 text-muted-foreground" />}
+        isLoading={isLoadingCompany || isLoadingMachinery}
+      />
       
-      {isLoadingOrders ? (
-        <Skeleton className="h-32" />
-      ) : (
-        <DashboardCard
-          title="Ordens de Serviço"
-          value={ordersCount}
-          icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
-        />
-      )}
+      <DashboardCard
+        title="Ordens de Serviço"
+        value={ordersCount}
+        icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
+        isLoading={isLoadingCompany || isLoadingOrders}
+      />
       
-      {isLoadingEconomy ? (
-        <Skeleton className="h-32" />
-      ) : (
-        <DashboardCard
-          title="Economia Gerada"
-          value={economyGenerated}
-          icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-        />
-      )}
+      <DashboardCard
+        title="Economia Gerada"
+        value={economyGenerated}
+        icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+        isLoading={isLoadingCompany || isLoadingEconomy}
+      />
     </div>
   );
 }

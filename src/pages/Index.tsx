@@ -5,7 +5,7 @@ import { CompanyIdProvider } from "@/components/dashboard/CompanyIdProvider";
 
 const Index = () => {
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col space-y-2">
         <h1 className="text-2xl font-bold">Painel de Controle</h1>
         <p className="text-muted-foreground">
@@ -14,11 +14,13 @@ const Index = () => {
       </div>
 
       <CompanyIdProvider>
-        <DashboardMetrics />
+        <div className="space-y-6 animate-in slide-in-from-left-5 duration-500">
+          <DashboardMetrics />
 
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-          <MaintenanceChart />
-          <MachineryStatusChart />
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+            <MaintenanceChart />
+            <MachineryStatusChart />
+          </div>
         </div>
       </CompanyIdProvider>
     </div>
