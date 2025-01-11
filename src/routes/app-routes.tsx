@@ -21,6 +21,7 @@ import SuperAdminAnalytics from "@/pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "@/pages/super-admin/SupportTickets";
 import TutorialManagement from "@/pages/super-admin/TutorialManagement";
 import Documentation from "@/pages/Documentation";
+import Tickets from "@/pages/Tickets";
 
 export const AppRoutes = () => {
   return (
@@ -78,6 +79,14 @@ export const AppRoutes = () => {
                   element={
                     <ProtectedRoute minRole="common">
                       <ServiceOrders />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/tickets" 
+                  element={
+                    <ProtectedRoute minRole="common">
+                      <Tickets />
                     </ProtectedRoute>
                   } 
                 />

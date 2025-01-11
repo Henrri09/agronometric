@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BugReport {
   id: string;
@@ -20,6 +22,7 @@ interface BugReport {
 export default function SupportTickets() {
   const [bugReports, setBugReports] = useState<BugReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [responses, setResponses] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     fetchBugReports();
@@ -65,10 +68,36 @@ export default function SupportTickets() {
       if (error) throw error;
       
       toast.success("Status atualizado com sucesso");
-      fetchBugReports(); // Recarrega a lista
+      fetchBugReports();
     } catch (error: any) {
       console.error('Error updating status:', error);
       toast.error("Erro ao atualizar status");
+    }
+  };
+
+  const handleResponseSubmit = async (reportId: string) => {
+    const responseText = responses[reportId];
+    if (!responseText?.trim()) {
+      toast.error("Por favor, insira uma resposta");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('bug_report_responses')
+        .insert({
+          bug_report_id: reportId,
+          response_text: responseText,
+          responded_by: (await supabase.auth.getUser()).data.user?.id
+        });
+
+      if (error) throw error;
+
+      toast.success("Resposta enviada com sucesso");
+      setResponses(prev => ({ ...prev, [reportId]: '' }));
+    } catch (error: any) {
+      console.error('Error sending response:', error);
+      toast.error("Erro ao enviar resposta");
     }
   };
 
@@ -97,6 +126,7 @@ export default function SupportTickets() {
                     <TableHead>Screenshot</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Ações</TableHead>
+                    <TableHead>Resposta</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -140,6 +170,25 @@ export default function SupportTickets() {
                           <option value="resolved">Resolvido</option>
                           <option value="closed">Fechado</option>
                         </select>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Textarea
+                            value={responses[report.id] || ''}
+                            onChange={(e) => setResponses(prev => ({
+                              ...prev,
+                              [report.id]: e.target.value
+                            }))}
+                            placeholder="Digite sua resposta..."
+                            className="min-w-[200px]"
+                          />
+                          <Button
+                            onClick={() => handleResponseSubmit(report.id)}
+                            size="sm"
+                          >
+                            Enviar Resposta
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

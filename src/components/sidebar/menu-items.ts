@@ -1,38 +1,75 @@
-import { 
-  Database, 
-  DollarSign, 
-  LineChart, 
-  LifeBuoy,
-  Home,
-  Users,
-  Tractor,
-  BarChart2,
-  Boxes,
-  Calendar,
+import {
+  LayoutDashboard,
   Settings,
+  Users,
+  Wrench,
+  Calendar,
+  BarChart,
+  Boxes,
+  ClipboardList,
   BookOpen,
-  ListTodo,
-  Video
+  Ticket,
 } from "lucide-react";
-import { MenuItemType } from "./types";
 
-export const menuItems: MenuItemType[] = [
-  { title: "Painel Empresa", icon: Home, path: "/" },
-  { title: "Cadastro Usuário", icon: Users, path: "/users" },
-  { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
-  { title: "Analytics", icon: BarChart2, path: "/analytics" },
-  { title: "Inventário de peças", icon: Boxes, path: "/parts-inventory" },
-  { title: "Cronograma de manutenção", icon: Calendar, path: "/maintenance-schedule" },
-  { title: "Calendário", icon: Calendar, path: "/calendar" },
-  { title: "Gestão de Tarefas", icon: ListTodo, path: "/task-management" },
-  { title: "Configurações", icon: Settings, path: "/settings" },
-  { title: "Documentação", icon: BookOpen, path: "/documentation" },
-];
-
-export const superAdminItems: MenuItemType[] = [
-  { title: "Gestão de Empresas", icon: Database, path: "/super-admin" },
-  { title: "Gestão Financeira", icon: DollarSign, path: "/super-admin/financial" },
-  { title: "Analytics", icon: LineChart, path: "/super-admin/analytics" },
-  { title: "Suporte", icon: LifeBuoy, path: "/super-admin/support" },
-  { title: "Tutoriais", icon: Video, path: "/super-admin/tutorials" }
+export const menuItems = [
+  {
+    title: "Dashboard",
+    href: "/",
+    icon: LayoutDashboard,
+    role: "visitor",
+  },
+  {
+    title: "Maquinário",
+    href: "/machinery",
+    icon: Wrench,
+    role: "visitor",
+  },
+  {
+    title: "Ordens de Serviço",
+    href: "/service-orders",
+    icon: ClipboardList,
+    role: "common",
+  },
+  {
+    title: "Calendário",
+    href: "/calendar",
+    icon: Calendar,
+    role: "visitor",
+  },
+  {
+    title: "Estoque de Peças",
+    href: "/parts-inventory",
+    icon: Boxes,
+    role: "visitor",
+  },
+  {
+    title: "Tickets",
+    href: "/tickets",
+    icon: Ticket,
+    role: "common",
+  },
+  {
+    title: "Analytics",
+    href: "/analytics",
+    icon: BarChart,
+    role: "common",
+  },
+  {
+    title: "Documentação",
+    href: "/documentation",
+    icon: BookOpen,
+    role: "visitor",
+  },
+  {
+    title: "Usuários",
+    href: "/users",
+    icon: Users,
+    role: "admin",
+  },
+  {
+    title: "Configurações",
+    href: "/settings",
+    icon: Settings,
+    role: "admin",
+  },
 ];
