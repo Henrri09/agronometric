@@ -68,6 +68,10 @@ export default function Tickets() {
         description="Visualize e gerencie seus tickets de suporte"
       />
 
+      <div className="flex justify-start">
+        <BugReportDialog />
+      </div>
+
       <Card>
         <CardContent className="p-6">
           <Table>
@@ -117,10 +121,6 @@ export default function Tickets() {
           </Table>
         </CardContent>
       </Card>
-
-      <div className="flex justify-start">
-        <BugReportDialog />
-      </div>
     </div>
   );
 }
