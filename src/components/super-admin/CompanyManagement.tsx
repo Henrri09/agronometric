@@ -11,6 +11,7 @@ import { CompanyList } from "@/components/super-admin/CompanyList";
 export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchCompanies = async () => {
     try {
@@ -31,32 +32,26 @@ export function CompanyManagement() {
 
   const handleSubmit = async (data: any) => {
     try {
-      const { data: company, error: companyError } = await supabase
-        .from("companies")
-        .insert({
-          name: data.name,
-          cnpj: data.cnpj,
-          address: data.address,
-          location: data.location
-        })
-        .select()
-        .single();
-
-      if (companyError) throw companyError;
-
-      const { error: rpcError } = await supabase.rpc("create_company_with_admin", {
-        company_name: data.name,
-        admin_email: data.adminEmail,
-        admin_full_name: data.adminName
+      setIsLoading(true);
+      
+      const { error } = await supabase.functions.invoke('create-company', {
+        body: {
+          companyName: data.name,
+          adminEmail: data.adminEmail,
+          adminName: data.adminName
+        }
       });
 
-      if (rpcError) throw rpcError;
+      if (error) throw error;
 
       toast.success("Empresa criada com sucesso!");
       setIsDialogOpen(false);
       fetchCompanies();
     } catch (error: any) {
+      console.error('Error creating company:', error);
       toast.error(error.message || "Erro ao criar empresa");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,6 +81,7 @@ export function CompanyManagement() {
           <CompanyForm
             onSubmit={handleSubmit}
             onCancel={() => setIsDialogOpen(false)}
+            isLoading={isLoading}
           />
         </DialogContent>
       </Dialog>
