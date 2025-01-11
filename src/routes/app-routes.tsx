@@ -6,6 +6,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/Dashboard";
+import Index from "@/pages/Index";
 import Users from "@/pages/Users";
 import Machinery from "@/pages/Machinery";
 import ServiceOrders from "@/pages/ServiceOrders";
@@ -57,6 +58,7 @@ export const AppRoutes = () => {
               <Routes>
                 {/* Base routes accessible by all authenticated non-super-admin users */}
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/index" element={<Index />} />
                 <Route path="/machinery" element={<Machinery />} />
                 <Route path="/parts-inventory" element={<PartsInventory />} />
                 <Route path="/maintenance-schedule" element={<MaintenanceSchedule />} />

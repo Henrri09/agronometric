@@ -12,11 +12,13 @@ import {
   Settings,
   BookOpen,
   ListTodo,
-  Video
+  Video,
+  LayoutDashboard
 } from "lucide-react";
 import { MenuItemType } from "./types";
 
 export const menuItems: MenuItemType[] = [
+  { title: "Painel Geral", icon: LayoutDashboard, path: "/index" },
   { title: "Painel Empresa", icon: Home, path: "/" },
   { title: "Cadastro Usuário", icon: Users, path: "/users" },
   { title: "Cadastro Maquinários", icon: Tractor, path: "/machinery" },
