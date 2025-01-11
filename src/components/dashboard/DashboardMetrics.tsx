@@ -34,9 +34,11 @@ export function DashboardMetrics() {
     queryFn: async () => {
       if (!companyId) return 0;
       
+      // Busca apenas maquinários da empresa atual através do join com profiles
       const { count, error } = await supabase
         .from('machinery')
-        .select('*', { count: 'exact', head: true })
+        .select('*, profiles!inner(*)', { count: 'exact', head: true })
+        .eq('profiles.company_id', companyId)
         .eq('status', 'active');
       
       if (error) {
@@ -55,11 +57,12 @@ export function DashboardMetrics() {
     queryFn: async () => {
       if (!companyId) return 0;
       
+      // Busca apenas ordens de serviço da empresa atual
       const { count, error } = await supabase
         .from('service_orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
-        .eq('created_by', companyId);
+        .select('*, profiles!inner(*)', { count: 'exact', head: true })
+        .eq('profiles.company_id', companyId)
+        .eq('status', 'pending');
       
       if (error) {
         console.error("Erro ao buscar ordens de serviço:", error);
@@ -79,8 +82,18 @@ export function DashboardMetrics() {
       
       const { data: maintenanceHistory, error } = await supabase
         .from('maintenance_history')
-        .select('total_cost, maintenance_type')
-        .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+        .select(`
+          total_cost,
+          maintenance_type,
+          machinery_id,
+          machinery!inner(
+            id,
+            profiles!inner(company_id)
+          )
+        `)
+        .eq('machinery.profiles.company_id', companyId)
+        .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+        .eq('maintenance_type', 'preventive');
 
       if (error) {
         console.error("Erro ao buscar histórico de manutenções:", error);
@@ -89,8 +102,7 @@ export function DashboardMetrics() {
       }
 
       const preventiveCosts = maintenanceHistory
-        ?.filter(m => m.maintenance_type === 'preventive')
-        .reduce((sum, m) => sum + (m.total_cost || 0), 0) || 0;
+        ?.reduce((sum, m) => sum + (m.total_cost || 0), 0) || 0;
 
       return Math.round(preventiveCosts * 0.3);
     },
