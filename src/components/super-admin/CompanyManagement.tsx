@@ -5,12 +5,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { CompanyForm } from "@/components/super-admin/CompanyForm";
+import { CompanyForm, CompanyFormValues } from "@/components/super-admin/CompanyForm";
 import { CompanyList } from "@/components/super-admin/CompanyList";
 
 export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<any>(null);
 
   useEffect(() => {
     fetchCompanies();
@@ -27,7 +28,6 @@ export function CompanyManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      console.log("Companies fetched:", data);
       setCompanies(data || []);
     } catch (error: any) {
       console.error('Error fetching companies:', error);
@@ -35,40 +35,85 @@ export function CompanyManagement() {
     }
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: CompanyFormValues) => {
     try {
-      // Criar empresa
-      const { data: company, error: companyError } = await supabase
-        .from("companies")
-        .insert({
-          name: data.name,
-          cnpj: data.cnpj,
-          address: data.address,
-          location: data.location
-        })
-        .select()
-        .single();
+      if (editingCompany) {
+        // Atualizar empresa existente
+        const { error: updateError } = await supabase
+          .from("companies")
+          .update({
+            name: data.name,
+            cnpj: data.cnpj,
+            address: data.address,
+            location: data.location
+          })
+          .eq('id', editingCompany.id);
 
-      if (companyError) throw companyError;
+        if (updateError) throw updateError;
+        
+        toast.success("Você alterou os dados dessa empresa com sucesso!");
+      } else {
+        // Criar nova empresa
+        const { data: company, error: companyError } = await supabase
+          .from("companies")
+          .insert({
+            name: data.name,
+            cnpj: data.cnpj,
+            address: data.address,
+            location: data.location
+          })
+          .select()
+          .single();
 
-      // Chamar a função de criação de empresa e admin
-      const { error: rpcError } = await supabase.functions.invoke('create-company', {
-        body: {
-          companyName: data.name,
-          adminEmail: data.adminEmail,
-          adminName: data.adminName
-        }
-      });
+        if (companyError) throw companyError;
 
-      if (rpcError) throw rpcError;
+        const { error: rpcError } = await supabase.functions.invoke('create-company', {
+          body: {
+            companyName: data.name,
+            adminEmail: data.adminEmail,
+            adminName: data.adminName
+          }
+        });
 
-      toast.success("Empresa criada com sucesso!");
+        if (rpcError) throw rpcError;
+
+        toast.success("Empresa criada com sucesso!");
+      }
+
       setIsDialogOpen(false);
+      setEditingCompany(null);
       fetchCompanies();
     } catch (error: any) {
-      console.error('Error creating company:', error);
-      toast.error(error.message || "Erro ao criar empresa");
+      console.error('Error managing company:', error);
+      toast.error(error.message || "Erro ao gerenciar empresa");
     }
+  };
+
+  const handleEdit = (company: any) => {
+    setEditingCompany(company);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (companyId: string) => {
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .delete()
+        .eq('id', companyId);
+
+      if (error) throw error;
+
+      toast.success("Empresa excluída com sucesso!");
+      fetchCompanies();
+    } catch (error: any) {
+      console.error('Error deleting company:', error);
+      toast.error(error.message || "Erro ao excluir empresa");
+    }
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+    setEditingCompany(null);
   };
 
   return (
@@ -85,6 +130,8 @@ export function CompanyManagement() {
           <CompanyList
             companies={companies}
             onRefresh={fetchCompanies}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
           />
         </CardContent>
       </Card>
@@ -92,11 +139,21 @@ export function CompanyManagement() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nova Empresa</DialogTitle>
+            <DialogTitle>
+              {editingCompany ? "Editar Empresa" : "Nova Empresa"}
+            </DialogTitle>
           </DialogHeader>
           <CompanyForm
             onSubmit={handleSubmit}
-            onCancel={() => setIsDialogOpen(false)}
+            onCancel={handleCancel}
+            defaultValues={editingCompany ? {
+              name: editingCompany.name,
+              cnpj: editingCompany.cnpj,
+              address: editingCompany.address,
+              location: editingCompany.location,
+              adminName: editingCompany.profiles?.[0]?.full_name || "",
+              adminEmail: ""
+            } : undefined}
           />
         </DialogContent>
       </Dialog>

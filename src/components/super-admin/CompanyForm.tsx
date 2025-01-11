@@ -17,11 +17,12 @@ const companyFormSchema = z.object({
 export type CompanyFormValues = z.infer<typeof companyFormSchema>;
 
 interface CompanyFormProps {
+  defaultValues?: Partial<CompanyFormValues>;
   onSubmit: (data: CompanyFormValues) => Promise<void>;
   onCancel: () => void;
 }
 
-export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
+export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormProps) {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -31,6 +32,7 @@ export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
       location: "",
       adminName: "",
       adminEmail: "",
+      ...defaultValues,
     },
   });
 
@@ -126,7 +128,7 @@ export function CompanyForm({ onSubmit, onCancel }: CompanyFormProps) {
             Cancelar
           </Button>
           <Button type="submit">
-            Criar
+            {defaultValues ? "Salvar" : "Criar"}
           </Button>
         </div>
       </form>
