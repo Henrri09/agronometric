@@ -6,6 +6,18 @@ import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+interface MachineryWithName {
+  machinery_id: string;
+  machinery: {
+    name: string;
+  } | null;
+}
+
+interface MostDemandedMachinery {
+  name: string;
+  count: number;
+}
+
 export function DashboardMetrics() {
   const { companyId, isLoading: isLoadingCompany, error: companyError } = useCompanyId();
 
@@ -122,10 +134,10 @@ export function DashboardMetrics() {
       }
 
       if (!data || data.length === 0) {
-        return { name: 'N/A', count: 0 };
+        return { name: 'N/A', count: 0 } as MostDemandedMachinery;
       }
 
-      const counts = data.reduce((acc: Record<string, { name: string, count: number }>, curr) => {
+      const counts = (data as MachineryWithName[]).reduce((acc: Record<string, MostDemandedMachinery>, curr) => {
         const name = curr.machinery?.name || 'N/A';
         const machineryId = curr.machinery_id;
         if (!acc[machineryId]) {
