@@ -38,8 +38,7 @@ export function DashboardMetrics() {
       
       const { count, error } = await supabase
         .from('machinery')
-        .select('*, profiles!inner(*)', { count: 'exact', head: true })
-        .eq('profiles.company_id', companyId)
+        .select('*', { count: 'exact', head: true })
         .eq('status', 'active');
       
       if (error) {
@@ -60,8 +59,7 @@ export function DashboardMetrics() {
       
       const { count, error } = await supabase
         .from('service_orders')
-        .select('*, profiles!inner(*)', { count: 'exact', head: true })
-        .eq('profiles.company_id', companyId)
+        .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
       
       if (error) {
@@ -86,14 +84,10 @@ export function DashboardMetrics() {
           total_cost,
           maintenance_type,
           machinery_id,
-          machinery!inner(
-            id,
-            profiles!inner(company_id)
-          )
+          machinery!inner(id)
         `)
-        .eq('machinery.profiles.company_id', companyId)
-        .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-        .eq('maintenance_type', 'preventive');
+        .eq('maintenance_type', 'preventive')
+        .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
       if (error) {
         console.error("Erro ao buscar histórico de manutenções:", error);
