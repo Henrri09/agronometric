@@ -4,58 +4,90 @@ import { toast } from "sonner";
 
 type CompanyIdContextType = {
   companyId: string | null;
+  isLoading: boolean;
+  error: string | null;
 };
 
-const CompanyIdContext = createContext<CompanyIdContextType>({ companyId: null });
+const CompanyIdContext = createContext<CompanyIdContextType>({
+  companyId: null,
+  isLoading: true,
+  error: null
+});
 
 export const useCompanyId = () => useContext(CompanyIdContext);
 
 export function CompanyIdProvider({ children }: { children: React.ReactNode }) {
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const getCompanyId = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.error("Usuário não encontrado");
-          toast.error("Usuário não encontrado");
-          return;
+        setIsLoading(true);
+        setError(null);
+
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          throw new Error("Erro ao buscar usuário");
         }
 
-        console.log("User ID:", user.id);
+        if (!user) {
+          throw new Error("Usuário não encontrado");
+        }
 
-        const { data: profile, error } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('company_id')
           .eq('id', user.id)
           .maybeSingle();
 
-        if (error) {
-          console.error("Erro ao buscar perfil:", error);
-          toast.error("Erro ao carregar dados da empresa");
-          return;
+        if (profileError) {
+          throw new Error("Erro ao buscar perfil do usuário");
         }
 
         if (!profile?.company_id) {
-          console.error("Company ID não encontrado para o usuário");
-          toast.error("Empresa não encontrada para este usuário");
-          return;
+          throw new Error("Empresa não encontrada para este usuário");
         }
 
-        console.log("Company ID encontrado:", profile.company_id);
-        setCompanyId(profile.company_id);
-      } catch (error) {
-        console.error("Erro ao buscar usuário:", error);
-        toast.error("Erro ao carregar dados do usuário");
+        if (isMounted) {
+          setCompanyId(profile.company_id);
+          setError(null);
+        }
+      } catch (err) {
+        if (isMounted) {
+          const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+          setError(errorMessage);
+          toast.error(errorMessage);
+          console.error("Erro ao carregar dados da empresa:", err);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     getCompanyId();
+
+    // Monitorar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      if (isMounted) {
+        getCompanyId();
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
-    <CompanyIdContext.Provider value={{ companyId }}>
+    <CompanyIdContext.Provider value={{ companyId, isLoading, error }}>
       {children}
     </CompanyIdContext.Provider>
   );
