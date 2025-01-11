@@ -123,7 +123,9 @@ export function DashboardMetrics() {
         .from('maintenance_history')
         .select(`
           machinery_id,
-          machinery!inner(name)
+          machinery:machinery_id (
+            name
+          )
         `)
         .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
 
@@ -137,15 +139,17 @@ export function DashboardMetrics() {
         return { name: 'N/A', count: 0 } as MostDemandedMachinery;
       }
 
-      const counts = (data as MachineryWithName[]).reduce((acc: Record<string, MostDemandedMachinery>, curr) => {
-        const name = curr.machinery?.name || 'N/A';
-        const machineryId = curr.machinery_id;
-        if (!acc[machineryId]) {
-          acc[machineryId] = { name, count: 0 };
+      const counts: Record<string, MostDemandedMachinery> = {};
+      
+      data.forEach((item: any) => {
+        const name = item.machinery?.name || 'N/A';
+        const machineryId = item.machinery_id;
+        
+        if (!counts[machineryId]) {
+          counts[machineryId] = { name, count: 0 };
         }
-        acc[machineryId].count++;
-        return acc;
-      }, {});
+        counts[machineryId].count++;
+      });
 
       const mostDemanded = Object.values(counts).sort((a, b) => b.count - a.count)[0] || { name: 'N/A', count: 0 };
       return mostDemanded;
