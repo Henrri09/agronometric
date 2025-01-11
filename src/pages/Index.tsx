@@ -10,35 +10,138 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const mockData = {
-  alerts: [
-    {
-      title: "Manutenção Preventiva Necessária",
-      description: "Esteira transportadora B2 requer manutenção em 3 dias",
-      severity: "warning" as const,
-    },
-    {
-      title: "Manutenção Urgente",
-      description: "Moinho M5 apresentando vibração anormal",
-      severity: "error" as const,
-    },
-  ],
-  stats: {
-    machines: 24,
-    users: 15,
-    orders: 8,
-    maintenance: 3,
-  },
-  chartData: [
-    { month: "Jan", preventive: 12, corrective: 5 },
-    { month: "Fev", preventive: 15, corrective: 4 },
-    { month: "Mar", preventive: 18, corrective: 3 },
-    { month: "Abr", preventive: 16, corrective: 6 },
-  ],
-};
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const Index = () => {
+  const [companyId, setCompanyId] = useState<string | null>(null);
+
+  // Buscar o company_id do usuário logado
+  useEffect(() => {
+    const getCompanyId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.company_id) {
+          setCompanyId(profile.company_id);
+        }
+      }
+    };
+    getCompanyId();
+  }, []);
+
+  // Buscar maquinários
+  const { data: machineryCount = 0 } = useQuery({
+    queryKey: ['machinery-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('machinery')
+        .select('*', { count: 'exact', head: true });
+      return count || 0;
+    },
+  });
+
+  // Buscar usuários da empresa
+  const { data: usersCount = 0 } = useQuery({
+    queryKey: ['users-count', companyId],
+    queryFn: async () => {
+      if (!companyId) return 0;
+      const { count } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('company_id', companyId);
+      return count || 0;
+    },
+    enabled: !!companyId,
+  });
+
+  // Buscar ordens de serviço pendentes
+  const { data: ordersCount = 0 } = useQuery({
+    queryKey: ['orders-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('service_orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      return count || 0;
+    },
+  });
+
+  // Buscar manutenções pendentes
+  const { data: maintenanceCount = 0 } = useQuery({
+    queryKey: ['maintenance-count'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('maintenance_schedules')
+        .select('*', { count: 'exact', head: true })
+        .is('last_maintenance_date', null);
+      return count || 0;
+    },
+  });
+
+  // Buscar alertas de manutenção
+  const { data: alerts = [] } = useQuery({
+    queryKey: ['maintenance-alerts'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('maintenance_schedules')
+        .select(`
+          id,
+          machinery_id,
+          next_maintenance_date,
+          machinery (name)
+        `)
+        .lte('next_maintenance_date', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString())
+        .order('next_maintenance_date');
+      
+      return (data || []).map(schedule => ({
+        title: "Manutenção Preventiva Necessária",
+        description: `${schedule.machinery?.name} requer manutenção em ${new Date(schedule.next_maintenance_date).toLocaleDateString()}`,
+        severity: "warning" as const,
+      }));
+    },
+  });
+
+  // Buscar dados do gráfico de manutenções
+  const { data: chartData = [] } = useQuery({
+    queryKey: ['maintenance-chart'],
+    queryFn: async () => {
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 3);
+
+      const { data: maintenanceData } = await supabase
+        .from('maintenance_history')
+        .select('maintenance_date, maintenance_type')
+        .gte('maintenance_date', startDate.toISOString());
+
+      const monthlyData: Record<string, { preventive: number; corrective: number }> = {};
+      
+      maintenanceData?.forEach(maintenance => {
+        const month = new Date(maintenance.maintenance_date).toLocaleString('default', { month: 'short' });
+        if (!monthlyData[month]) {
+          monthlyData[month] = { preventive: 0, corrective: 0 };
+        }
+        if (maintenance.maintenance_type === 'preventive') {
+          monthlyData[month].preventive++;
+        } else if (maintenance.maintenance_type === 'corrective') {
+          monthlyData[month].corrective++;
+        }
+      });
+
+      return Object.entries(monthlyData).map(([month, data]) => ({
+        month,
+        preventive: data.preventive,
+        corrective: data.corrective,
+      }));
+    },
+  });
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -46,7 +149,7 @@ const Index = () => {
       </div>
 
       <div className="space-y-4">
-        {mockData.alerts.map((alert, index) => (
+        {alerts.map((alert, index) => (
           <MaintenanceAlert key={index} {...alert} />
         ))}
       </div>
@@ -54,22 +157,22 @@ const Index = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Maquinários"
-          value={mockData.stats.machines}
+          value={machineryCount}
           icon={<Tractor className="h-4 w-4 text-primary" />}
         />
         <DashboardCard
           title="Usuários"
-          value={mockData.stats.users}
+          value={usersCount}
           icon={<Users className="h-4 w-4 text-primary" />}
         />
         <DashboardCard
           title="Ordens de Serviço"
-          value={mockData.stats.orders}
+          value={ordersCount}
           icon={<ClipboardList className="h-4 w-4 text-primary" />}
         />
         <DashboardCard
           title="Manutenções Pendentes"
-          value={mockData.stats.maintenance}
+          value={maintenanceCount}
           icon={<Wrench className="h-4 w-4 text-primary" />}
         />
       </div>
@@ -78,7 +181,7 @@ const Index = () => {
         <h2 className="text-xl font-semibold mb-4">Manutenções Preventivas vs. Corretivas</h2>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockData.chartData}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
