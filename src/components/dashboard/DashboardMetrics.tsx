@@ -4,11 +4,12 @@ import { DashboardCard } from "@/components/DashboardCard";
 import { Users, Tractor, ClipboardList, DollarSign } from "lucide-react";
 import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardMetrics() {
   const { companyId } = useCompanyId();
 
-  const { data: usersCount = 0 } = useQuery({
+  const { data: usersCount = 0, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['users-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
@@ -21,7 +22,7 @@ export function DashboardMetrics() {
       if (error) {
         console.error("Erro ao buscar usuários:", error);
         toast.error("Erro ao carregar quantidade de usuários");
-        return 0;
+        throw error;
       }
       
       return count || 0;
@@ -29,7 +30,7 @@ export function DashboardMetrics() {
     enabled: !!companyId
   });
 
-  const { data: machineryCount = 0 } = useQuery({
+  const { data: machineryCount = 0, isLoading: isLoadingMachinery } = useQuery({
     queryKey: ['machinery-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
@@ -44,7 +45,7 @@ export function DashboardMetrics() {
       if (error) {
         console.error("Erro ao buscar maquinários:", error);
         toast.error("Erro ao carregar quantidade de maquinários");
-        return 0;
+        throw error;
       }
       
       return count || 0;
@@ -52,7 +53,7 @@ export function DashboardMetrics() {
     enabled: !!companyId
   });
 
-  const { data: ordersCount = 0 } = useQuery({
+  const { data: ordersCount = 0, isLoading: isLoadingOrders } = useQuery({
     queryKey: ['pending-orders-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
@@ -67,7 +68,7 @@ export function DashboardMetrics() {
       if (error) {
         console.error("Erro ao buscar ordens de serviço:", error);
         toast.error("Erro ao carregar quantidade de ordens de serviço");
-        return 0;
+        throw error;
       }
       
       return count || 0;
@@ -75,7 +76,7 @@ export function DashboardMetrics() {
     enabled: !!companyId
   });
 
-  const { data: economyGenerated = 0 } = useQuery({
+  const { data: economyGenerated = 0, isLoading: isLoadingEconomy } = useQuery({
     queryKey: ['economy-generated', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
@@ -98,7 +99,7 @@ export function DashboardMetrics() {
       if (error) {
         console.error("Erro ao buscar histórico de manutenções:", error);
         toast.error("Erro ao calcular economia gerada");
-        return 0;
+        throw error;
       }
 
       const preventiveCosts = maintenanceHistory
@@ -109,31 +110,55 @@ export function DashboardMetrics() {
     enabled: !!companyId
   });
 
+  if (!companyId) {
+    return (
+      <div className="text-center text-muted-foreground">
+        Carregando dados da empresa...
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <DashboardCard
-        title="Total de Usuários"
-        value={usersCount}
-        icon={<Users className="h-4 w-4 text-muted-foreground" />}
-      />
+      {isLoadingUsers ? (
+        <Skeleton className="h-32" />
+      ) : (
+        <DashboardCard
+          title="Total de Usuários"
+          value={usersCount}
+          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+        />
+      )}
       
-      <DashboardCard
-        title="Maquinários"
-        value={machineryCount}
-        icon={<Tractor className="h-4 w-4 text-muted-foreground" />}
-      />
+      {isLoadingMachinery ? (
+        <Skeleton className="h-32" />
+      ) : (
+        <DashboardCard
+          title="Maquinários"
+          value={machineryCount}
+          icon={<Tractor className="h-4 w-4 text-muted-foreground" />}
+        />
+      )}
       
-      <DashboardCard
-        title="Ordens de Serviço"
-        value={ordersCount}
-        icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
-      />
+      {isLoadingOrders ? (
+        <Skeleton className="h-32" />
+      ) : (
+        <DashboardCard
+          title="Ordens de Serviço"
+          value={ordersCount}
+          icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
+        />
+      )}
       
-      <DashboardCard
-        title="Economia Gerada"
-        value={economyGenerated}
-        icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-      />
+      {isLoadingEconomy ? (
+        <Skeleton className="h-32" />
+      ) : (
+        <DashboardCard
+          title="Economia Gerada"
+          value={economyGenerated}
+          icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+        />
+      )}
     </div>
   );
 }
