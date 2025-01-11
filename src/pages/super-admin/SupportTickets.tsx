@@ -60,6 +60,45 @@ export default function SupportTickets() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedReportId) return;
+
+    try {
+      const { error } = await supabase
+        .from('bug_reports')
+        .delete()
+        .eq('id', selectedReportId);
+
+      if (error) throw error;
+
+      toast.success("Ticket excluído com sucesso");
+      fetchBugReports();
+    } catch (error: any) {
+      console.error('Error deleting report:', error);
+      toast.error("Erro ao excluir ticket");
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedReportId(null);
+    }
+  };
+
+  const handleArchive = async (reportId: string) => {
+    try {
+      const { error } = await supabase
+        .from('bug_reports')
+        .update({ status: 'closed' })
+        .eq('id', reportId);
+
+      if (error) throw error;
+
+      toast.success("Ticket arquivado com sucesso");
+      fetchBugReports();
+    } catch (error: any) {
+      console.error('Error archiving ticket:', error);
+      toast.error("Erro ao arquivar ticket");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     const colors = {
       pending: "bg-yellow-500",
@@ -113,45 +152,6 @@ export default function SupportTickets() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedReportId) return;
-
-    try {
-      const { error } = await supabase
-        .from('bug_reports')
-        .delete()
-        .eq('id', selectedReportId);
-
-      if (error) throw error;
-
-      toast.success("Ticket excluído com sucesso");
-      fetchBugReports();
-    } catch (error: any) {
-      console.error('Error deleting report:', error);
-      toast.error("Erro ao excluir ticket");
-    } finally {
-      setDeleteDialogOpen(false);
-      setSelectedReportId(null);
-    }
-  };
-
-  const handleArchive = async (reportId: string) => {
-    try {
-      const { error } = await supabase
-        .from('support_tickets')
-        .update({ archived: true })
-        .eq('id', reportId);
-
-      if (error) throw error;
-
-      toast.success("Ticket arquivado com sucesso");
-      fetchBugReports();
-    } catch (error: any) {
-      console.error('Error archiving ticket:', error);
-      toast.error("Erro ao arquivar ticket");
-    }
-  };
-
   return (
     <div className="p-6">
       <PageHeader
@@ -182,7 +182,9 @@ export default function SupportTickets() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bugReports.map((report) => (
+                  {bugReports
+                    .filter(report => report.status !== 'closed')
+                    .map((report) => (
                     <TableRow key={report.id}>
                       <TableCell>{report.company?.name || 'N/A'}</TableCell>
                       <TableCell>
