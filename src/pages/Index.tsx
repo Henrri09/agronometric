@@ -1,6 +1,6 @@
 import { DashboardCard } from "@/components/DashboardCard";
 import { MaintenanceAlert } from "@/components/MaintenanceAlert";
-import { Tractor, Users, ClipboardList, Wrench } from "lucide-react";
+import { Tractor, Users, ClipboardList, DollarSign } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -29,6 +29,7 @@ const Index = () => {
           .single();
         
         if (profile?.company_id) {
+          console.log("Company ID encontrado:", profile.company_id);
           setCompanyId(profile.company_id);
         }
       }
@@ -36,15 +37,18 @@ const Index = () => {
     getCompanyId();
   }, []);
 
-  // Buscar maquinários
+  // Buscar maquinários da empresa
   const { data: machineryCount = 0 } = useQuery({
-    queryKey: ['machinery-count'],
+    queryKey: ['machinery-count', companyId],
     queryFn: async () => {
+      if (!companyId) return 0;
+      console.log("Buscando maquinários para company_id:", companyId);
       const { count } = await supabase
         .from('machinery')
         .select('*', { count: 'exact', head: true });
       return count || 0;
     },
+    enabled: !!companyId,
   });
 
   // Buscar usuários da empresa
@@ -52,6 +56,7 @@ const Index = () => {
     queryKey: ['users-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
+      console.log("Buscando usuários para company_id:", companyId);
       const { count } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
@@ -61,34 +66,50 @@ const Index = () => {
     enabled: !!companyId,
   });
 
-  // Buscar ordens de serviço pendentes
+  // Buscar ordens de serviço da empresa
   const { data: ordersCount = 0 } = useQuery({
-    queryKey: ['orders-count'],
+    queryKey: ['orders-count', companyId],
     queryFn: async () => {
+      if (!companyId) return 0;
+      console.log("Buscando ordens de serviço para company_id:", companyId);
       const { count } = await supabase
         .from('service_orders')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending');
       return count || 0;
     },
+    enabled: !!companyId,
   });
 
-  // Buscar manutenções pendentes
-  const { data: maintenanceCount = 0 } = useQuery({
-    queryKey: ['maintenance-count'],
+  // Calcular economia gerada (baseado no histórico de manutenções)
+  const { data: economyGenerated = 0 } = useQuery({
+    queryKey: ['economy-generated', companyId],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('maintenance_schedules')
-        .select('*', { count: 'exact', head: true })
-        .is('last_maintenance_date', null);
-      return count || 0;
+      if (!companyId) return 0;
+      console.log("Calculando economia para company_id:", companyId);
+      const { data: maintenanceHistory } = await supabase
+        .from('maintenance_history')
+        .select('total_cost, maintenance_type')
+        .gte('maintenance_date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (!maintenanceHistory) return 0;
+
+      // Cálculo simplificado: economia é 30% do custo total de manutenções preventivas
+      const preventiveCosts = maintenanceHistory
+        .filter(m => m.maintenance_type === 'preventive')
+        .reduce((sum, m) => sum + (m.total_cost || 0), 0);
+
+      return Math.round(preventiveCosts * 0.3);
     },
+    enabled: !!companyId,
   });
 
   // Buscar alertas de manutenção
   const { data: alerts = [] } = useQuery({
-    queryKey: ['maintenance-alerts'],
+    queryKey: ['maintenance-alerts', companyId],
     queryFn: async () => {
+      if (!companyId) return [];
+      console.log("Buscando alertas de manutenção para company_id:", companyId);
       const { data } = await supabase
         .from('maintenance_schedules')
         .select(`
@@ -106,12 +127,15 @@ const Index = () => {
         severity: "warning" as const,
       }));
     },
+    enabled: !!companyId,
   });
 
   // Buscar dados do gráfico de manutenções
   const { data: chartData = [] } = useQuery({
-    queryKey: ['maintenance-chart'],
+    queryKey: ['maintenance-chart', companyId],
     queryFn: async () => {
+      if (!companyId) return [];
+      console.log("Buscando dados do gráfico para company_id:", companyId);
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 3);
 
@@ -140,12 +164,16 @@ const Index = () => {
         corrective: data.corrective,
       }));
     },
+    enabled: !!companyId,
   });
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+      <div className="flex flex-col space-y-4">
+        <h1 className="text-2xl font-bold">Painel de Controle</h1>
+        <p className="text-muted-foreground">
+          Visualize os principais indicadores do seu negócio
+        </p>
       </div>
 
       <div className="space-y-4">
@@ -156,14 +184,14 @@ const Index = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
+          title="Total de Usuários"
+          value={usersCount}
+          icon={<Users className="h-4 w-4 text-primary" />}
+        />
+        <DashboardCard
           title="Maquinários"
           value={machineryCount}
           icon={<Tractor className="h-4 w-4 text-primary" />}
-        />
-        <DashboardCard
-          title="Usuários"
-          value={usersCount}
-          icon={<Users className="h-4 w-4 text-primary" />}
         />
         <DashboardCard
           title="Ordens de Serviço"
@@ -171,25 +199,34 @@ const Index = () => {
           icon={<ClipboardList className="h-4 w-4 text-primary" />}
         />
         <DashboardCard
-          title="Manutenções Pendentes"
-          value={maintenanceCount}
-          icon={<Wrench className="h-4 w-4 text-primary" />}
+          title="Economia Gerada"
+          value={economyGenerated}
+          icon={<DollarSign className="h-4 w-4 text-primary" />}
         />
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Manutenções Preventivas vs. Corretivas</h2>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="preventive" name="Preventivas" fill="#2F5233" />
-              <Bar dataKey="corrective" name="Corretivas" fill="#FF4444" />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Manutenções Preventivas vs. Corretivas</h2>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="preventive" name="Preventivas" fill="#2F5233" />
+                <Bar dataKey="corrective" name="Corretivas" fill="#FF4444" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-card p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Status dos Equipamentos</h2>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground">Em desenvolvimento</p>
+          </div>
         </div>
       </div>
     </div>
