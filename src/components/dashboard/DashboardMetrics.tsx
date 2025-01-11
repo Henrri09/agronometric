@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardMetrics() {
   const { companyId } = useCompanyId();
+  console.log("CompanyId no DashboardMetrics:", companyId);
 
   const { data: usersCount = 0, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['users-count', companyId],
@@ -35,7 +36,6 @@ export function DashboardMetrics() {
     queryFn: async () => {
       if (!companyId) return 0;
       
-      // Busca apenas maquinários da empresa atual através do join com profiles
       const { count, error } = await supabase
         .from('machinery')
         .select('*, profiles!inner(*)', { count: 'exact', head: true })
@@ -58,7 +58,6 @@ export function DashboardMetrics() {
     queryFn: async () => {
       if (!companyId) return 0;
       
-      // Busca apenas ordens de serviço da empresa atual
       const { count, error } = await supabase
         .from('service_orders')
         .select('*, profiles!inner(*)', { count: 'exact', head: true })
@@ -111,9 +110,15 @@ export function DashboardMetrics() {
   });
 
   if (!companyId) {
+    console.error("CompanyId não encontrado");
     return (
-      <div className="text-center text-muted-foreground">
-        Carregando dados da empresa...
+      <div className="text-center">
+        <div className="text-muted-foreground mb-2">
+          Erro ao carregar dados da empresa
+        </div>
+        <div className="text-sm text-red-500">
+          ID da empresa não encontrado. Por favor, verifique se você está logado corretamente.
+        </div>
       </div>
     );
   }
