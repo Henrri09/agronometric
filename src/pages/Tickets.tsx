@@ -63,13 +63,10 @@ export default function Tickets() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <PageHeader
-          title="Meus Tickets"
-          description="Visualize e gerencie seus tickets de suporte"
-        />
-        <BugReportDialog />
-      </div>
+      <PageHeader
+        title="Meus Tickets"
+        description="Visualize e gerencie seus tickets de suporte"
+      />
 
       <Card>
         <CardContent className="p-6">
@@ -120,6 +117,10 @@ export default function Tickets() {
           </Table>
         </CardContent>
       </Card>
+
+      <div className="flex justify-end">
+        <BugReportDialog />
+      </div>
     </div>
   );
 }
