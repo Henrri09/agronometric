@@ -12,6 +12,7 @@ export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchCompanies = async () => {
     try {
@@ -33,6 +34,7 @@ export function CompanyManagement() {
   const handleSubmit = async (data: any) => {
     try {
       setIsLoading(true);
+      setError(null);
       
       const { error } = await supabase.functions.invoke('create-company', {
         body: {
@@ -42,14 +44,27 @@ export function CompanyManagement() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Try to parse the error message from the response body
+        let errorMessage = error.message;
+        try {
+          const errorBody = JSON.parse(error.message);
+          if (errorBody.error) {
+            errorMessage = errorBody.error;
+          }
+        } catch {
+          // If parsing fails, use the original error message
+        }
+        setError(errorMessage);
+        return;
+      }
 
       toast.success("Empresa criada com sucesso!");
       setIsDialogOpen(false);
       fetchCompanies();
     } catch (error: any) {
       console.error('Error creating company:', error);
-      toast.error(error.message || "Erro ao criar empresa");
+      setError(error.message || "Erro ao criar empresa");
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +88,15 @@ export function CompanyManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setError(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Nova Empresa</DialogTitle>
@@ -82,6 +105,7 @@ export function CompanyManagement() {
             onSubmit={handleSubmit}
             onCancel={() => setIsDialogOpen(false)}
             isLoading={isLoading}
+            error={error}
           />
         </DialogContent>
       </Dialog>

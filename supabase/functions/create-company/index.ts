@@ -25,6 +25,22 @@ serve(async (req) => {
 
     const { companyName, adminEmail, adminName }: CreateCompanyRequest = await req.json()
 
+    // First check if user already exists
+    const { data: existingUser } = await supabaseClient.auth.admin.listUsers()
+    const userExists = existingUser?.users.some(user => user.email === adminEmail)
+    
+    if (userExists) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Um usuário com este email já está registrado. Por favor, use um email diferente." 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
+    }
+
     // 1. Create company first
     const { data: companyData, error: companyError } = await supabaseClient
       .from('companies')

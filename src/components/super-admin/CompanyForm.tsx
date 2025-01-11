@@ -5,6 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const companyFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -21,9 +22,10 @@ interface CompanyFormProps {
   onSubmit: (data: CompanyFormValues) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
-export function CompanyForm({ onSubmit, onCancel, isLoading = false }: CompanyFormProps) {
+export function CompanyForm({ onSubmit, onCancel, isLoading = false, error }: CompanyFormProps) {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -39,6 +41,12 @@ export function CompanyForm({ onSubmit, onCancel, isLoading = false }: CompanyFo
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <FormField
           control={form.control}
           name="name"
