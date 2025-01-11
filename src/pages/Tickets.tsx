@@ -118,7 +118,7 @@ export default function Tickets() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-start">
         <BugReportDialog />
       </div>
     </div>
