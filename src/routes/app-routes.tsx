@@ -5,7 +5,6 @@ import { AppLayout } from "./app-layout";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
-import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
 import Users from "@/pages/Users";
 import Machinery from "@/pages/Machinery";
@@ -57,7 +56,7 @@ export const AppRoutes = () => {
             <AppLayout>
               <Routes>
                 {/* Base routes accessible by all authenticated non-super-admin users */}
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Navigate to="/index" replace />} />
                 <Route path="/index" element={<Index />} />
                 <Route path="/machinery" element={<Machinery />} />
                 <Route path="/parts-inventory" element={<PartsInventory />} />
@@ -102,7 +101,7 @@ export const AppRoutes = () => {
                   } 
                 />
 
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/index" replace />} />
               </Routes>
             </AppLayout>
           </ProtectedRoute>
