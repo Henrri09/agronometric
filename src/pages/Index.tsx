@@ -1,8 +1,8 @@
 import { MaintenanceAlert } from "@/components/MaintenanceAlert";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CompanyIdProvider } from "@/components/dashboard/CompanyIdProvider";
 import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { MaintenanceChart } from "@/components/dashboard/MaintenanceChart";
+import { MachineryStatusChart } from "@/components/dashboard/MachineryStatusChart";
 
 const Index = () => {
   return (
@@ -26,17 +26,7 @@ const Index = () => {
           
           <div className="grid gap-4 mt-4 md:grid-cols-2">
             <MaintenanceChart />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Status dos Equipamentos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  Em desenvolvimento
-                </div>
-              </CardContent>
-            </Card>
+            <MachineryStatusChart />
           </div>
         </div>
       </CompanyIdProvider>
