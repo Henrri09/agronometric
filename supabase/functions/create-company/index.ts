@@ -25,10 +25,10 @@ serve(async (req) => {
 
     const { companyName, adminEmail, adminName }: CreateCompanyRequest = await req.json()
 
-    // Generate a temporary password
+    // Gerar senha temporária
     const temporaryPassword = Math.random().toString(36).slice(-8)
 
-    // Create the admin user
+    // Criar o usuário admin
     const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
       email: adminEmail,
       password: temporaryPassword,
@@ -40,7 +40,7 @@ serve(async (req) => {
 
     if (authError) throw authError
 
-    // Create company and set up admin
+    // Criar empresa e configurar admin
     const { data: companyData, error: companyError } = await supabaseClient
       .rpc('create_company_with_admin', {
         company_name: companyName,
@@ -50,7 +50,7 @@ serve(async (req) => {
 
     if (companyError) throw companyError
 
-    // Send welcome email with temporary password
+    // Enviar email de boas-vindas
     const { error: emailError } = await supabaseClient.functions.invoke('send-welcome-email', {
       body: {
         to: adminEmail,
@@ -62,6 +62,9 @@ serve(async (req) => {
 
     if (emailError) throw emailError
 
+    console.log('Company created successfully:', companyData);
+    console.log('Welcome email sent to:', adminEmail);
+
     return new Response(
       JSON.stringify({ message: 'Company and admin created successfully' }),
       { 
@@ -71,6 +74,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('Error in create-company function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

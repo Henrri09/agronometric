@@ -51,6 +51,7 @@ serve(async (req) => {
     })
 
     const data = await res.json()
+    console.log('Email sent:', data);
 
     return new Response(
       JSON.stringify(data),
@@ -61,6 +62,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('Error in send-welcome-email function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

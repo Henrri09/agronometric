@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,6 +12,10 @@ export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
   const fetchCompanies = async () => {
     try {
       const { data, error } = await supabase
@@ -23,14 +27,17 @@ export function CompanyManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      console.log("Companies fetched:", data);
       setCompanies(data || []);
     } catch (error: any) {
+      console.error('Error fetching companies:', error);
       toast.error(error.message || "Erro ao carregar empresas");
     }
   };
 
   const handleSubmit = async (data: any) => {
     try {
+      // Criar empresa
       const { data: company, error: companyError } = await supabase
         .from("companies")
         .insert({
@@ -44,10 +51,13 @@ export function CompanyManagement() {
 
       if (companyError) throw companyError;
 
-      const { error: rpcError } = await supabase.rpc("create_company_with_admin", {
-        company_name: data.name,
-        admin_email: data.adminEmail,
-        admin_full_name: data.adminName
+      // Chamar a função de criação de empresa e admin
+      const { error: rpcError } = await supabase.functions.invoke('create-company', {
+        body: {
+          companyName: data.name,
+          adminEmail: data.adminEmail,
+          adminName: data.adminName
+        }
       });
 
       if (rpcError) throw rpcError;
@@ -56,6 +66,7 @@ export function CompanyManagement() {
       setIsDialogOpen(false);
       fetchCompanies();
     } catch (error: any) {
+      console.error('Error creating company:', error);
       toast.error(error.message || "Erro ao criar empresa");
     }
   };
