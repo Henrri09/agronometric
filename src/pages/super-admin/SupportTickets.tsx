@@ -8,6 +8,16 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface BugReport {
   id: string;
@@ -23,6 +33,8 @@ export default function SupportTickets() {
   const [bugReports, setBugReports] = useState<BugReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [responses, setResponses] = useState<{ [key: string]: string }>({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBugReports();
@@ -101,6 +113,45 @@ export default function SupportTickets() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedReportId) return;
+
+    try {
+      const { error } = await supabase
+        .from('bug_reports')
+        .delete()
+        .eq('id', selectedReportId);
+
+      if (error) throw error;
+
+      toast.success("Ticket excluído com sucesso");
+      fetchBugReports();
+    } catch (error: any) {
+      console.error('Error deleting report:', error);
+      toast.error("Erro ao excluir ticket");
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedReportId(null);
+    }
+  };
+
+  const handleArchive = async (reportId: string) => {
+    try {
+      const { error } = await supabase
+        .from('support_tickets')
+        .update({ archived: true })
+        .eq('id', reportId);
+
+      if (error) throw error;
+
+      toast.success("Ticket arquivado com sucesso");
+      fetchBugReports();
+    } catch (error: any) {
+      console.error('Error archiving ticket:', error);
+      toast.error("Erro ao arquivar ticket");
+    }
+  };
+
   return (
     <div className="p-6">
       <PageHeader
@@ -160,16 +211,37 @@ export default function SupportTickets() {
                         {new Date(report.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <select
-                          className="border rounded p-1"
-                          value={report.status}
-                          onChange={(e) => handleStatusUpdate(report.id, e.target.value)}
-                        >
-                          <option value="pending">Pendente</option>
-                          <option value="in_progress">Em Progresso</option>
-                          <option value="resolved">Resolvido</option>
-                          <option value="closed">Fechado</option>
-                        </select>
+                        <div className="space-y-2">
+                          <select
+                            className="border rounded p-1"
+                            value={report.status}
+                            onChange={(e) => handleStatusUpdate(report.id, e.target.value)}
+                          >
+                            <option value="pending">Pendente</option>
+                            <option value="in_progress">Em Progresso</option>
+                            <option value="resolved">Resolvido</option>
+                            <option value="closed">Fechado</option>
+                          </select>
+                          <div className="space-x-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleArchive(report.id)}
+                            >
+                              Arquivar
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedReportId(report.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                            >
+                              Excluir
+                            </Button>
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="space-y-2">
@@ -208,6 +280,23 @@ export default function SupportTickets() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esse ticket? Essa ação é irreversível.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
