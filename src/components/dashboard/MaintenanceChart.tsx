@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export function MaintenanceChart() {
-  const { companyId } = useCompanyId();
+  const { companyId, isLoading: isLoadingCompany, error: companyError } = useCompanyId();
 
   const { data: chartData = [], isLoading } = useQuery({
     queryKey: ['maintenance-chart', companyId],
@@ -65,22 +67,24 @@ export function MaintenanceChart() {
     enabled: !!companyId
   });
 
-  if (!companyId) {
+  if (companyError) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Manutenções Preventivas vs. Corretivas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground">
-            Carregando dados da empresa...
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Erro ao carregar dados</AlertTitle>
+            <AlertDescription>{companyError}</AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     );
   }
 
-  if (isLoading) {
+  if (isLoadingCompany || isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -88,6 +92,25 @@ export function MaintenanceChart() {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!chartData.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Manutenções Preventivas vs. Corretivas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Sem dados disponíveis</AlertTitle>
+            <AlertDescription>
+              Não há registros de manutenção para o período selecionado.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     );

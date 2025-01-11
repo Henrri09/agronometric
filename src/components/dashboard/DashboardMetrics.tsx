@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardCard } from "@/components/DashboardCard";
-import { Users, Tractor, ClipboardList, DollarSign } from "lucide-react";
+import { Users, Tractor, ClipboardList, DollarSign, AlertCircle } from "lucide-react";
 import { useCompanyId } from "./CompanyIdProvider";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function DashboardMetrics() {
-  const { companyId } = useCompanyId();
-  console.log("CompanyId no DashboardMetrics:", companyId);
+  const { companyId, isLoading: isLoadingCompany, error: companyError } = useCompanyId();
 
   const { data: usersCount = 0, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['users-count', companyId],
@@ -103,17 +103,37 @@ export function DashboardMetrics() {
     enabled: !!companyId
   });
 
-  if (!companyId) {
-    console.error("CompanyId não encontrado");
+  if (companyError) {
     return (
-      <div className="text-center">
-        <div className="text-muted-foreground mb-2">
-          Erro ao carregar dados da empresa
-        </div>
-        <div className="text-sm text-red-500">
-          ID da empresa não encontrado. Por favor, verifique se você está logado corretamente.
-        </div>
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Erro ao carregar dados</AlertTitle>
+        <AlertDescription>
+          {companyError}. Por favor, tente novamente mais tarde.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isLoadingCompany) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-32" />
+        ))}
       </div>
+    );
+  }
+
+  if (!companyId) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Empresa não encontrada</AlertTitle>
+        <AlertDescription>
+          Não foi possível identificar sua empresa. Por favor, verifique se você está logado corretamente.
+        </AlertDescription>
+      </Alert>
     );
   }
 
