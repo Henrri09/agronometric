@@ -1,15 +1,7 @@
 import { DashboardCard } from "@/components/DashboardCard";
 import { MaintenanceAlert } from "@/components/MaintenanceAlert";
 import { Tractor, Users, ClipboardList, DollarSign } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -23,57 +15,42 @@ const Index = () => {
     const getCompanyId = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('company_id')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          if (error) {
-            console.error("Erro ao buscar perfil:", error);
-            toast.error("Erro ao carregar dados da empresa");
-            return;
-          }
+        if (!user) {
+          console.log("Usuário não encontrado");
+          return;
+        }
 
-          if (profile?.company_id) {
-            console.log("Company ID encontrado:", profile.company_id);
-            setCompanyId(profile.company_id);
-          }
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erro ao buscar perfil:", error);
+          toast.error("Erro ao carregar dados da empresa");
+          return;
+        }
+
+        if (profile?.company_id) {
+          console.log("Company ID encontrado:", profile.company_id);
+          setCompanyId(profile.company_id);
         }
       } catch (error) {
         console.error("Erro ao buscar usuário:", error);
         toast.error("Erro ao carregar dados do usuário");
       }
     };
+
     getCompanyId();
   }, []);
 
-  // Buscar maquinários da empresa
-  const { data: machineryCount = 0, isLoading: loadingMachinery } = useQuery({
-    queryKey: ['machinery-count', companyId],
-    queryFn: async () => {
-      if (!companyId) return 0;
-      const { count, error } = await supabase
-        .from('machinery')
-        .select('*', { count: 'exact', head: true });
-      
-      if (error) {
-        console.error("Erro ao buscar maquinários:", error);
-        toast.error("Erro ao carregar quantidade de maquinários");
-        return 0;
-      }
-      
-      return count || 0;
-    },
-    enabled: !!companyId,
-  });
-
-  // Buscar usuários da empresa
-  const { data: usersCount = 0, isLoading: loadingUsers } = useQuery({
+  // Buscar total de usuários da empresa
+  const { data: usersCount = 0 } = useQuery({
     queryKey: ['users-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
+      
       const { count, error } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
@@ -87,14 +64,37 @@ const Index = () => {
       
       return count || 0;
     },
-    enabled: !!companyId,
+    enabled: !!companyId
   });
 
-  // Buscar ordens de serviço pendentes da empresa
-  const { data: ordersCount = 0, isLoading: loadingOrders } = useQuery({
+  // Buscar total de maquinários
+  const { data: machineryCount = 0 } = useQuery({
+    queryKey: ['machinery-count', companyId],
+    queryFn: async () => {
+      if (!companyId) return 0;
+      
+      const { count, error } = await supabase
+        .from('machinery')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      
+      if (error) {
+        console.error("Erro ao buscar maquinários:", error);
+        toast.error("Erro ao carregar quantidade de maquinários");
+        return 0;
+      }
+      
+      return count || 0;
+    },
+    enabled: !!companyId
+  });
+
+  // Buscar ordens de serviço pendentes
+  const { data: ordersCount = 0 } = useQuery({
     queryKey: ['pending-orders-count', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
+      
       const { count, error } = await supabase
         .from('service_orders')
         .select('*', { count: 'exact', head: true })
@@ -108,14 +108,15 @@ const Index = () => {
       
       return count || 0;
     },
-    enabled: !!companyId,
+    enabled: !!companyId
   });
 
   // Calcular economia gerada (baseado no histórico de manutenções)
-  const { data: economyGenerated = 0, isLoading: loadingEconomy } = useQuery({
+  const { data: economyGenerated = 0 } = useQuery({
     queryKey: ['economy-generated', companyId],
     queryFn: async () => {
       if (!companyId) return 0;
+      
       const { data: maintenanceHistory, error } = await supabase
         .from('maintenance_history')
         .select('total_cost, maintenance_type')
@@ -136,14 +137,15 @@ const Index = () => {
 
       return Math.round(preventiveCosts * 0.3);
     },
-    enabled: !!companyId,
+    enabled: !!companyId
   });
 
   // Buscar alertas de manutenção
-  const { data: alerts = [], isLoading: loadingAlerts } = useQuery({
+  const { data: alerts = [] } = useQuery({
     queryKey: ['maintenance-alerts', companyId],
     queryFn: async () => {
       if (!companyId) return [];
+      
       const { data, error } = await supabase
         .from('maintenance_schedules')
         .select(`
@@ -167,14 +169,15 @@ const Index = () => {
         severity: "warning" as const,
       }));
     },
-    enabled: !!companyId,
+    enabled: !!companyId
   });
 
   // Buscar dados do gráfico de manutenções
-  const { data: chartData = [], isLoading: loadingChart } = useQuery({
+  const { data: chartData = [] } = useQuery({
     queryKey: ['maintenance-chart', companyId],
     queryFn: async () => {
       if (!companyId) return [];
+      
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 3);
 
@@ -209,14 +212,8 @@ const Index = () => {
         corrective: data.corrective,
       }));
     },
-    enabled: !!companyId,
+    enabled: !!companyId
   });
-
-  const isLoading = loadingMachinery || loadingUsers || loadingOrders || loadingEconomy || loadingAlerts || loadingChart;
-
-  if (isLoading) {
-    return <div className="p-6">Carregando dados...</div>;
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -260,16 +257,14 @@ const Index = () => {
         <div className="bg-card p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Manutenções Preventivas vs. Corretivas</h2>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="preventive" name="Preventivas" fill="#2F5233" />
-                <Bar dataKey="corrective" name="Corretivas" fill="#FF4444" />
-              </BarChart>
-            </ResponsiveContainer>
+            <BarChart width={500} height={300} data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="preventive" name="Preventivas" fill="#2F5233" />
+              <Bar dataKey="corrective" name="Corretivas" fill="#FF4444" />
+            </BarChart>
           </div>
         </div>
 
