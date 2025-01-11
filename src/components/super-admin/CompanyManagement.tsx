@@ -51,7 +51,7 @@ export function CompanyManagement() {
 
         if (updateError) throw updateError;
         
-        toast.success("Você alterou os dados dessa empresa com sucesso!");
+        toast.success("Empresa atualizada com sucesso!");
       } else {
         // Criar nova empresa
         const { data: company, error: companyError } = await supabase
@@ -67,6 +67,7 @@ export function CompanyManagement() {
 
         if (companyError) throw companyError;
 
+        // Criar perfil do administrador usando a edge function
         const { error: rpcError } = await supabase.functions.invoke('create-company', {
           body: {
             companyName: data.name,
