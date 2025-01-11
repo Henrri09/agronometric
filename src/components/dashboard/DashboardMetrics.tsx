@@ -121,12 +121,17 @@ export function DashboardMetrics() {
         throw error;
       }
 
+      if (!data || data.length === 0) {
+        return { name: 'N/A', count: 0 };
+      }
+
       const counts = data.reduce((acc: Record<string, { name: string, count: number }>, curr) => {
         const name = curr.machinery?.name || 'N/A';
-        if (!acc[curr.machinery_id]) {
-          acc[curr.machinery_id] = { name, count: 0 };
+        const machineryId = curr.machinery_id;
+        if (!acc[machineryId]) {
+          acc[machineryId] = { name, count: 0 };
         }
-        acc[curr.machinery_id].count++;
+        acc[machineryId].count++;
         return acc;
       }, {});
 
