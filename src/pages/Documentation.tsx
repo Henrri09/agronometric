@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GlossarySection } from "@/components/documentation/GlossarySection";
 import { SystemGuides } from "@/components/documentation/SystemGuides";
 import { TutorialVideos } from "@/components/documentation/TutorialVideos";
-import { BugReportDialog } from "@/components/documentation/BugReportDialog";
 
 export default function Documentation() {
   return (
@@ -37,10 +36,6 @@ export default function Documentation() {
           </div>
         </CardContent>
       </Card>
-
-      <div className="flex justify-start">
-        <BugReportDialog />
-      </div>
     </div>
   );
 }
