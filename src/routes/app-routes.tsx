@@ -56,7 +56,6 @@ export const AppRoutes = () => {
           <ProtectedRoute nonSuperAdmin>
             <AppLayout>
               <Routes>
-                {/* Base routes accessible by all authenticated non-super-admin users */}
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/machinery" element={<Machinery />} />
                 <Route path="/parts-inventory" element={<PartsInventory />} />
@@ -64,51 +63,11 @@ export const AppRoutes = () => {
                 <Route path="/calendar" element={<Calendar />} />
                 <Route path="/task-management" element={<TaskManagement />} />
                 <Route path="/documentation" element={<Documentation />} />
-
-                {/* Routes accessible by common users and admins */}
-                <Route 
-                  path="/analytics" 
-                  element={
-                    <ProtectedRoute minRole="common">
-                      <Analytics />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/service-orders" 
-                  element={
-                    <ProtectedRoute minRole="common">
-                      <ServiceOrders />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/tickets" 
-                  element={
-                    <ProtectedRoute minRole="common">
-                      <Tickets />
-                    </ProtectedRoute>
-                  } 
-                />
-
-                {/* Admin only routes */}
-                <Route 
-                  path="/users" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Users />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/settings" 
-                  element={
-                    <ProtectedRoute adminOnly>
-                      <Settings />
-                    </ProtectedRoute>
-                  } 
-                />
-
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/service-orders" element={<ServiceOrders />} />
+                <Route path="/tickets" element={<Tickets />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppLayout>

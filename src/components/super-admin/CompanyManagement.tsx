@@ -12,6 +12,7 @@ export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchCompanies();
@@ -28,6 +29,7 @@ export function CompanyManagement() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+      console.log("Fetched companies:", data);
       setCompanies(data || []);
     } catch (error: any) {
       console.error('Error fetching companies:', error);
@@ -37,8 +39,9 @@ export function CompanyManagement() {
 
   const handleSubmit = async (data: CompanyFormValues) => {
     try {
+      setIsLoading(true);
+      
       if (editingCompany) {
-        // Atualizar empresa existente
         const { error: updateError } = await supabase
           .from("companies")
           .update({
@@ -54,20 +57,6 @@ export function CompanyManagement() {
         toast.success("Empresa atualizada com sucesso!");
       } else {
         // Criar nova empresa
-        const { data: company, error: companyError } = await supabase
-          .from("companies")
-          .insert({
-            name: data.name,
-            cnpj: data.cnpj,
-            address: data.address,
-            location: data.location
-          })
-          .select()
-          .single();
-
-        if (companyError) throw companyError;
-
-        // Criar perfil do administrador usando a edge function
         const { error: rpcError } = await supabase.functions.invoke('create-company', {
           body: {
             companyName: data.name,
@@ -81,12 +70,13 @@ export function CompanyManagement() {
         toast.success("Empresa criada com sucesso!");
       }
 
-      setIsDialogOpen(false);
-      setEditingCompany(null);
+      handleCancel();
       fetchCompanies();
     } catch (error: any) {
       console.error('Error managing company:', error);
       toast.error(error.message || "Erro ao gerenciar empresa");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -97,6 +87,7 @@ export function CompanyManagement() {
 
   const handleDelete = async (companyId: string) => {
     try {
+      setIsLoading(true);
       const { error } = await supabase
         .from("companies")
         .delete()
@@ -109,6 +100,8 @@ export function CompanyManagement() {
     } catch (error: any) {
       console.error('Error deleting company:', error);
       toast.error(error.message || "Erro ao excluir empresa");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,7 +113,7 @@ export function CompanyManagement() {
   return (
     <>
       <div className="mb-4">
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsDialogOpen(true)} disabled={isLoading}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Empresa
         </Button>
@@ -147,6 +140,7 @@ export function CompanyManagement() {
           <CompanyForm
             onSubmit={handleSubmit}
             onCancel={handleCancel}
+            isLoading={isLoading}
             defaultValues={editingCompany ? {
               name: editingCompany.name,
               cnpj: editingCompany.cnpj,

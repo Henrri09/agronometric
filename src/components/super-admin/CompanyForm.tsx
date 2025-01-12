@@ -20,9 +20,10 @@ interface CompanyFormProps {
   defaultValues?: Partial<CompanyFormValues>;
   onSubmit: (data: CompanyFormValues) => Promise<void>;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
-export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormProps) {
+export function CompanyForm({ defaultValues, onSubmit, onCancel, isLoading }: CompanyFormProps) {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
     defaultValues: {
@@ -46,7 +47,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>Nome da Empresa</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -60,7 +61,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>CNPJ</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="00000000000000" />
+                <Input {...field} placeholder="00000000000000" disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,7 +75,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>Endereço</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -88,7 +89,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>Local</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,7 +103,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>Nome do Administrador</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -116,7 +117,7 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
             <FormItem>
               <FormLabel>Email do Administrador</FormLabel>
               <FormControl>
-                <Input {...field} type="email" />
+                <Input {...field} type="email" disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,11 +125,11 @@ export function CompanyForm({ defaultValues, onSubmit, onCancel }: CompanyFormPr
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
             Cancelar
           </Button>
-          <Button type="submit">
-            {defaultValues ? "Salvar" : "Criar"}
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Salvando..." : defaultValues ? "Salvar" : "Criar"}
           </Button>
         </div>
       </form>
