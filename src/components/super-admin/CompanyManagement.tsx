@@ -7,12 +7,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CompanyForm, CompanyFormValues } from "@/components/super-admin/CompanyForm";
 import { CompanyList } from "@/components/super-admin/CompanyList";
+import { MaintenanceAlert } from "@/components/MaintenanceAlert";
 
 export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCompany, setEditingCompany] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCompanies();
@@ -40,6 +42,7 @@ export function CompanyManagement() {
   const handleSubmit = async (data: CompanyFormValues) => {
     try {
       setIsLoading(true);
+      setError(null);
       
       if (editingCompany) {
         const { error: updateError } = await supabase
@@ -65,15 +68,23 @@ export function CompanyManagement() {
           }
         });
 
-        if (rpcError) throw rpcError;
+        if (rpcError) {
+          // Verificar se é um erro de email duplicado
+          if (rpcError.message.includes('email address has already been registered')) {
+            setError('Este email já está cadastrado. Por favor, use outro email.');
+            return;
+          }
+          throw rpcError;
+        }
 
         toast.success("Empresa criada com sucesso!");
+        handleCancel();
       }
 
-      handleCancel();
       fetchCompanies();
     } catch (error: any) {
       console.error('Error managing company:', error);
+      setError(error.message || "Erro ao gerenciar empresa");
       toast.error(error.message || "Erro ao gerenciar empresa");
     } finally {
       setIsLoading(false);
@@ -108,6 +119,7 @@ export function CompanyManagement() {
   const handleCancel = () => {
     setIsDialogOpen(false);
     setEditingCompany(null);
+    setError(null);
   };
 
   return (
@@ -137,6 +149,13 @@ export function CompanyManagement() {
               {editingCompany ? "Editar Empresa" : "Nova Empresa"}
             </DialogTitle>
           </DialogHeader>
+          {error && (
+            <MaintenanceAlert
+              title="Erro"
+              description={error}
+              severity="error"
+            />
+          )}
           <CompanyForm
             onSubmit={handleSubmit}
             onCancel={handleCancel}

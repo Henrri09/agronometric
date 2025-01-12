@@ -25,6 +25,29 @@ serve(async (req) => {
 
     const { companyName, adminEmail, adminName }: CreateCompanyRequest = await req.json()
 
+    // Primeiro, verificar se o usuário já existe
+    const { data: existingUser, error: userCheckError } = await supabaseClient.auth.admin.listUsers()
+    
+    if (userCheckError) {
+      console.error('Error checking existing user:', userCheckError)
+      throw userCheckError
+    }
+
+    const userExists = existingUser.users.some(user => user.email === adminEmail)
+    
+    if (userExists) {
+      console.error('User already exists:', adminEmail)
+      return new Response(
+        JSON.stringify({ 
+          error: "Este email já está cadastrado. Por favor, use outro email ou entre em contato com o suporte." 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
+    }
+
     // Gerar senha temporária
     const temporaryPassword = Math.random().toString(36).slice(-8)
 
@@ -38,7 +61,10 @@ serve(async (req) => {
       }
     })
 
-    if (authError) throw authError
+    if (authError) {
+      console.error('Error creating user:', authError)
+      throw authError
+    }
 
     // Criar empresa e configurar admin
     const { data: companyData, error: companyError } = await supabaseClient
@@ -48,7 +74,10 @@ serve(async (req) => {
         admin_full_name: adminName
       })
 
-    if (companyError) throw companyError
+    if (companyError) {
+      console.error('Error creating company:', companyError)
+      throw companyError
+    }
 
     // Enviar email de boas-vindas
     const { error: emailError } = await supabaseClient.functions.invoke('send-welcome-email', {
@@ -60,10 +89,13 @@ serve(async (req) => {
       }
     })
 
-    if (emailError) throw emailError
+    if (emailError) {
+      console.error('Error sending welcome email:', emailError)
+      throw emailError
+    }
 
-    console.log('Company created successfully:', companyData);
-    console.log('Welcome email sent to:', adminEmail);
+    console.log('Company created successfully:', companyData)
+    console.log('Welcome email sent to:', adminEmail)
 
     return new Response(
       JSON.stringify({ message: 'Company and admin created successfully' }),
@@ -74,7 +106,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in create-company function:', error);
+    console.error('Error in create-company function:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
