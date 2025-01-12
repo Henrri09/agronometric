@@ -18,25 +18,28 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting create-company function')
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     const { companyName, adminEmail, adminName }: CreateCompanyRequest = await req.json()
+    console.log('Request data:', { companyName, adminEmail, adminName })
 
     // Primeiro, verificar se o usuário já existe
-    const { data: existingUser, error: userCheckError } = await supabaseClient.auth.admin.listUsers()
+    const { data: existingUsers, error: userCheckError } = await supabaseClient.auth.admin.listUsers()
     
     if (userCheckError) {
-      console.error('Error checking existing user:', userCheckError)
-      throw userCheckError
+      console.error('Error checking existing users:', userCheckError)
+      throw new Error('Erro ao verificar usuários existentes')
     }
 
-    const userExists = existingUser.users.some(user => user.email === adminEmail)
+    const userExists = existingUsers.users.some(user => user.email === adminEmail)
     
     if (userExists) {
-      console.error('User already exists:', adminEmail)
+      console.log('User already exists:', adminEmail)
       return new Response(
         JSON.stringify({ 
           error: "Este email já está cadastrado. Por favor, use outro email ou entre em contato com o suporte." 
@@ -50,6 +53,7 @@ serve(async (req) => {
 
     // Gerar senha temporária
     const temporaryPassword = Math.random().toString(36).slice(-8)
+    console.log('Generated temporary password')
 
     // Criar o usuário admin
     const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
@@ -63,8 +67,10 @@ serve(async (req) => {
 
     if (authError) {
       console.error('Error creating user:', authError)
-      throw authError
+      throw new Error(`Erro ao criar usuário: ${authError.message}`)
     }
+
+    console.log('User created successfully')
 
     // Criar empresa e configurar admin
     const { data: companyData, error: companyError } = await supabaseClient
@@ -76,8 +82,10 @@ serve(async (req) => {
 
     if (companyError) {
       console.error('Error creating company:', companyError)
-      throw companyError
+      throw new Error(`Erro ao criar empresa: ${companyError.message}`)
     }
+
+    console.log('Company created successfully:', companyData)
 
     // Enviar email de boas-vindas
     const { error: emailError } = await supabaseClient.functions.invoke('send-welcome-email', {
@@ -91,14 +99,17 @@ serve(async (req) => {
 
     if (emailError) {
       console.error('Error sending welcome email:', emailError)
-      throw emailError
+      // Não vamos lançar erro aqui, pois a empresa já foi criada
+      console.log('Company creation successful but welcome email failed')
+    } else {
+      console.log('Welcome email sent successfully')
     }
 
-    console.log('Company created successfully:', companyData)
-    console.log('Welcome email sent to:', adminEmail)
-
     return new Response(
-      JSON.stringify({ message: 'Company and admin created successfully' }),
+      JSON.stringify({ 
+        message: 'Empresa e administrador criados com sucesso',
+        companyId: companyData 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -108,7 +119,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in create-company function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || 'Erro interno ao criar empresa'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 

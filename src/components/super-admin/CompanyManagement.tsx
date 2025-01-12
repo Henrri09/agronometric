@@ -35,7 +35,7 @@ export function CompanyManagement() {
       setCompanies(data || []);
     } catch (error: any) {
       console.error('Error fetching companies:', error);
-      toast.error(error.message || "Erro ao carregar empresas");
+      toast.error("Erro ao carregar empresas");
     }
   };
 
@@ -58,6 +58,7 @@ export function CompanyManagement() {
         if (updateError) throw updateError;
         
         toast.success("Empresa atualizada com sucesso!");
+        handleCancel();
       } else {
         // Criar nova empresa
         const { error: rpcError } = await supabase.functions.invoke('create-company', {
@@ -69,12 +70,10 @@ export function CompanyManagement() {
         });
 
         if (rpcError) {
-          // Verificar se é um erro de email duplicado
-          if (rpcError.message.includes('email address has already been registered')) {
-            setError('Este email já está cadastrado. Por favor, use outro email.');
-            return;
-          }
-          throw rpcError;
+          console.error('Error creating company:', rpcError);
+          setError(rpcError.message || "Erro ao criar empresa");
+          setIsLoading(false);
+          return;
         }
 
         toast.success("Empresa criada com sucesso!");
@@ -85,7 +84,6 @@ export function CompanyManagement() {
     } catch (error: any) {
       console.error('Error managing company:', error);
       setError(error.message || "Erro ao gerenciar empresa");
-      toast.error(error.message || "Erro ao gerenciar empresa");
     } finally {
       setIsLoading(false);
     }
