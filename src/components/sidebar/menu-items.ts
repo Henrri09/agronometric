@@ -9,7 +9,6 @@ import {
   ClipboardList,
   BookOpen,
   Ticket,
-  Building2,
   HeartHandshake,
   BookCheck,
   LineChart,
@@ -83,12 +82,6 @@ export const superAdminItems = [
     title: "Dashboard",
     href: "/super-admin",
     icon: LayoutDashboard,
-    role: "super_admin",
-  },
-  {
-    title: "Empresas",
-    href: "/super-admin/companies",
-    icon: Building2,
     role: "super_admin",
   },
   {
