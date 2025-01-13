@@ -31,7 +31,7 @@ serve(async (req) => {
     const { companyName, adminEmail, adminName, cnpj, address, location }: CreateCompanyRequest = await req.json()
     console.log('Request data:', { companyName, adminEmail, adminName, cnpj, address, location })
 
-    // Primeiro, verificar se o usuário já existe
+    // First, verify if the user already exists
     const { data: existingUsers, error: userCheckError } = await supabaseClient.auth.admin.listUsers()
     
     if (userCheckError) {
@@ -54,7 +54,7 @@ serve(async (req) => {
       )
     }
 
-    // Criar empresa com os dados adicionais
+    // Create company with the data
     const { data: companyData, error: companyError } = await supabaseClient
       .rpc('create_company_with_admin', {
         company_name: companyName,

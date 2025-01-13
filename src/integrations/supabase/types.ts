@@ -699,7 +699,10 @@ export type Database = {
         Args: {
           company_name: string
           admin_email: string
-          admin_full_name: string
+          admin_name: string
+          company_cnpj?: string
+          company_address?: string
+          company_location?: string
         }
         Returns: string
       }
