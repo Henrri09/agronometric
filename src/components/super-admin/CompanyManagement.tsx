@@ -60,7 +60,7 @@ export function CompanyManagement() {
         toast.success("Empresa atualizada com sucesso!");
         handleCancel();
       } else {
-        // Criar nova empresa
+        // Create new company
         const { data: response, error: rpcError } = await supabase.functions.invoke('create-company', {
           body: {
             companyName: data.name,
@@ -74,14 +74,13 @@ export function CompanyManagement() {
 
         if (rpcError) {
           console.error('Error creating company:', rpcError);
-          // Try to parse the error message from the response
           try {
+            // Try to parse the error message from the response
             const errorBody = JSON.parse(rpcError.message);
             setError(errorBody.error || "Erro ao criar empresa");
           } catch {
             setError(rpcError.message || "Erro ao criar empresa");
           }
-          setIsLoading(false);
           return;
         }
 
