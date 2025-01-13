@@ -61,17 +61,26 @@ export function CompanyManagement() {
         handleCancel();
       } else {
         // Criar nova empresa
-        const { error: rpcError } = await supabase.functions.invoke('create-company', {
+        const { data: response, error: rpcError } = await supabase.functions.invoke('create-company', {
           body: {
             companyName: data.name,
             adminEmail: data.adminEmail,
-            adminName: data.adminName
+            adminName: data.adminName,
+            cnpj: data.cnpj,
+            address: data.address,
+            location: data.location
           }
         });
 
         if (rpcError) {
           console.error('Error creating company:', rpcError);
-          setError(rpcError.message || "Erro ao criar empresa");
+          // Try to parse the error message from the response
+          try {
+            const errorBody = JSON.parse(rpcError.message);
+            setError(errorBody.error || "Erro ao criar empresa");
+          } catch {
+            setError(rpcError.message || "Erro ao criar empresa");
+          }
           setIsLoading(false);
           return;
         }
