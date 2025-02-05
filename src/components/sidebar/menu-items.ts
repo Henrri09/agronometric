@@ -12,6 +12,7 @@ import {
   HeartHandshake,
   BookCheck,
   LineChart,
+  ListTodo,
 } from "lucide-react";
 
 export const menuItems = [
@@ -56,6 +57,12 @@ export const menuItems = [
     href: "/analytics",
     icon: BarChart,
     role: "common",
+  },
+  {
+    title: "Gerenciamento de Tarefas",
+    href: "/task-management",
+    icon: ListTodo,
+    role: "visitor",
   },
   {
     title: "Documentação",
