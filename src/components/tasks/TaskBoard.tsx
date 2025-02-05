@@ -1,4 +1,5 @@
-import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
+
+import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { DraggableTaskColumn } from "./DraggableTaskColumn";
@@ -24,9 +25,19 @@ interface TaskBoardProps {
   sensors: any;
 }
 
-export function TaskBoard({ tasks, sensors }: TaskBoardProps) {
+export function TaskBoard({ tasks }: TaskBoardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Configuração otimizada dos sensores
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Reduz a distância necessária para iniciar o drag
+        tolerance: 5, // Aumenta a tolerância para movimentos pequenos
+      },
+    })
+  );
 
   const updateTaskStatus = async (id: string, status: string) => {
     const { error } = await supabase
@@ -90,7 +101,7 @@ export function TaskBoard({ tasks, sensors }: TaskBoardProps) {
 
   return (
     <DndContext 
-      sensors={sensors} 
+      sensors={sensors}
       onDragEnd={handleDragEnd}
     >
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
