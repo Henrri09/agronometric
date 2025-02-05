@@ -1,4 +1,4 @@
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { DraggableTaskColumn } from "./DraggableTaskColumn";
@@ -89,7 +89,10 @@ export function TaskBoard({ tasks, sensors }: TaskBoardProps) {
   const doneTasks = getTasksByStatus("done");
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext 
+      sensors={sensors} 
+      onDragEnd={handleDragEnd}
+    >
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <DraggableTaskColumn
           id="todo"
