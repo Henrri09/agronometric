@@ -1,5 +1,5 @@
 
-import { MoreVertical, Calendar } from "lucide-react";
+import { MoreVertical, Calendar, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -54,48 +54,29 @@ export function TaskCard({
 }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "urgent":
-        return "bg-red-500/80";
-      case "high":
-        return "bg-orange-500/80";
-      case "medium":
-        return "bg-yellow-500/80";
-      case "low":
-        return "bg-blue-500/80";
+  const getServiceTypeClass = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case "preventive":
+        return "bg-blue-100 text-blue-700";
+      case "corrective":
+        return "bg-orange-100 text-orange-700";
       default:
-        return "bg-blue-500/80";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "todo":
-        return <Badge variant="outline">A fazer</Badge>;
+        return <Badge variant="outline" className="bg-white">A fazer</Badge>;
       case "in_progress":
-        return <Badge className="bg-primary/80">Em andamento</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-none">Em andamento</Badge>;
       case "review":
-        return <Badge className="bg-warning/80">Em revisão</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-none">Em revisão</Badge>;
       case "done":
-        return <Badge className="bg-success/80">Concluído</Badge>;
+        return <Badge className="bg-success/20 text-success border-none">Concluído</Badge>;
       default:
         return <Badge>{status}</Badge>;
-    }
-  };
-
-  const getPriorityLabel = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "urgent":
-        return "Urgente";
-      case "high":
-        return "Alta";
-      case "medium":
-        return "Média";
-      case "low":
-        return "Baixa";
-      default:
-        return priority;
     }
   };
 
@@ -103,12 +84,7 @@ export function TaskCard({
     <Card className="bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200">
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between">
-          <TaskCardHeader
-            title={title}
-            description={description}
-            isExpanded={isExpanded}
-            onToggleExpand={() => setIsExpanded(!isExpanded)}
-          />
+          <h3 className="font-medium text-base">{title}</h3>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -138,19 +114,37 @@ export function TaskCard({
           </DropdownMenu>
         </div>
 
+        {description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+        )}
+
         <div className="flex items-center gap-2">
           {getStatusBadge(status)}
-          <Badge className={getPriorityColor(priority)}>
-            {getPriorityLabel(priority)}
-          </Badge>
+          {serviceOrders && (
+            <Badge 
+              className={`${getServiceTypeClass(serviceOrders.service_type)} border-none`}
+            >
+              {serviceOrders.service_type === "preventive" ? "preventiva" : serviceOrders.service_type}
+            </Badge>
+          )}
         </div>
 
-        {date && (
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Calendar className="mr-2 h-4 w-4" />
-            {format(new Date(date), "dd 'de' MMMM", { locale: ptBR })}
-          </div>
-        )}
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          {date && (
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              {format(new Date(date), "dd 'de' MMMM", { locale: ptBR })}
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-sm hover:bg-transparent hover:text-primary p-0"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? "Ver menos" : "Ver mais"}
+          </Button>
+        </div>
 
         {isExpanded && serviceOrders && (
           <ServiceOrderDetails serviceOrder={serviceOrders} />
