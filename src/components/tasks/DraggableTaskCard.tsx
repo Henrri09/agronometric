@@ -32,9 +32,10 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: transition || 'transform 0.3s ease-in-out',
+    transition: transition || undefined,
     opacity: isDragging ? 0.5 : 1,
-    cursor: 'grab',
+    position: 'relative' as const,
+    zIndex: isDragging ? 999 : 'auto',
     touchAction: 'none',
   };
 
@@ -44,7 +45,7 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-manipulation transform transition-all duration-300 ease-in-out hover:scale-[1.02] active:scale-[1.01]"
+      className="touch-manipulation transform transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[1.01] will-change-transform"
     >
       <TaskCard {...props} />
     </div>
