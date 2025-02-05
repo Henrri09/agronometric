@@ -29,12 +29,13 @@ export function TaskBoard({ tasks }: TaskBoardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Configuração otimizada dos sensores
+  // Configuração otimizada dos sensores para movimento mais suave
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Reduz a distância necessária para iniciar o drag
-        tolerance: 5, // Aumenta a tolerância para movimentos pequenos
+        distance: 5, // Reduz ainda mais a distância para iniciar o drag
+        tolerance: 3, // Menor tolerância para mais precisão
+        delay: 0, // Remove qualquer delay no início do drag
       },
     })
   );

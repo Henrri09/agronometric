@@ -31,18 +31,18 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
     isDragging,
   } = useSortable({ 
     id: props.id,
-    animateLayoutChanges: () => false // Desativa animações de layout para melhor performance
+    animateLayoutChanges: () => true // Ativa animações suaves de layout
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: transition || undefined,
-    opacity: isDragging ? 0.5 : 1,
+    transition: transition || 'transform 200ms ease-in-out',
+    opacity: isDragging ? 0.6 : 1,
     position: 'relative' as const,
     zIndex: isDragging ? 999 : 'auto',
     touchAction: 'none',
     cursor: isDragging ? 'grabbing' : 'grab',
-    willChange: 'transform', // Otimiza a performance das transformações
+    willChange: 'transform',
   };
 
   return (
@@ -51,7 +51,7 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-manipulation select-none motion-reduce:transform-none"
+      className="touch-manipulation select-none transform transition-all duration-200 ease-in-out hover:shadow-md active:shadow-lg"
     >
       <TaskCard {...props} />
     </div>
