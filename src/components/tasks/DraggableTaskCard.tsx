@@ -1,3 +1,4 @@
+
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskCard } from "./TaskCard";
@@ -32,7 +33,7 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition: transition || "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+    transition: transition || "transform 200ms cubic-bezier(0.2, 0, 0, 1)",
     opacity: isDragging ? 0.8 : 1,
     position: 'relative' as const,
     zIndex: isDragging ? 999 : 'auto',
@@ -46,7 +47,7 @@ export function DraggableTaskCard(props: DraggableTaskCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="touch-manipulation select-none transform will-change-transform motion-reduce:transform-none transition-all duration-150 ease-in-out hover:scale-[1.02] active:scale-[1.01] hover:shadow-md"
+      className="touch-manipulation select-none transform will-change-transform motion-reduce:transform-none transition-all duration-200 ease-in-out hover:scale-[1.02] active:scale-[1.01] hover:shadow-lg"
     >
       <TaskCard {...props} />
     </div>

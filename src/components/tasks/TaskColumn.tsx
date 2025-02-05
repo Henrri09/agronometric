@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskCard } from "./TaskCard";
 import { ReactNode } from "react";
@@ -38,17 +39,17 @@ export function TaskColumn({
   renderTask,
 }: TaskColumnProps) {
   return (
-    <Card>
+    <Card className="bg-[#7AE09A]/20 border-none">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between text-base font-medium">
           {title}
-          <span className="rounded-full bg-primary/10 px-2 py-1 text-xs">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold">
             {count} {count === 1 ? "tarefa" : "tarefas"}
           </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-2">
-        <div className="space-y-2">
+        <div className="space-y-3">
           {tasks.map((task) =>
             renderTask ? (
               renderTask(task)
