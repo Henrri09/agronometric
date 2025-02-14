@@ -1,22 +1,21 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-Deno.serve(async (req) => {
-  try {
-    const { userId } = await req.json()
-    
-    // Get environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Missing environment variables.')
+const supabaseClient = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
     }
+  }
+)
 
-    // Initialize Supabase client with service role key
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    // Delete the user from auth.users
-    const { error: deleteError } = await supabase.auth.admin.deleteUser(
+const deleteUser = async (userId: string) => {
+  try {
+    const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(
       userId
     )
 
@@ -25,17 +24,42 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ message: 'User deleted successfully' }),
       {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200,
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      }
     )
+  } catch (error) {
+    console.error('Error in delete-user function:', error)
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      }
+    )
+  }
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const { userId } = await req.json()
+
+    if (!userId) {
+      throw new Error('Missing required field: userId')
+    }
+
+    return await deleteUser(userId)
   } catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        headers: { 'Content-Type': 'application/json' },
-        status: 400,
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400
+      }
     )
   }
 })

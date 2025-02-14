@@ -8,12 +8,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserFormValues } from "@/components/users/UserForm";
 import { UserList, User } from "@/components/users/UserList";
 import { UserDialog } from "@/components/users/UserDialog";
+import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const { companyId } = useCompanyId();
 
   useEffect(() => {
     checkAdminStatus();
@@ -28,34 +31,37 @@ export default function Users() {
         .select("role")
         .eq("user_id", session.user.id)
         .single();
-      
+
       setIsAdmin(roles?.role === "admin");
     }
   };
 
   const fetchUsers = async () => {
     try {
+
+
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("*");
+        .select("*")
+        .eq('company_id', companyId);
 
       if (profilesError) throw profilesError;
 
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
-        .select("*");
+        .select("*")
 
       if (rolesError) throw rolesError;
 
       const combinedUsers = profiles?.map(profile => {
         const userRole = userRoles?.find(role => role.user_id === profile.id);
         const role = userRole?.role;
-        
+
         if (role === "super_admin") return null;
-        
+
         return {
           id: profile.id,
           email: "",
@@ -78,7 +84,8 @@ export default function Users() {
         const { error: profileError } = await supabase
           .from("profiles")
           .update({ full_name: data.full_name })
-          .eq("id", selectedUser.id);
+          .eq("company_id", companyId)
+          .eq("id", selectedUser.id)
 
         if (profileError) throw profileError;
 
@@ -100,6 +107,7 @@ export default function Users() {
           options: {
             data: {
               full_name: data.full_name,
+              company_id: companyId
             },
           }
         });
@@ -156,7 +164,7 @@ export default function Users() {
       });
 
       if (deleteError) throw deleteError;
-      
+
       toast.success("Usuário excluído com sucesso!");
       fetchUsers();
     } catch (error: any) {
@@ -180,7 +188,7 @@ export default function Users() {
         title="Gestão de Usuários"
         description="Gerencie os usuários do sistema e suas permissões"
       />
-      
+
       <div className="mb-4">
         <Button
           onClick={() => {

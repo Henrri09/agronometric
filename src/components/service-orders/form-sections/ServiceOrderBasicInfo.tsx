@@ -6,21 +6,25 @@ import { Control } from "react-hook-form";
 import { ServiceOrderFormValues } from "../schema";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
 interface ServiceOrderBasicInfoProps {
   control: Control<ServiceOrderFormValues>;
 }
 
 export function ServiceOrderBasicInfo({ control }: ServiceOrderBasicInfoProps) {
   // Fetch users list
+
+  const { companyId } = useCompanyId();
+
   const { data: users } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
+        .eq('company_id', companyId)
         .order('full_name');
-      
+
       if (error) throw error;
       return data;
     },

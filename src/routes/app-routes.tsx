@@ -4,7 +4,9 @@ import { AppLayout } from "./app-layout";
 
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import ResetPassword from "@/pages/ResetPassword";
+import RequestReset from "@/pages/RequestReset";
+import NewPassword from "@/pages/NewPassword";
+import SetInitialPassword from "@/pages/SetInitialPassword";
 import Dashboard from "@/pages/Dashboard";
 import Users from "@/pages/Users";
 import Machinery from "@/pages/Machinery";
@@ -28,8 +30,10 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      
+      <Route path="/request-reset" element={<RequestReset />} />
+      <Route path="/reset-password" element={<NewPassword />} />
+      <Route path="/set-initial-password" element={<SetInitialPassword />} />
+
       {/* Super Admin Routes */}
       <Route
         path="/super-admin/*"

@@ -39,7 +39,7 @@ export default function Login() {
     try {
       setLoading(true);
       console.log("Iniciando login...");
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -60,7 +60,7 @@ export default function Login() {
 
         console.log("Login realizado com sucesso!");
         toast.success("Login realizado com sucesso!");
-        
+
         if (roleData?.role === 'super_admin') {
           navigate("/super-admin");
         } else {
@@ -84,7 +84,7 @@ export default function Login() {
     try {
       setLoading(true);
       console.log("Enviando email de redefinição de senha...");
-      
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
@@ -113,7 +113,7 @@ export default function Login() {
           <h1 className="text-2xl font-bold text-accent mb-2">AgroMetric</h1>
           <p className="text-accent/70">Faça login para continuar</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <div className="relative">
@@ -128,7 +128,7 @@ export default function Login() {
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-5 w-5 text-primary/60" />
@@ -149,19 +149,7 @@ export default function Login() {
           </Button>
 
           <div className="flex flex-col items-center space-y-4">
-            <div className="flex flex-col items-center space-y-2 w-full">
-              <p className="text-center text-sm text-accent/70">
-                Não tem uma conta?{" "}
-                <button
-                  type="button"
-                  onClick={() => navigate("/register")}
-                  className="text-primary hover:text-primary-hover hover:underline"
-                  disabled={loading}
-                >
-                  Registre-se
-                </button>
-              </p>
-              
+            <div className="flex flex-col items-center w-full">
               <button
                 type="button"
                 onClick={handleResetPassword}
@@ -177,7 +165,7 @@ export default function Login() {
                 </p>
               )}
             </div>
-            
+
             <SupportChat />
           </div>
         </form>
