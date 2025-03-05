@@ -8,18 +8,21 @@ import { MachineryForm } from "@/components/machinery/MachineryForm";
 import { Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
 export default function Machinery() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data: machinery, refetch } = useQuery({
+  const { companyId } = useCompanyId();
+
+  const { data: machinery, refetch, isLoading } = useQuery({
     queryKey: ['machinery'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('machinery')
         .select('*')
+        .eq('company_id', companyId)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -44,14 +47,14 @@ export default function Machinery() {
         title="Gestão de Maquinários"
         description="Gerencie todos os equipamentos cadastrados no sistema"
       />
-      
+
       <div className="flex justify-end">
         <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Maquinário
         </Button>
       </div>
-      
+
       <Card>
         <CardContent className="p-6">
           <Table>
@@ -64,14 +67,22 @@ export default function Machinery() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {machinery?.map((machine) => (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">Carregando...</TableCell>
+                </TableRow>
+              ) : machinery?.length > 0 ? machinery.map((machine) => (
                 <TableRow key={machine.id}>
                   <TableCell>{machine.name}</TableCell>
                   <TableCell>{machine.model}</TableCell>
                   <TableCell>{machine.serial_number}</TableCell>
                   <TableCell>{getStatusText(machine.status)}</TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow style={{ height: 100 }}>
+                  <TableCell colSpan={4} className="text-center">Nenhum maquinário encontrado</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

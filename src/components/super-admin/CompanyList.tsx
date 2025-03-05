@@ -39,7 +39,7 @@ interface CompanyListProps {
 
 export function CompanyList({ companies, onRefresh, onEdit, onDelete }: CompanyListProps) {
   const [deleteCompanyId, setDeleteCompanyId] = useState<string | null>(null);
-  
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":

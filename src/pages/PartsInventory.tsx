@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { TablesInsert } from "@/integrations/supabase/types";
+import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -31,7 +32,7 @@ export default function PartsInventory() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
+  const { companyId } = useCompanyId();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +51,8 @@ export default function PartsInventory() {
       const { data, error } = await supabase
         .from("parts_inventory")
         .select("*")
-        .order("name");
-
+        .order("name")
+        .eq('company_id', companyId);
       if (error) throw error;
       return data;
     },
@@ -248,7 +249,7 @@ export default function PartsInventory() {
                 </TableRow>
               ) : parts?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center">
+                  <TableCell style={{ height: 100 }} colSpan={7} className="text-center">
                     Nenhuma peça cadastrada
                   </TableCell>
                 </TableRow>

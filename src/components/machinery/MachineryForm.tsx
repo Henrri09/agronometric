@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { useCompanyId } from "../dashboard/CompanyIdProvider";
 
 const machineryFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -40,6 +41,9 @@ interface MachineryFormProps {
 export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const { companyId } = useCompanyId();
+
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -72,7 +76,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
         const context = canvas.getContext('2d');
         if (context) {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
+
           // Convert to file
           canvas.toBlob((blob) => {
             if (blob) {
@@ -105,6 +109,10 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
     try {
       setIsUploading(true);
 
+      const { data: user, error: userError } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+
       // First insert the machinery data
       const { data: machinery, error: machineryError } = await supabase
         .from('machinery')
@@ -113,6 +121,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
           model: data.model,
           serial_number: data.serial_number,
           status: data.status,
+          company_id: companyId,
         })
         .select()
         .single();
@@ -152,7 +161,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
         title: "Sucesso",
         description: "Maquinário cadastrado com sucesso",
       });
-      
+
       onSuccess();
     } catch (error) {
       console.error('Error creating machinery:', error);

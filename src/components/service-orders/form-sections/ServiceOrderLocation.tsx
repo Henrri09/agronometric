@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { MachineryForm } from "@/components/machinery/MachineryForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
 interface ServiceOrderLocationProps {
   control: Control<ServiceOrderFormValues>;
 }
@@ -19,7 +19,7 @@ interface ServiceOrderLocationProps {
 export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
   const isMobile = useIsMobile();
   const [isNewMachineryDialogOpen, setIsNewMachineryDialogOpen] = useState(false);
-
+  const { companyId } = useCompanyId();
   // Fetch machinery list
   const { data: machinery, refetch: refetchMachinery } = useQuery({
     queryKey: ['machinery'],
@@ -27,8 +27,9 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
       const { data, error } = await supabase
         .from('machinery')
         .select('*')
+        .eq('company_id', companyId)
         .order('name');
-      
+
       if (error) throw error;
       return data;
     },
@@ -40,7 +41,7 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
       input.type = 'file';
       input.accept = 'image/*';
       input.capture = 'environment';
-      
+
       input.onchange = (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (file) {
@@ -48,7 +49,7 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
           // Here you would handle the file upload to your storage
         }
       };
-      
+
       input.click();
     } catch (error) {
       console.error('Error capturing photo:', error);
@@ -58,7 +59,7 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
   return (
     <div className="space-y-4 rounded-lg border p-4">
       <h2 className="text-lg font-semibold">Informações do Equipamento</h2>
-      
+
       <FormField
         control={control}
         name="machinery_id"
@@ -80,8 +81,8 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
                   ))}
                 </SelectContent>
               </Select>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 variant="outline"
                 onClick={() => setIsNewMachineryDialogOpen(true)}
               >
@@ -132,9 +133,9 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
             Upload
           </Button>
           {isMobile && (
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               className="w-32"
               onClick={() => handleCameraCapture('machinery-photo')}
             >
@@ -153,9 +154,9 @@ export function ServiceOrderLocation({ control }: ServiceOrderLocationProps) {
             Upload
           </Button>
           {isMobile && (
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               className="w-32"
               onClick={() => handleCameraCapture('problem-photo')}
             >
