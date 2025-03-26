@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -30,6 +30,7 @@ type MachineryFormValues = {
   model: string;
   serial_number?: string;
   status: "active" | "maintenance" | "inactive";
+  commodity: string;
   maintenance_frequency: string;
 };
 
@@ -41,6 +42,26 @@ interface MachineryFormProps {
 export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [commodities, setCommodities] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCommodities = async () => {
+      try {
+        const { data, error } = await supabase.from('commodities').select('*');
+        if (error) {
+          console.error('Error fetching commodities:', error);
+        }
+        console.log(data);
+        if (data) {
+          setCommodities(data);
+        }
+
+      } catch (error) {
+        console.error('Error fetching commodities:', error);
+      }
+    };
+    fetchCommodities();
+  }, []);
 
   const { companyId } = useCompanyId();
 
@@ -242,6 +263,32 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="commodity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Commodity</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a commodity" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {commodities.map((commodity) => (
+                    <SelectItem key={commodity.id} value={commodity.id}>
+                      {commodity.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
 
         <FormField
           control={form.control}

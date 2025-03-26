@@ -129,6 +129,59 @@ export type Database = {
           },
         ]
       }
+      commodities: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      commodity_prices: {
+        Row: {
+          commodity_id: string
+          created_at: string
+          id: number
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          commodity_id: string
+          created_at?: string
+          id?: number
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          commodity_id?: string
+          created_at?: string
+          id?: number
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_prices_commodity_id_fkey"
+            columns: ["commodity_id"]
+            isOneToOne: false
+            referencedRelation: "commodities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address: string | null
