@@ -35,8 +35,7 @@ export default function Tickets() {
       const { data, error } = await supabase
         .from('bug_reports')
         .select(`
-          *,
-          responses:bug_report_responses(response_text, created_at)
+          *
         `)
         .eq('reporter_id', user.id)
         .order('created_at', { ascending: false });
@@ -84,7 +83,7 @@ export default function Tickets() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bugReports.map((report) => (
+              {bugReports.length > 0 ? bugReports.map((report) => (
                 <TableRow key={report.id}>
                   <TableCell>
                     <div>
@@ -116,7 +115,13 @@ export default function Tickets() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center pt-8">
+                    <p className="text-muted-foreground">Nenhum ticket encontrado</p>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -6,9 +6,7 @@ type CompanyIdContextType = {
   companyId: string | null;
 };
 
-const CompanyIdContext = createContext<CompanyIdContextType>({ companyId: null });
-
-export const useCompanyId = () => useContext(CompanyIdContext);
+export const CompanyIdContext = createContext<CompanyIdContextType>({ companyId: null });
 
 export function CompanyIdProvider({ children }: { children: React.ReactNode }) {
   const [companyId, setCompanyId] = useState<string | null>(null);

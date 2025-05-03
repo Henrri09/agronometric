@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Bug, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCompanyId } from "@/hooks/useCompanyId";
+
 
 export function BugReportDialog() {
   const [bugReport, setBugReport] = useState({ title: "", description: "" });
@@ -22,6 +24,8 @@ export function BugReportDialog() {
       setSelectedFile(file);
     }
   };
+
+  const { companyId } = useCompanyId();
 
   const handleBugReport = async () => {
     if (!bugReport.title || !bugReport.description) {
@@ -50,12 +54,21 @@ export function BugReportDialog() {
         screenshot_url = publicUrl;
       }
 
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error("Usuário não encontrado");
+        return;
+      }
+
       const { error } = await supabase
         .from('bug_reports')
         .insert([{
           title: bugReport.title,
           description: bugReport.description,
           screenshot_url,
+          company_id: companyId,
+          reporter_id: user?.id,
         }]);
 
       if (error) throw error;
@@ -138,8 +151,8 @@ export function BugReportDialog() {
               Máximo: 5MB. Formatos aceitos: PNG, JPG, JPEG
             </p>
           </div>
-          <Button 
-            onClick={handleBugReport} 
+          <Button
+            onClick={handleBugReport}
             className="w-full"
             disabled={isSubmitting}
           >

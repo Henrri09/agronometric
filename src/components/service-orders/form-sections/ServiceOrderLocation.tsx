@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { MachineryForm } from "@/components/machinery/MachineryForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
+
 interface ServiceOrderLocationProps {
   control: Control<ServiceOrderFormValues>;
 }

@@ -12,6 +12,7 @@ import {
   HeartHandshake,
   BookCheck,
   LineChart,
+  ListChecks,
 } from "lucide-react";
 
 export const menuItems = [
@@ -49,6 +50,12 @@ export const menuItems = [
     title: "Tickets",
     href: "/tickets",
     icon: Ticket,
+    role: "common",
+  },
+  {
+    title: "Gestão de Tarefas",
+    href: "/task-management",
+    icon: ListChecks,
     role: "common",
   },
   {

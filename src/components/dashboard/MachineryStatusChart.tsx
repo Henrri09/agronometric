@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCompanyId } from "./CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -43,7 +43,7 @@ export function MachineryStatusChart() {
 
       return Object.entries(statusCount).map(([status, value]) => ({
         name: status === 'active' ? 'Ativo' :
-              status === 'maintenance' ? 'Em Manutenção' : 'Inativo',
+          status === 'maintenance' ? 'Em Manutenção' : 'Inativo',
         value
       }));
     },

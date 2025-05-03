@@ -1,4 +1,4 @@
-import { MaintenanceAlert } from "@/components/MaintenanceAlert";
+import { MaintenanceAlert } from "@/pages/dashboard/components/MaintenanceAlert";
 import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { MaintenanceChart } from "@/components/dashboard/MaintenanceChart";
 import { MachineryStatusChart } from "@/components/dashboard/MachineryStatusChart";

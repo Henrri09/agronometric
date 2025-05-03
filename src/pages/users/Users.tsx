@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserFormValues } from "@/components/users/UserForm";
 import { UserList, User } from "@/components/users/UserList";
 import { UserDialog } from "@/components/users/UserDialog";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);

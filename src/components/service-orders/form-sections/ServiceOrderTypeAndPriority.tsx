@@ -18,7 +18,7 @@ export function ServiceOrderTypeAndPriority({ control }: ServiceOrderTypeAndPrio
             <FormLabel>Tipo de Serviço</FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger >
                   <SelectValue placeholder="Selecione o tipo de serviço" />
                 </SelectTrigger>
               </FormControl>

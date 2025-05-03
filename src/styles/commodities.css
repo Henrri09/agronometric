@@ -1,0 +1,301 @@
+.commodities-banner {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.commodities-banner h1 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.commodity-carousel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.commodity-item {
+    background-color: white;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.commodity-item h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1e40af;
+    font-size: 1.25rem;
+    text-align: center;
+}
+
+/* Estilo para o container do gráfico */
+.chart-container {
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilo para o resumo de preços */
+.price-summary {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.price-item {
+    background-color: #f3f4f6;
+    border-radius: 4px;
+    padding: 0.75rem;
+    min-width: 150px;
+    text-align: center;
+    flex: 1;
+    max-width: 250px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.price-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.price-label {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.price-value {
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin: 0 0 0.25rem 0;
+    color: #047857;
+}
+
+.price-date {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.carousel-controls button {
+    background-color: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.carousel-controls button:hover {
+    background-color: #1e3a8a;
+    transform: translateY(-2px);
+}
+
+.carousel-controls button:active {
+    transform: translateY(0);
+}
+
+.carousel-indicators {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.indicator:hover {
+    transform: scale(1.2);
+}
+
+.indicator.active {
+    background-color: #1e40af;
+}
+
+/* Estilos para o tooltip do gráfico */
+.recharts-tooltip-wrapper {
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.recharts-tooltip-item-name,
+.recharts-tooltip-item-value {
+    color: #333;
+}
+
+.recharts-tooltip-label {
+    font-weight: bold;
+    color: #1e40af;
+}
+
+/* Estilo para as barras do gráfico ao passar o mouse */
+.recharts-rectangle.recharts-bar-rectangle:hover {
+    filter: brightness(0.9);
+    cursor: pointer;
+}
+
+/* Melhorar a legibilidade dos eixos */
+.recharts-cartesian-axis-tick-value {
+    fill: #666;
+    font-size: 0.8rem;
+}
+
+/* Garantir que os valores no eixo Y não quebrem */
+.recharts-cartesian-axis.recharts-yAxis .recharts-cartesian-axis-tick-value tspan {
+    font-size: 11px;
+    text-anchor: end;
+}
+
+.recharts-legend-item-text {
+    color: #333 !important;
+    font-weight: 500;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .price-summary {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .price-item {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Estilos para o ticker de commodities */
+.ticker-container {
+    background-color: #111827;
+    overflow: hidden;
+    width: 100%;
+    height: 40px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    user-select: none;
+    /* Garantir que o ticker não sofra com problemas de renderização */
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
+
+.ticker-content {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    white-space: nowrap;
+    /* Garantir renderização suave */
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+@keyframes ticker {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+/* Assegura suavidade no Safari */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    @keyframes ticker {
+        0% {
+            -webkit-transform: translate3d(0, 0, 0);
+        }
+        100% {
+            -webkit-transform: translate3d(-50%, 0, 0);
+        }
+    }
+}
+
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 15px;
+    color: white;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ticker-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.ticker-symbol {
+    font-weight: 600;
+    margin-right: 10px;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.ticker-price {
+    margin-right: 10px;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.ticker-variation {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    min-width: 65px;
+    text-align: center;
+}
+
+.ticker-variation.positive {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.ticker-variation.negative {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Estado de carregamento */
+.ticker-container:empty::before {
+    content: "Carregando...";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}

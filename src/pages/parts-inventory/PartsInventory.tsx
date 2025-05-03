@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { TablesInsert } from "@/integrations/supabase/types";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 
 const formSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -62,6 +62,7 @@ export default function PartsInventory() {
     mutationFn: async (values: FormValues) => {
       const insertData: TablesInsert<"parts_inventory"> = {
         name: values.name,
+        company_id: companyId,
         description: values.description || null,
         quantity: values.quantity,
         minimum_quantity: values.minimum_quantity,

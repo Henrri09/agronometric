@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { CompanyForm, CompanyFormValues } from "@/components/super-admin/CompanyForm";
 import { CompanyList } from "@/components/super-admin/CompanyList";
-import { MaintenanceAlert } from "@/components/MaintenanceAlert";
+import { MaintenanceAlert } from "@/pages/dashboard/components/MaintenanceAlert";
 
 export function CompanyManagement() {
   const [companies, setCompanies] = useState<any[]>([]);

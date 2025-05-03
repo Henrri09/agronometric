@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCompanyId } from "./CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -13,7 +13,7 @@ export function MaintenanceChart() {
     queryKey: ['maintenance-chart', companyId],
     queryFn: async () => {
       if (!companyId) return [];
-      
+
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 3);
 
@@ -38,7 +38,7 @@ export function MaintenanceChart() {
       }
 
       const monthlyData: Record<string, { preventive: number; corrective: number }> = {};
-      
+
       maintenanceData?.forEach(maintenance => {
         const month = new Date(maintenance.maintenance_date).toLocaleString('pt-BR', { month: 'short' });
         if (!monthlyData[month]) {

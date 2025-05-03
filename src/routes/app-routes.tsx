@@ -2,28 +2,28 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./protected-route";
 import { AppLayout } from "./app-layout";
 
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import RequestReset from "@/pages/RequestReset";
-import NewPassword from "@/pages/NewPassword";
-import SetInitialPassword from "@/pages/SetInitialPassword";
-import Dashboard from "@/pages/Dashboard";
-import Users from "@/pages/Users";
-import Machinery from "@/pages/Machinery";
-import ServiceOrders from "@/pages/ServiceOrders";
-import Analytics from "@/pages/Analytics";
-import Settings from "@/pages/Settings";
-import TaskManagement from "@/pages/TaskManagement";
-import Calendar from "@/pages/Calendar";
-import PartsInventory from "@/pages/PartsInventory";
-import MaintenanceSchedule from "@/pages/MaintenanceSchedule";
+import Login from "@/pages/login/Login";
+import Register from "@/pages/register/Register";
+import RequestReset from "@/pages/request-reset/RequestReset";
+import NewPassword from "@/pages/new-password/NewPassword";
+import SetInitialPassword from "@/pages/set-initial-password/SetInitialPassword";
+import Dashboard from "@/pages/dashboard/Dashboard";
+import Users from "@/pages/users/Users";
+import Machinery from "@/pages/machinery/Machinery";
+import ServiceOrders from "@/pages/service-orders/ServiceOrders";
+import Analytics from "@/pages/analytics/Analytics";
+import Settings from "@/pages/settings/Settings";
+import TaskManagement from "@/pages/task-management/TaskManagement";
+import Calendar from "@/pages/calendar/Calendar";
+import PartsInventory from "@/pages/parts-inventory/PartsInventory";
+import MaintenanceSchedule from "@/pages/maintenance-schedule/MaintenanceSchedule";
 import SuperAdmin from "@/pages/SuperAdmin";
 import FinancialManagement from "@/pages/super-admin/FinancialManagement";
 import SuperAdminAnalytics from "@/pages/super-admin/SuperAdminAnalytics";
 import SupportTickets from "@/pages/super-admin/SupportTickets";
 import TutorialManagement from "@/pages/super-admin/TutorialManagement";
-import Documentation from "@/pages/Documentation";
-import Tickets from "@/pages/Tickets";
+import Documentation from "@/pages/documentation/Documentation";
+import Tickets from "@/pages/tickets/Tickets";
 
 export const AppRoutes = () => {
   return (

@@ -8,11 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { isSameDay } from "date-fns";
 import { CalendarDayContent } from "@/components/calendar/CalendarDayContent";
 import { ServiceOrdersList } from "@/components/calendar/ServiceOrdersList";
-import { MaintenanceAlert } from "@/components/MaintenanceAlert";
+import { MaintenanceAlert } from "@/pages/dashboard/components/MaintenanceAlert";
 
 export default function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  
+
   const { data: serviceOrders, isLoading } = useQuery({
     queryKey: ["service-orders"],
     queryFn: async () => {
@@ -98,9 +98,9 @@ export default function Calendar() {
               className="rounded-md border"
               components={{
                 DayContent: ({ date: dayDate }) => (
-                  <CalendarDayContent 
-                    day={dayDate} 
-                    serviceOrders={serviceOrders || []} 
+                  <CalendarDayContent
+                    day={dayDate}
+                    serviceOrders={serviceOrders || []}
                   />
                 ),
               }}

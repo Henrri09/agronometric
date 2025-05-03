@@ -1,12 +1,14 @@
 import { PageHeader } from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MaintenanceAlert } from "@/components/MaintenanceAlert";
+import { MaintenanceAlert } from "@/pages/dashboard/components/MaintenanceAlert";
 import { DashboardCard } from "@/components/DashboardCard";
 import { Users, Wrench, ClipboardList, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 import type { Database } from "@/integrations/supabase/types";
+import { useQuery } from "@tanstack/react-query";
+import { CommoditiesBanner } from "./components/CommoditiesBanner";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type MaintenanceHistory = Database['public']['Tables']['maintenance_history']['Row'];
@@ -76,12 +78,16 @@ export default function Dashboard() {
     fetchData();
   }, [companyId]);
 
-  const calculateTotalCost = (orders: ServiceOrder[]) => {
-    return orders.reduce((acc, order) => {
-      const maintenanceCost = order.maintenance_history?.[0]?.total_cost || 0;
-      return acc + maintenanceCost;
-    }, 0);
-  };
+
+  const { data: economyGenerated = 0, isLoading: isLoadingEconomy } = useQuery({
+    queryKey: ['metrics', companyId],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:3002/metrics?companyId=${companyId}`);
+      const data = await res.json();
+      return data;
+    },
+    enabled: !!companyId
+  });
 
   return (
     <div className="p-6">
@@ -95,6 +101,8 @@ export default function Dashboard() {
         description="Há 3 equipamentos que precisam de manutenção preventiva esta semana."
         severity="warning"
       />
+
+      <CommoditiesBanner />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
         <DashboardCard
@@ -117,7 +125,7 @@ export default function Dashboard() {
 
         <DashboardCard
           title="Economia Gerada"
-          value={calculateTotalCost(orders)}
+          value={Number((economyGenerated.totalCost as number)?.toFixed(2))}
           icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
         />
       </div>

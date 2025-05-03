@@ -49,7 +49,7 @@ export default function SupportTickets() {
           company:companies(name)
         `)
         .order('created_at', { ascending: false });
-
+      console.log('data', data);
       if (error) throw error;
       setBugReports(data || []);
     } catch (error: any) {
@@ -101,23 +101,33 @@ export default function SupportTickets() {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: "bg-yellow-500",
-      in_progress: "bg-blue-500",
-      resolved: "bg-green-500",
-      closed: "bg-gray-500"
+      pending: "bg-yellow-500 text-nowrap",
+      in_progress: "bg-blue-500 text-nowrap",
+      resolved: "bg-green-500 text-nowrap",
+      closed: "bg-gray-500 text-nowrap"
     };
     return colors[status as keyof typeof colors] || "bg-gray-500";
   };
 
+  const getStatusLabel = (status: string): string => {
+    const translations = {
+      pending: "Pendente",
+      in_progress: "Em Progresso",
+      resolved: "Resolvido",
+      closed: "Fechado"
+    };
+    return translations[status as keyof typeof translations] || status;
+  };
+
   const handleStatusUpdate = async (reportId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('bug_reports')
         .update({ status: newStatus })
         .eq('id', reportId);
 
       if (error) throw error;
-      
+
       toast.success("Status atualizado com sucesso");
       fetchBugReports();
     } catch (error: any) {
@@ -158,7 +168,7 @@ export default function SupportTickets() {
         title="Central de Suporte"
         description="Gerencie os tickets de suporte e reports de bug"
       />
-      
+
       <Tabs defaultValue="bugs" className="space-y-4">
         <TabsList>
           <TabsTrigger value="bugs">Reports de Bug</TabsTrigger>
@@ -185,88 +195,88 @@ export default function SupportTickets() {
                   {bugReports
                     .filter(report => report.status !== 'closed')
                     .map((report) => (
-                    <TableRow key={report.id}>
-                      <TableCell>{report.company?.name || 'N/A'}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{report.title}</p>
-                          <p className="text-sm text-muted-foreground">{report.description}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(report.status)}>
-                          {report.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {report.screenshot_url && (
-                          <a 
-                            href={report.screenshot_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            Ver imagem
-                          </a>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(report.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <select
-                            className="border rounded p-1"
-                            value={report.status}
-                            onChange={(e) => handleStatusUpdate(report.id, e.target.value)}
-                          >
-                            <option value="pending">Pendente</option>
-                            <option value="in_progress">Em Progresso</option>
-                            <option value="resolved">Resolvido</option>
-                            <option value="closed">Fechado</option>
-                          </select>
-                          <div className="space-x-2">
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleArchive(report.id)}
+                      <TableRow key={report.id}>
+                        <TableCell>{report.company?.name || 'N/A'}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{report.title}</p>
+                            <p className="text-sm text-muted-foreground">{report.description}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(report.status)}>
+                            {getStatusLabel(report.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {report.screenshot_url && (
+                            <a
+                              href={report.screenshot_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
                             >
-                              Arquivar
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedReportId(report.id);
-                                setDeleteDialogOpen(true);
-                              }}
+                              Ver imagem
+                            </a>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-2">
+                            <select
+                              className="border rounded p-1"
+                              value={report.status}
+                              onChange={(e) => handleStatusUpdate(report.id, e.target.value)}
                             >
-                              Excluir
+                              <option value="pending">Pendente</option>
+                              <option value="in_progress">Em Progresso</option>
+                              <option value="resolved">Resolvido</option>
+                              <option value="closed">Fechado</option>
+                            </select>
+                            <div className="space-x-2">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleArchive(report.id)}
+                              >
+                                Arquivar
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedReportId(report.id);
+                                  setDeleteDialogOpen(true);
+                                }}
+                              >
+                                Excluir
+                              </Button>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-2">
+                            <Textarea
+                              value={responses[report.id] || ''}
+                              onChange={(e) => setResponses(prev => ({
+                                ...prev,
+                                [report.id]: e.target.value
+                              }))}
+                              placeholder="Digite sua resposta..."
+                              className="min-w-[200px]"
+                            />
+                            <Button
+                              onClick={() => handleResponseSubmit(report.id)}
+                              size="sm"
+                            >
+                              Enviar Resposta
                             </Button>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <Textarea
-                            value={responses[report.id] || ''}
-                            onChange={(e) => setResponses(prev => ({
-                              ...prev,
-                              [report.id]: e.target.value
-                            }))}
-                            placeholder="Digite sua resposta..."
-                            className="min-w-[200px]"
-                          />
-                          <Button
-                            onClick={() => handleResponseSubmit(report.id)}
-                            size="sm"
-                          >
-                            Enviar Resposta
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </CardContent>
@@ -310,7 +320,7 @@ export default function SupportTickets() {
                         </TableCell>
                         <TableCell>
                           <Badge className={getStatusColor(report.status)}>
-                            {report.status}
+                            {getStatusLabel(report.status)}
                           </Badge>
                         </TableCell>
                         <TableCell>

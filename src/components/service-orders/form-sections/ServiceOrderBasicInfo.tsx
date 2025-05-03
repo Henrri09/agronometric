@@ -6,7 +6,8 @@ import { Control } from "react-hook-form";
 import { ServiceOrderFormValues } from "../schema";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
+
 interface ServiceOrderBasicInfoProps {
   control: Control<ServiceOrderFormValues>;
 }

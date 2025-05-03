@@ -8,7 +8,7 @@ import { MachineryForm } from "@/components/machinery/MachineryForm";
 import { Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompanyId } from "@/components/dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 export default function Machinery() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 

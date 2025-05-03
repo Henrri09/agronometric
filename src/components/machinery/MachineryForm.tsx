@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { useCompanyId } from "../dashboard/CompanyIdProvider";
+import { useCompanyId } from "@/hooks/useCompanyId";
 
 const machineryFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -23,6 +23,7 @@ const machineryFormSchema = z.object({
       return isNaN(num) ? 0 : num;
     })
     .pipe(z.number().min(0, "Frequência deve ser maior ou igual a 0")),
+  commodity: z.string().min(1, "Commodity é obrigatório"),
 });
 
 type MachineryFormValues = {
@@ -76,6 +77,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
       serial_number: "",
       status: "active",
       maintenance_frequency: "",
+      commodity: "",
     },
   });
 
@@ -130,7 +132,15 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
     try {
       setIsUploading(true);
 
-      const { data: user, error: userError } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast({
+          title: "Erro",
+          description: "Usuário não encontrado",
+          variant: "destructive",
+        });
+      }
 
       if (userError) throw userError;
 
@@ -143,6 +153,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
           serial_number: data.serial_number,
           status: data.status,
           company_id: companyId,
+          commodity_id: data.commodity,
         })
         .select()
         .single();
@@ -173,6 +184,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
             machinery_id: machinery.id,
             frequency_days: frequencyDays,
             next_maintenance_date: nextMaintenanceDate.toISOString(),
+            created_by: user.id,
           });
 
         if (scheduleError) throw scheduleError;
@@ -277,7 +289,7 @@ export function MachineryForm({ onSuccess, onCancel }: MachineryFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {commodities.map((commodity) => (
+                  {commodities.map((commodity: any) => (
                     <SelectItem key={commodity.id} value={commodity.id}>
                       {commodity.name}
                     </SelectItem>
