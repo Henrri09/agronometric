@@ -65,6 +65,12 @@ export const menuItems = [
     role: "common",
   },
   {
+    title: "Gerenciamento de Tarefas",
+    href: "/task-management",
+    icon: ListChecks,
+    role: "visitor",
+  },
+  {
     title: "Documentação",
     href: "/documentation",
     icon: BookOpen,
