@@ -6,6 +6,7 @@ import { Users, Tractor, ClipboardList, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCompanyId } from "@/hooks/useCompanyId";
+import { apiUrl } from "@/utils/api";
 
 export function DashboardMetrics() {
   const { companyId } = useCompanyId();
@@ -81,7 +82,7 @@ export function DashboardMetrics() {
     queryKey: ['metrics', companyId],
     queryFn: async () => {
       alert(companyId);
-      const res = await fetch(`http://localhost:3002/metrics?companyId=${companyId}`);
+      const res = await fetch(`${apiUrl}/metrics?companyId=${companyId}`);
       const data = await res.json();
       return data;
     },

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useRef, useCallback } from "react";
 import "../../../styles/commodities.css";
+import { apiUrl } from "@/utils/api";
 
 type Commodity = {
     id: string;
@@ -22,7 +23,7 @@ export function CommoditiesBanner() {
 
     const getCommodities = async () => {
         try {
-            const res = await fetch('http://localhost:3002/commodities');
+            const res = await fetch(`${apiUrl}/commodities`);
             const data = await res.json();
             return data;
         } catch (error) {

@@ -9,6 +9,7 @@ import { useCompanyId } from "@/hooks/useCompanyId";
 import type { Database } from "@/integrations/supabase/types";
 import { useQuery } from "@tanstack/react-query";
 import { CommoditiesBanner } from "./components/CommoditiesBanner";
+import { apiUrl } from "@/utils/api";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type MaintenanceHistory = Database['public']['Tables']['maintenance_history']['Row'];
@@ -82,7 +83,7 @@ export default function Dashboard() {
   const { data: economyGenerated = 0, isLoading: isLoadingEconomy } = useQuery({
     queryKey: ['metrics', companyId],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:3002/metrics?companyId=${companyId}`);
+      const res = await fetch(`${apiUrl}/metrics?companyId=${companyId}`);
       const data = await res.json();
       return data;
     },
